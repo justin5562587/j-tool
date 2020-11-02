@@ -26,9 +26,9 @@ set(FILES_SRC
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
 
 #find_package(SFML REQUIRED COMPONENTS graphics window system)
-find_package(Qt5 COMPONENTS Gui REQUIRED)
+find_package(Qt5 COMPONENTS Gui Widget REQUIRED)
 
 add_executable(j_tool ${FILES_HEADER} ${FILES_SRC})
 
 #target_link_libraries(j_tool sfml-graphics sfml-window sfml-system)
-target_link_libraries(j_tool Qt5::Gui)
+target_link_libraries(j_tool Qt5::Gui Qt5::Widget)

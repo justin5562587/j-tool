@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 
-AddDialog::AddDialog(QWidget* parent) : QDialog(parent), nameText(new QLineEdit()), addressText(new QTextEdit()) {
+AddDialog::AddDialog(QWidget *parent) : QDialog(parent), nameText(new QLineEdit()), addressText(new QTextEdit()) {
     auto nameLabel = new QLabel(tr("Name"));
     auto addressLabel = new QLabel(tr("Address"));
     auto okButton = new QPushButton(tr("OK"));
@@ -18,7 +18,7 @@ AddDialog::AddDialog(QWidget* parent) : QDialog(parent), nameText(new QLineEdit(
     gLayout->addWidget(nameLabel, 0, 0);
     gLayout->addWidget(nameText, 0, 1);
 
-    gLayout->addWidget(addressLabel, 1, 0, Qt::AlignLeft|Qt::AlignTop);
+    gLayout->addWidget(addressLabel, 1, 0, Qt::AlignLeft | Qt::AlignTop);
     gLayout->addWidget(addressText, 1, 1, Qt::AlignLeft);
 
     auto buttonLayout = new QHBoxLayout;
@@ -37,6 +37,19 @@ AddDialog::AddDialog(QWidget* parent) : QDialog(parent), nameText(new QLineEdit(
     setWindowTitle(tr("Add a Contact"));
 }
 
+QString AddDialog::name() const {
+    return nameText->text();
+}
+
+QString AddDialog::address() const {
+    return addressText->toPlainText();
+}
+
+void AddDialog::editAddress(const QString &name, const QString &address) {
+    nameText->setReadOnly(true);
+    nameText->setText(name);
+    addressText->setPlainText(address);
+}
 
 
 

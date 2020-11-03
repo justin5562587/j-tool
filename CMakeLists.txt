@@ -18,6 +18,7 @@ set(FILES_HEADER
         ${INCROOT}/AddressWidget.h
         ${INCROOT}/NewAddressTab.h
         ${INCROOT}/AddDialog.h
+        ${INCROOT}/MainWindow.h
         )
 
 set(FILES_SRC
@@ -25,6 +26,7 @@ set(FILES_SRC
         ${SRCROOT}/AddressWidget.cpp
         ${SRCROOT}/NewAddressTab.cpp
         ${SRCROOT}/AddDialog.cpp
+        ${SRCROOT}/MainWindow.cpp
         ${SRCROOT}/main.cpp
         )
 

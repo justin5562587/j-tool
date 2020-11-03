@@ -10,6 +10,7 @@
 #include <QItemSelection>
 
 #include "../include/TableModel.h"
+#include "../include/NewAddressTab.h"
 
 class AddressWidget : public QTabWidget {
 Q_OBJECT

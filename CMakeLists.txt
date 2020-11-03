@@ -14,11 +14,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 set(FILES_HEADER
-        ${INCROOT}/FileConverter.h
+        ${INCROOT}/TableModel.h
         )
 
 set(FILES_SRC
-        ${SRCROOT}/FileConverter.cpp
+        ${SRCROOT}/TableModel.cpp
         ${SRCROOT}/main.cpp
         )
 

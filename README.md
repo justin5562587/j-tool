@@ -2,6 +2,7 @@
 A integrated desktop tools for programmers
 
 ## Functionalities
+- Contact Menu
 - Picture browser
 - File converter
 

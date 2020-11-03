@@ -15,10 +15,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(FILES_HEADER
         ${INCROOT}/TableModel.h
+        ${INCROOT}/AddressWidget.h
+        ${INCROOT}/NewAddressTab.h
+        ${INCROOT}/AddDialog.h
         )
 
 set(FILES_SRC
         ${SRCROOT}/TableModel.cpp
+        ${SRCROOT}/AddressWidget.cpp
+        ${SRCROOT}/NewAddressTab.cpp
+        ${SRCROOT}/AddDialog.cpp
         ${SRCROOT}/main.cpp
         )
 

@@ -2,16 +2,18 @@
 //#include <QQmlApplicationEngine>
 //#include <QQmlContext>
 //#include "fluxhub.h"
+#include <QtGui>
+#include <QApplication>
 #include <QImage>
 #include <QLabel>
 
 int main(int argc, char *argv[]) {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//    QGuiApplication app(argc, argv);
 
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QImage image;
-    image.load("");
+    image.load("../resources/test.jpeg");
 
     QLabel myLabel;
     myLabel.setPixmap(QPixmap::fromImage(image));

@@ -36,7 +36,6 @@ void MainWindow::createMenus() {
 
     connect(addressWidget, &AddressWidget::selectionChanged,
             this, &MainWindow::updateActions);
-
 }
 
 void MainWindow::openFile() {

@@ -24,7 +24,7 @@ inline QDataStream &operator<<(QDataStream &stream, const Contact &contact) {
     return stream << contact.name << contact.address;
 }
 
-inline QDataStream &operator>>(QDataStream &stream, const Contact &contact) {
+inline QDataStream &operator>>(QDataStream &stream, Contact &contact) {
     return stream >> contact.name >> contact.address;
 }
 

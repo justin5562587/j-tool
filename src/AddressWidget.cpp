@@ -8,6 +8,7 @@
 #include <QSortFilterProxyModel>
 #include <QTableView>
 #include <QMessageBox>
+#include <QHeaderView>
 #include <QFile>
 
 AddressWidget::AddressWidget(QWidget *parent) : QTabWidget(parent), table(new TableModel(this)),

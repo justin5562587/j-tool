@@ -9,24 +9,47 @@
 #include <QMainWindow>
 #include <QItemSelection>
 
+#include <QMenuBar>
+//
+//class MainWindow : public QMainWindow {
+//Q_OBJECT
+//
+//public:
+//    MainWindow();
+//
+//private slots:
+//    void updateActions(const QItemSelection& selection);
+//
+//    void openFile();
+//
+//    void saveFile();
+//
+//private:
+//    void createMenus();
+//
+//    AddressWidget* addressWidget;
+//    QAction *editAct;
+//    QAction *removeAct;
+//
+//};
+
 class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
+
     MainWindow();
 
-private slots:
-    void updateActions(const QItemSelection& selection);
-
-    void openFile();
-
-    void saveFile();
+    MainWindow(QWidget* parent);
+//
+//private slots:
+//    void newFile();
+//
+//    void open();
 
 private:
-    void createMenus();
 
-    AddressWidget* addressWidget;
-    QAction *editAct;
-    QAction *removeAct;
+    QAction* newAct;
+    QAction* openAct;
 
 };

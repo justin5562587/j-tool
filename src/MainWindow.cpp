@@ -9,6 +9,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QLabel>
+#include <QPushButton>
+#include <QHBoxLayout>
+
 
 #include <iostream>
 
@@ -21,7 +24,28 @@ MainWindow::MainWindow() : QMainWindow() {
     QLabel* label = new QLabel();
     QPixmap img("../resources/test.jpeg");
     label->setPixmap(img);
-    setCentralWidget(label);
+
+
+
+
+    QWidget* centerArea = new QWidget(this);
+
+    QPushButton *button1 = new QPushButton("One");
+    QPushButton *button2 = new QPushButton("Two");
+    QPushButton *button3 = new QPushButton("Three");
+    QPushButton *button4 = new QPushButton("Four");
+    QPushButton *button5 = new QPushButton("Five");
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget(label);
+//    layout->addWidget(button2);
+//    layout->addWidget(button3);
+//    layout->addWidget(button4);
+//    layout->addWidget(button5);
+
+    centerArea->setLayout(layout);
+
+    setCentralWidget(centerArea);
 }
 
 void MainWindow::createImageBrowserMenus() {

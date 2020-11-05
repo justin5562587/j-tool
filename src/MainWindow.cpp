@@ -72,7 +72,7 @@ void MainWindow::loadContactMenu() {
 }
 
 void MainWindow::selectImageAndShow() {
-    QString filename = 
+    QString filename =
 }
 
 void MainWindow::selectFolderAndShow() {

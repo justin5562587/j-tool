@@ -52,7 +52,6 @@ private slots:
     void selectImageAndShow();
     void selectFolderAndShow();
 
-
 private:
     void createContactMenus();
     void createImageBrowserMenus();
@@ -63,7 +62,7 @@ private:
     QAction* loadContactMenuAct;
 
     // Image Browser
-    QAction* selectImageAct;
-    QAction* selectImageFolderAct;
+    QAction* openImageAct;
+    QAction* printImageAct;
 
 };

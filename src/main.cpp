@@ -1,5 +1,7 @@
 #include <QApplication>
-#include "../include/MainWindow.h"
+//#include "../include/MainWindow.h"
+
+#include "../include/ImageViewer.h"
 
 int main(int argc, char *argv[]) {
 
@@ -7,7 +9,9 @@ int main(int argc, char *argv[]) {
 //    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 //#endif
     QApplication app(argc, argv);
-    MainWindow mw;
-    mw.show();
+//    MainWindow mw;
+//    mw.show();
+    ImageViewer imageViewer;
+    imageViewer.show();
     return app.exec();
 }

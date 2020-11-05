@@ -1,17 +1,14 @@
 #include <QApplication>
-//#include "../include/MainWindow.h"
-
-#include "../include/ImageViewer.h"
+#include "../include/MainWindow.h"
 
 int main(int argc, char *argv[]) {
 
 //#ifdef Q_OS_ANDROID
 //    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 //#endif
+
     QApplication app(argc, argv);
-//    MainWindow mw;
-//    mw.show();
-    ImageViewer imageViewer;
-    imageViewer.show();
+    MainWindow mw;
+    mw.show();
     return app.exec();
 }

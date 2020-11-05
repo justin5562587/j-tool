@@ -8,28 +8,30 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QLabel>
 
 #include <iostream>
 
 MainWindow::MainWindow() : QMainWindow() {
     createContactMenus();
     createImageBrowserMenus();
+    createExtraMenus();
     setWindowTitle("J-Tool");
+
+    QLabel* label = new QLabel();
+    QPixmap img("../resources/test.jpeg");
+    label->setPixmap(img);
+    setCentralWidget(label);
 }
 
 void MainWindow::createImageBrowserMenus() {
     QMenu *openMenu = menuBar()->addMenu("Image Browser");
 
-    selectImageAct = new QAction("Select image", this);
-    selectImageAct->setStatusTip("Select single image then show");
-    connect(selectImageAct, &QAction::triggered, this, &MainWindow::selectImageAndShow);
+    openImageAct = new QAction("Select image", this);
+    openImageAct->setStatusTip("Select single image then show");
+    connect(openImageAct, &QAction::triggered, this, &MainWindow::openAndShowImage);
 
-    selectImageFolderAct = new QAction("Select folder", this);
-    selectImageFolderAct->setStatusTip("Select a folder then show images in it");
-    connect(selectImageFolderAct, &QAction::triggered, this, &MainWindow::selectFolderAndShow);
-
-    openMenu->addAction(selectImageAct);
-    openMenu->addAction(selectImageFolderAct);
+    openMenu->addAction(openImageAct);
 }
 
 void MainWindow::createContactMenus() {
@@ -52,6 +54,12 @@ void MainWindow::createContactMenus() {
     openMenu->addAction(loadContactMenuAct);
 }
 
+void MainWindow::createExtraMenus() {
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    helpMenu->addAction(tr("&About"), this, &MainWindow::about);
+}
+
 void MainWindow::showContactMenu() {
     QMessageBox msgBox;
     msgBox.setText("Coming soon...");
@@ -71,14 +79,15 @@ void MainWindow::loadContactMenu() {
     };
 }
 
-void MainWindow::selectImageAndShow() {
-    QString filename =
+void MainWindow::openAndShowImage() {
+    // todo
 }
 
-void MainWindow::selectFolderAndShow() {
+// extra
 
+void MainWindow::about() {
+    QMessageBox::about(this, tr("About J-Tool"), tr("J-Tool is a highly integrated desktop application designed for programmer"));
 }
-
 
 //
 //MainWindow::MainWindow() : QMainWindow(), addressWidget(new AddressWidget) {

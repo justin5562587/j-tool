@@ -40,16 +40,30 @@ public:
 
     MainWindow();
 
-    MainWindow(QWidget* parent);
-//
-//private slots:
-//    void newFile();
-//
-//    void open();
+    MainWindow(QWidget *parent);
+
+private slots:
+    // Contact Menu
+    void showContactMenu();
+    void saveContactMenu();
+    void loadContactMenu();
+
+    // Image Browser
+    void selectImageAndShow();
+    void selectFolderAndShow();
+
 
 private:
+    void createContactMenus();
+    void createImageBrowserMenus();
 
-    QAction* newAct;
-    QAction* openAct;
+    // Contact Menu
+    QAction* showContactMenuAct;
+    QAction* saveContactMenuAct;
+    QAction* loadContactMenuAct;
+
+    // Image Browser
+    QAction* selectImageAct;
+    QAction* selectImageFolderAct;
 
 };

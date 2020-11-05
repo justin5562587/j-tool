@@ -7,30 +7,79 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QMessageBox>
+
+#include <iostream>
 
 MainWindow::MainWindow() : QMainWindow() {
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    createContactMenus();
+    createImageBrowserMenus();
+    setWindowTitle("J-Tool");
+}
 
-    QMenu *newMenu = menuBar()->addMenu(tr("&New"));
+void MainWindow::createImageBrowserMenus() {
+    QMenu *openMenu = menuBar()->addMenu("Image Browser");
 
-    QMenu *closeMenu = menuBar()->addMenu(tr("&Close"));
+    selectImageAct = new QAction("Select image", this);
+    selectImageAct->setStatusTip("Select single image then show");
+    connect(selectImageAct, &QAction::triggered, this, &MainWindow::selectImageAndShow);
 
+    selectImageFolderAct = new QAction("Select folder", this);
+    selectImageFolderAct->setStatusTip("Select a folder then show images in it");
+    connect(selectImageFolderAct, &QAction::triggered, this, &MainWindow::selectFolderAndShow);
 
-//    QMenu *newMenu = menuBar()->addMenu(tr("&New"));
-//    newAct = new QAction(tr("&New"), this);
-//    newAct->setStatusTip("Create a New File");
-//    newAct->setShortcut(QKeySequence::New);
-//    newMenu->addAction(newAct);
-//    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-//
-//    QMenu *openMenu = menuBar()->addMenu(tr("&Open"));
-//    openAct = new QAction(tr("&Open"), this);
-//    openAct->setStatusTip("Open a File");
-//    openAct->setShortcut(QKeySequence::Open);
-//    openMenu->addAction(openAct);
-//    connect(openAct, &QAction::triggered, this, &MainWindow::open);
+    openMenu->addAction(selectImageAct);
+    openMenu->addAction(selectImageFolderAct);
+}
+
+void MainWindow::createContactMenus() {
+    QMenu *openMenu = menuBar()->addMenu("Contact Menu");
+
+    showContactMenuAct = new QAction("Show Contact Menu", this);
+    showContactMenuAct->setStatusTip("Display all Contact Menu");
+    connect(showContactMenuAct, &QAction::triggered, this, &MainWindow::showContactMenu);
+
+    saveContactMenuAct = new QAction("Save Contact Menu", this);
+    saveContactMenuAct->setStatusTip("Save current status of Contact Menu");
+    connect(saveContactMenuAct, &QAction::triggered, this, &MainWindow::saveContactMenu);
+
+    loadContactMenuAct = new QAction("Load Contact Menu", this);
+    loadContactMenuAct->setStatusTip("Load data of Contact Menu from file");
+    connect(loadContactMenuAct, &QAction::triggered, this, &MainWindow::loadContactMenu);
+
+    openMenu->addAction(showContactMenuAct);
+    openMenu->addAction(saveContactMenuAct);
+    openMenu->addAction(loadContactMenuAct);
+}
+
+void MainWindow::showContactMenu() {
+    QMessageBox msgBox;
+    msgBox.setText("Coming soon...");
+    msgBox.exec();
+}
+
+void MainWindow::saveContactMenu() {
+    QMessageBox msgBox;
+    msgBox.setText("Coming soon...");
+    msgBox.exec();
+}
+
+void MainWindow::loadContactMenu() {
+    QString filename = QFileDialog::getOpenFileName(this);
+    if (!filename.isEmpty()) {
+        std::cout << filename.toStdString() << std::endl;
+    };
+}
+
+void MainWindow::selectImageAndShow() {
+    QString filename = 
+}
+
+void MainWindow::selectFolderAndShow() {
 
 }
+
+
 //
 //MainWindow::MainWindow() : QMainWindow(), addressWidget(new AddressWidget) {
 //    setCentralWidget(addressWidget);
@@ -60,7 +109,7 @@ MainWindow::MainWindow() : QMainWindow() {
 //
 //    connect(addressWidget, &AddressWidget::selectionChanged,this, &MainWindow::updateActions);
 //}
-//
+
 //void MainWindow::openFile() {
 //    QString filename = QFileDialog::getOpenFileName(this);
 //    if (!filename.isEmpty()) {

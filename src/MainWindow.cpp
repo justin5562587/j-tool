@@ -16,33 +16,16 @@
 
 #include <iostream>
 
-MainWindow::MainWindow() : QMainWindow() {
+MainWindow::MainWindow() : QMainWindow(), imageBrowser() {
     createContactMenus();
     createImageBrowserMenus();
     createExtraMenus();
     setWindowTitle("J-Tool");
 
-//    QLabel* label = new QLabel();
-//    QPixmap img("../resources/test.jpeg");
-//    label->setPixmap(img);
+//    QWidget* centralArea = new QWidget();
+//    centralArea->setLayout();
 
-    QGroupBox* testButtonBox = new QGroupBox("Test Buttons");
-    QHBoxLayout* testButtonLayout = new QHBoxLayout();
-    QPushButton* button1 = new QPushButton("Test");
-    QPushButton* button2 = new QPushButton("Test");
-    QPushButton* button3 = new QPushButton("Test");
-    testButtonLayout->addWidget(button1);
-    testButtonLayout->addWidget(button2);
-    testButtonLayout->addWidget(button3);
-    testButtonBox->setLayout(testButtonLayout);
-
-    QWidget* centralArea = new QWidget();
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(testButtonBox);
-    centralArea->setLayout(mainLayout);
-
-    setCentralWidget(centralArea);
-//    setLayout(mainLayout);
+    setCentralWidget(imageBrowser.getSelfWidget());
 }
 
 void MainWindow::createImageBrowserMenus() {

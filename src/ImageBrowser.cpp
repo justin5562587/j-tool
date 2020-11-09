@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QMessageBox>
+#include <iostream>
 
 ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), imageLabel(new QLabel), scrollArea(new QScrollArea) {
     QHBoxLayout* layout = new QHBoxLayout;
@@ -39,7 +40,12 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), im
     layout->addWidget(closeImageBtn);
     layout->addWidget(zoomInBtn);
     layout->addWidget(zoomOutBtn);
+    layout->addWidget(imageLabel);
     imageBrowserBox->setLayout(layout);
+}
+
+QGroupBox * ImageBrowser::getSelfWidget() {
+    return imageBrowserBox;
 }
 
 // slots
@@ -59,7 +65,6 @@ void ImageBrowser::openImage() {
     }
     const QPixmap pix = QPixmap::fromImage(image);
     imageLabel->setPixmap(pix);
-    // todo
 }
 
 void ImageBrowser::closeImage() {}

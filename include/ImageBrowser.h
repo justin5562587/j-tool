@@ -14,7 +14,7 @@ Q_OBJECT
 public:
     ImageBrowser(QWidget *parent = nullptr);
 
-    bool loadFile(const QString &);
+    QGroupBox* getSelfWidget();
 
 private slots:
 
@@ -27,8 +27,6 @@ private slots:
     void zoomOut();
 
 private:
-
-    void updateActions();
 
     QGroupBox *imageBrowserBox;
     QImage image;

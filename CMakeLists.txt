@@ -19,7 +19,7 @@ set(FILES_HEADER
 #        ${INCROOT}/NewAddressTab.h
 #        ${INCROOT}/AddDialog.h
 #        ${INCROOT}/ImageViewer.h
-#        ${INCROOT}/ImageBrowser.h
+        ${INCROOT}/ImageBrowser.h
         ${INCROOT}/MainWindow.h
         )
 
@@ -28,9 +28,8 @@ set(FILES_SRC
 #        ${SRCROOT}/AddressWidget.cpp
 #        ${SRCROOT}/NewAddressTab.cpp
 #        ${SRCROOT}/AddDialog.cpp
-#        ${SRCROOT}/ImageBrowser.cpp
+        ${SRCROOT}/ImageBrowser.cpp
         ${SRCROOT}/MainWindow.cpp
-#        ${SRCROOT}/ImageViewer.cpp
         ${SRCROOT}/main.cpp
         )
 

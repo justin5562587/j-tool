@@ -18,47 +18,27 @@ public:
 
 private slots:
 
-    void open();
+    void openImage();
 
-    void print();
+    void closeImage();
 
     void zoomIn();
 
     void zoomOut();
 
-    void normalSize();
-
-    void fitToWindow();
-
 private:
-
-    void createActions();
-
-    void createMenus();
 
     void updateActions();
 
-    void scaleImage(double factor);
-
-    void adjustScrollBar(QScrollBar *scrollBar, double factor);
-
-
     QGroupBox *imageBrowserBox;
-
     QImage image;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor = 1;
 
-#if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printer)
-    QPrinter printer;
-#endif
-
-    QAction *printAct;
-    QAction *copyAct;
-    QAction *zoomInAct;
-    QAction *zoomOutAct;
-    QAction *normalSizeAct;
-    QAction *fitToWindowAct;
+    QAction* openImageAct;
+    QAction* closeImageAct;
+    QAction* zoomInAct;
+    QAction* zoomOutAct;
 
 };

@@ -36,18 +36,9 @@ MainWindow::MainWindow() : QMainWindow() {
     testButtonLayout->addWidget(button3);
     testButtonBox->setLayout(testButtonLayout);
 
-    QGroupBox* submitButtonBox = new QGroupBox("Submit Buttons");
-    QHBoxLayout* submitButtonLayout = new QHBoxLayout();
-    QPushButton* button4 = new QPushButton("Submit");
-    QPushButton* button5 = new QPushButton("Submit");
-    submitButtonLayout->addWidget(button4);
-    submitButtonLayout->addWidget(button5);
-    submitButtonBox->setLayout(submitButtonLayout);
-
     QWidget* centralArea = new QWidget();
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(testButtonBox);
-    mainLayout->addWidget(submitButtonBox);
     centralArea->setLayout(mainLayout);
 
     setCentralWidget(centralArea);

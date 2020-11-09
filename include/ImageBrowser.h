@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QLabel>
 #include <QScrollArea>
+#include <QGroupBox>
 
 class ImageBrowser : public QWidget {
 Q_OBJECT
@@ -21,10 +22,6 @@ private slots:
 
     void print();
 
-    void copy();
-
-    void paste();
-
     void zoomIn();
 
     void zoomOut();
@@ -34,19 +31,19 @@ private slots:
     void fitToWindow();
 
 private:
+
     void createActions();
 
-//    void createMenus();
+    void createMenus();
 
     void updateActions();
-
-//    bool saveFile(const QString &fileName);
-//
-//    void setImage(const QImage &newImage);
 
     void scaleImage(double factor);
 
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
+
+
+    QGroupBox *imageBrowserBox;
 
     QImage image;
     QLabel *imageLabel;

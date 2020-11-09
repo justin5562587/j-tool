@@ -11,7 +11,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QHBoxLayout>
-
+#include <QGroupBox>
+#include <QLayout>
 
 #include <iostream>
 
@@ -21,31 +22,36 @@ MainWindow::MainWindow() : QMainWindow() {
     createExtraMenus();
     setWindowTitle("J-Tool");
 
-    QLabel* label = new QLabel();
-    QPixmap img("../resources/test.jpeg");
-    label->setPixmap(img);
+//    QLabel* label = new QLabel();
+//    QPixmap img("../resources/test.jpeg");
+//    label->setPixmap(img);
 
+    QGroupBox* testButtonBox = new QGroupBox("Test Buttons");
+    QHBoxLayout* testButtonLayout = new QHBoxLayout();
+    QPushButton* button1 = new QPushButton("Test");
+    QPushButton* button2 = new QPushButton("Test");
+    QPushButton* button3 = new QPushButton("Test");
+    testButtonLayout->addWidget(button1);
+    testButtonLayout->addWidget(button2);
+    testButtonLayout->addWidget(button3);
+    testButtonBox->setLayout(testButtonLayout);
 
+    QGroupBox* submitButtonBox = new QGroupBox("Submit Buttons");
+    QHBoxLayout* submitButtonLayout = new QHBoxLayout();
+    QPushButton* button4 = new QPushButton("Submit");
+    QPushButton* button5 = new QPushButton("Submit");
+    submitButtonLayout->addWidget(button4);
+    submitButtonLayout->addWidget(button5);
+    submitButtonBox->setLayout(submitButtonLayout);
 
+    QWidget* centralArea = new QWidget();
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(testButtonBox);
+    mainLayout->addWidget(submitButtonBox);
+    centralArea->setLayout(mainLayout);
 
-    QWidget* centerArea = new QWidget(this);
-
-    QPushButton *button1 = new QPushButton("One");
-    QPushButton *button2 = new QPushButton("Two");
-    QPushButton *button3 = new QPushButton("Three");
-    QPushButton *button4 = new QPushButton("Four");
-    QPushButton *button5 = new QPushButton("Five");
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget(label);
-//    layout->addWidget(button2);
-//    layout->addWidget(button3);
-//    layout->addWidget(button4);
-//    layout->addWidget(button5);
-
-    centerArea->setLayout(layout);
-
-    setCentralWidget(centerArea);
+    setCentralWidget(centralArea);
+//    setLayout(mainLayout);
 }
 
 void MainWindow::createImageBrowserMenus() {
@@ -112,36 +118,6 @@ void MainWindow::openAndShowImage() {
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"), tr("J-Tool is a highly integrated desktop application designed for programmer"));
 }
-
-//
-//MainWindow::MainWindow() : QMainWindow(), addressWidget(new AddressWidget) {
-//    setCentralWidget(addressWidget);
-//    createMenus();
-//    setWindowTitle(tr("Address Book"));
-//}
-//
-//void MainWindow::createMenus() {
-//    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-//    QAction *openAct = new QAction(tr("&Open..."), this);
-//    fileMenu->addAction(openAct);
-//    connect(openAct, &QAction::triggered, this, &MainWindow::openFile);
-//
-//    QMenu *toolMenu = menuBar()->addMenu(tr("&Tool"));
-//
-//    editAct = new QAction(tr("&Edit Entry..."), this);
-//    editAct->setEnabled(false);
-//    toolMenu->addAction(editAct);
-//    connect(editAct, &QAction::triggered, addressWidget, &AddressWidget::editEntry);
-//
-//    toolMenu->addSeparator();
-//
-//    removeAct = new QAction(tr("&Remove Entry"), this);
-//    removeAct->setEnabled(false);
-//    toolMenu->addAction(removeAct);
-//    connect(removeAct, &QAction::triggered, addressWidget, &AddressWidget::removeEntry);
-//
-//    connect(addressWidget, &AddressWidget::selectionChanged,this, &MainWindow::updateActions);
-//}
 
 //void MainWindow::openFile() {
 //    QString filename = QFileDialog::getOpenFileName(this);

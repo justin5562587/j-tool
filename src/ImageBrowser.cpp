@@ -16,8 +16,6 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), im
     imageLabel->setScaledContents(true);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-    QHBoxLayout* layout = new QHBoxLayout;
-
     openImageAct = new QAction;
     closeImageAct = new QAction;
     zoomInAct = new QAction;
@@ -49,18 +47,30 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), im
 
     fitWindowBtn->addAction(fitWindowAct);
     connect(fitWindowBtn, &QPushButton::clicked, this, &ImageBrowser::fitWindow);
-    
-    layout->addWidget(openImageBtn);
-    layout->addWidget(closeImageBtn);
-    layout->addWidget(zoomInBtn);
-    layout->addWidget(zoomOutBtn);
-    layout->addWidget(normalizeBtn);
-    layout->addWidget(fitWindowBtn);
 
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    QGroupBox* buttonBox = new QGroupBox;
+
+    buttonLayout->addWidget(openImageBtn);
+    buttonLayout->addWidget(closeImageBtn);
+    buttonLayout->addWidget(zoomInBtn);
+    buttonLayout->addWidget(zoomOutBtn);
+    buttonLayout->addWidget(normalizeBtn);
+    buttonLayout->addWidget(fitWindowBtn);
+    buttonBox->setLayout(buttonLayout);
+
+    QHBoxLayout* contentLayout = new QHBoxLayout;
+    QGroupBox* contentBox = new QGroupBox;
     scrollArea->setWidget(imageLabel);
     scrollArea->setBackgroundRole(QPalette::Dark);
-    layout->addWidget(scrollArea);
-    imageBrowserBox->setLayout(layout);
+    contentLayout->addWidget(scrollArea);
+    contentBox->setLayout(contentLayout);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(buttonBox);
+    mainLayout->addWidget(contentBox);
+
+    imageBrowserBox->setLayout(mainLayout);
 }
 
 QGroupBox * ImageBrowser::getSelfWidget() {
@@ -82,8 +92,15 @@ void ImageBrowser::openImage() {
                 .arg(QDir::toNativeSeparators(fileName), reader.errorString()));
         return;
     }
+    scaleFactor = 1.0;
+    scrollArea->setVisible(true);
+
     const QPixmap pix = QPixmap::fromImage(image);
     imageLabel->setPixmap(pix);
+
+    if (!fitWindowAct->isChecked()) {
+        imageLabel->adjustSize();
+    }
 }
 
 void ImageBrowser::closeImage() {

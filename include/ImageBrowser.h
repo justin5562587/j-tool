@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QGroupBox>
+#include <QPushButton>
 
 class ImageBrowser : public QWidget {
 Q_OBJECT
@@ -14,7 +15,7 @@ Q_OBJECT
 public:
     ImageBrowser(QWidget *parent = nullptr);
 
-    QGroupBox* getSelfWidget();
+    QGroupBox *getSelfWidget();
 
 private slots:
 
@@ -22,9 +23,18 @@ private slots:
 
     void closeImage();
 
+    void adjustScrollBar(QScrollBar *, double);
+
+    // scale control
+    void scaleImage(double);
+
     void zoomIn();
 
     void zoomOut();
+
+    void normalize();
+
+    void fitWindow();
 
 private:
 
@@ -34,9 +44,18 @@ private:
     QScrollArea *scrollArea;
     double scaleFactor = 1;
 
-    QAction* openImageAct;
-    QAction* closeImageAct;
-    QAction* zoomInAct;
-    QAction* zoomOutAct;
+    QPushButton *openImageBtn;
+    QPushButton *closeImageBtn;
+    QPushButton *zoomInBtn;
+    QPushButton *zoomOutBtn;
+    QPushButton *normalizeBtn;
+    QPushButton *fitWindowBtn;
+
+    QAction *openImageAct;
+    QAction *closeImageAct;
+    QAction *zoomInAct;
+    QAction *zoomOutAct;
+    QAction *normalizeAct;
+    QAction *fitWindowAct;
 
 };

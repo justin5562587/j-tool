@@ -8,7 +8,6 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QMessageBox>
-#include <iostream>
 #include <QScrollBar>
 
 ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), imageLabel(new QLabel), scrollArea(new QScrollArea) {
@@ -104,7 +103,8 @@ void ImageBrowser::openImage() {
 }
 
 void ImageBrowser::closeImage() {
-
+    normalize();
+    imageLabel->clear();
 }
 
 void ImageBrowser::adjustScrollBar(QScrollBar* scrollBar, double factor) {

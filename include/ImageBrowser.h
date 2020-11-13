@@ -39,7 +39,6 @@ private slots:
 private:
 
     void createActions();
-    
 
     QGroupBox *imageBrowserBox;
     QImage image;

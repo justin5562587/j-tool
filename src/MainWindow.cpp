@@ -19,12 +19,26 @@ MainWindow::MainWindow() : QMainWindow(), imageBrowser() {
 }
 
 void MainWindow::createMenus() {
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    // main menu
+    QMenu *mainMenu = menuBar()->addMenu("Model");
+    mainMenu->addAction("Image Browser", this, &MainWindow::changeToImageBrowser);
+    mainMenu->addAction("Todo List", this, &MainWindow::changeToTodoList);
 
+    // help
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About"), this, &MainWindow::about);
 }
 
 // slot
+void MainWindow::changeToImageBrowser() {
+    setCentralWidget(imageBrowser.getSelfWidget());
+}
+
+void MainWindow::changeToTodoList() {
+    setCentralWidget(todoList.getSelfWidget());
+}
+
 void MainWindow::about() {
-    QMessageBox::about(this, tr("About J-Tool"), tr("J-Tool is a highly integrated desktop application designed for programmer"));
+    QMessageBox::about(this, tr("About J-Tool"),
+                       tr("J-Tool is a highly integrated desktop application designed for programmer"));
 }

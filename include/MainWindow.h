@@ -18,34 +18,15 @@ public:
 
     MainWindow();
 
-    MainWindow(QWidget *parent);
-
 private slots:
-    // Contact Menu
-    void showContactMenu();
-    void saveContactMenu();
-    void loadContactMenu();
-
-    // Image Browser
-    void openAndShowImage();
 
     // extra
     void about();
 
 private:
-    void createContactMenus();
-    void createImageBrowserMenus();
-    void createExtraMenus();
+    void createMenus();
 
     // inside widgets
     ImageBrowser imageBrowser;
-
-    // Contact Menu
-    QAction* showContactMenuAct;
-    QAction* saveContactMenuAct;
-    QAction* loadContactMenuAct;
-
-    // Image Browser
-    QAction* openImageAct;
 
 };

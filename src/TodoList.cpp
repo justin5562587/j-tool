@@ -41,6 +41,10 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox) {
     clearBtn->addAction(clearAct);
     connect(clearBtn, &QPushButton::clicked, this, &TodoList::clear);
 
+    todoButtonLayout->addWidget(addItemBtn);
+    todoButtonLayout->addWidget(loadFromFileBtn);
+    todoButtonLayout->addWidget(saveToFileBtn);
+    todoButtonLayout->addWidget(clearBtn);
     todoButtonBox->setLayout(todoButtonLayout);
 
     // right box
@@ -71,11 +75,11 @@ void TodoList::clear() {
     todoListData->clear();
 }
 
-void TodoList::removeItem(int i) {
-    todoListData->remove(i);
+void TodoList::removeItem() {
+//    todoListData->remove(i);
 }
 
-void TodoList::addItem(TodoItem &todoItem) {
+void TodoList::addItem() {
 //    todoListData->push_back(todoItem);
 }
 

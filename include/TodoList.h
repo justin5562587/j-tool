@@ -26,9 +26,9 @@ private slots:
 
     void saveToFile();
 
-    void addItem(TodoItem&);
+    void addItem();
 
-    void removeItem(int);
+    void removeItem();
 
     void clear();
 

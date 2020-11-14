@@ -10,6 +10,7 @@
 #include <QMainWindow>
 #include <QItemSelection>
 #include <QMenuBar>
+#include <QVBoxLayout>
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -18,23 +19,28 @@ public:
 
     MainWindow();
 
+    void removeChildWidgets();
+
 private slots:
 
     // extra
     void about();
 
-    void changeToImageBrowser();
+    void setWithImageBrowser();
 
-    void changeToTodoList();
+    void setWithTodoList();
 
 private:
     void createMenus();
 
+    QWidget* centralWidget;
+
+    QVBoxLayout* mainLayout;
+
     // inside widgets
     ImageBrowser imageBrowser;
+    QGroupBox *imageBrowserWidget;
 
     TodoList todoList;
-
-    // actions
-
+    QGroupBox *todoListWidget;
 };

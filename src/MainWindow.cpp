@@ -9,22 +9,27 @@
 #include <QHBoxLayout>
 
 MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
+    imageBrowserWidget = imageBrowser.getSelfWidget();
+    todoListWidget = todoList.getSelfWidget();
+
     createMenus();
     setWindowTitle("J-Tool");
 
-//    QWidget* centralArea = new QWidget();
-//    centralArea->setLayout();
+    centralWidget = new QWidget();
+    mainLayout = new QVBoxLayout;
+
+    setWithImageBrowser();
 
     // set default widget
-    setCentralWidget(imageBrowser.getSelfWidget());
+    setCentralWidget(centralWidget);
 }
 
 void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Model");
-    mainMenu->addAction("Image Browser", this, &MainWindow::changeToImageBrowser);
+    mainMenu->addAction("Image Browser", this, &MainWindow::setWithImageBrowser);
     mainMenu->addSeparator();
-    mainMenu->addAction("Todo List", this, &MainWindow::changeToTodoList);
+    mainMenu->addAction("Todo List", this, &MainWindow::setWithTodoList);
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -32,12 +37,21 @@ void MainWindow::createMenus() {
 }
 
 // slot
-void MainWindow::changeToImageBrowser() {
-    setCentralWidget(imageBrowser.getSelfWidget());
+void MainWindow::setWithImageBrowser() {
+//    mainLayout->addWidget(imageBrowserWidget);
+//    centralWidget->setLayout(mainLayout);
 }
 
-void MainWindow::changeToTodoList() {
-    setCentralWidget(todoList.getSelfWidget());
+void MainWindow::setWithTodoList() {
+//    mainLayout->addWidget(todoListWidget);
+//    centralWidget->setLayout(mainLayout);
+}
+
+void MainWindow::removeChildWidgets() {
+    QList<QWidget *> widgets = findChildren<QWidget *>();
+    foreach(QWidget * widget, widgets){
+        delete widget;
+    }
 }
 
 void MainWindow::about() {

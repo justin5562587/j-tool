@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QAction>
 
 #include "../include/TodoItem.h"
 
@@ -38,15 +39,15 @@ private:
     QVector<TodoItem>* todoListData;
 
     QPushButton* loadFromFileBtn;
+    QPushButton* saveToFileBtn;
     QPushButton* addItemBtn;
-    QPushButton* removeItemBtn;
     QPushButton* clearBtn;
+    QPushButton* removeItemBtn; // attached on TodoItem
 
     QAction *loadFromFileAct;
     QAction *saveToFileAct;
     QAction *addItemAct;
-    QAction *removeItemAct;
     QAction *clearAct;
+    QAction *removeItemAct;
 
 };
-

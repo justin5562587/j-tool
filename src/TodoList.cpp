@@ -4,17 +4,65 @@
 #include "../include/TodoList.h"
 
 #include <QHBoxLayout>
+#include <QAction>
 #include <QLabel>
+#include <QScrollArea>
 
 TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox) {
-    QHBoxLayout* mainLayout = new QHBoxLayout;
+    // right-bottom todolist box
+    QVBoxLayout *todoItemsLayout = new QVBoxLayout;
+    QScrollArea *todoItemsBox = new QScrollArea;
+    todoItemsBox->setLayout(todoItemsLayout);
 
-    QLabel* titleLabel = new QLabel("Todo list");
-    mainLayout->addWidget(titleLabel);
+    // right-top button box
+    QHBoxLayout *todoButtonLayout = new QHBoxLayout;
+    QWidget *todoButtonBox = new QWidget;
+
+    loadFromFileAct = new QAction;
+    saveToFileAct = new QAction;
+    addItemAct = new QAction;
+    removeItemAct = new QAction;
+    clearAct = new QAction;
+
+    addItemBtn = new QPushButton("Add");
+    loadFromFileBtn = new QPushButton("Load");
+    saveToFileBtn = new QPushButton("Save");
+    clearBtn = new QPushButton("Clear");
+
+    addItemBtn->addAction(addItemAct);
+    connect(addItemBtn, &QPushButton::clicked, this, &TodoList::addItem);
+
+    loadFromFileBtn->addAction(loadFromFileAct);
+    connect(loadFromFileBtn, &QPushButton::clicked, this, &TodoList::loadFromFile);
+
+    saveToFileBtn->addAction(saveToFileAct);
+    connect(saveToFileBtn, &QPushButton::clicked, this, &TodoList::saveToFile);
+
+    clearBtn->addAction(clearAct);
+    connect(clearBtn, &QPushButton::clicked, this, &TodoList::clear);
+
+    todoButtonBox->setLayout(todoButtonLayout);
+
+    // right box
+    QVBoxLayout *rightLayout = new QVBoxLayout;
+    QWidget *rightBox = new QWidget;
+    rightLayout->addWidget(todoButtonBox);
+    rightLayout->addWidget(todoItemsBox);
+    rightBox->setLayout(rightLayout);
+
+    // left box
+    QLabel *leftBox = new QLabel;
+    QPixmap pixmap("../resources/test.jpeg");
+    leftBox->setPixmap(pixmap);
+
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(leftBox);
+    mainLayout->addWidget(rightBox);
+
     todoListBox->setLayout(mainLayout);
 }
 
-QGroupBox* TodoList::getSelfWidget() {
+QGroupBox *TodoList::getSelfWidget() {
     return todoListBox;
 }
 
@@ -27,8 +75,8 @@ void TodoList::removeItem(int i) {
     todoListData->remove(i);
 }
 
-void TodoList::addItem(TodoItem& todoItem) {
-    todoListData->push_back(todoItem);
+void TodoList::addItem(TodoItem &todoItem) {
+//    todoListData->push_back(todoItem);
 }
 
 void TodoList::loadFromFile() {}
@@ -36,5 +84,3 @@ void TodoList::loadFromFile() {}
 void TodoList::saveToFile() {
 
 }
-
-

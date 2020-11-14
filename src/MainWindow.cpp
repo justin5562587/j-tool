@@ -8,13 +8,14 @@
 #include <QMessageBox>
 #include <QHBoxLayout>
 
-MainWindow::MainWindow() : QMainWindow(), imageBrowser() {
+MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
     createMenus();
     setWindowTitle("J-Tool");
 
 //    QWidget* centralArea = new QWidget();
 //    centralArea->setLayout();
 
+    // set default widget
     setCentralWidget(imageBrowser.getSelfWidget());
 }
 
@@ -22,6 +23,7 @@ void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Model");
     mainMenu->addAction("Image Browser", this, &MainWindow::changeToImageBrowser);
+    mainMenu->addSeparator();
     mainMenu->addAction("Todo List", this, &MainWindow::changeToTodoList);
 
     // help

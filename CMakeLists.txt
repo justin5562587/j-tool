@@ -14,11 +14,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 set(FILES_HEADER
-#        ${INCROOT}/TableModel.h
-#        ${INCROOT}/AddressWidget.h
-#        ${INCROOT}/NewAddressTab.h
-#        ${INCROOT}/AddDialog.h
-#        ${INCROOT}/ImageViewer.h
         ${INCROOT}/TodoList.h
         ${INCROOT}/TodoItem.h
         ${INCROOT}/ImageBrowser.h
@@ -26,10 +21,6 @@ set(FILES_HEADER
         )
 
 set(FILES_SRC
-#        ${SRCROOT}/TableModel.cpp
-#        ${SRCROOT}/AddressWidget.cpp
-#        ${SRCROOT}/NewAddressTab.cpp
-#        ${SRCROOT}/AddDialog.cpp
         ${SRCROOT}/TodoList.cpp
         ${SRCROOT}/TodoItem.cpp
         ${SRCROOT}/ImageBrowser.cpp

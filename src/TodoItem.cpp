@@ -44,7 +44,7 @@ const QDateTime &TodoItem::getStartTime() const {
     return startTime;
 }
 
-void setStartTime(const QDateTime &startTime) {
+void TodoItem::setStartTime(const QDateTime &startTime) {
     TodoItem::startTime = startTime;
 }
 

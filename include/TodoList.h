@@ -21,13 +21,19 @@ public:
 
     QGroupBox* getSelfWidget();
 
+public slots:
+
+    void addItem();
+
 private slots:
 
     void loadFromFile();
 
     void saveToFile();
 
-    void addItem();
+//    void addItem();
+
+    void showAddDialog();
 
     void removeItem();
 

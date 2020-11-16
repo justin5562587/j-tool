@@ -2,9 +2,11 @@
 // Created by justin on 2020/11/16.
 //
 #include "../include/AddTodoItemDialog.h"
+#include "../include/TodoList.h"
 
 #include <QLabel>
 #include <QGridLayout>
+#include <QDialogButtonBox>
 
 AddTodoItemDialog::AddTodoItemDialog(QWidget *parent) : titleInput(new QLineEdit), descriptionInput(new QTextEdit),
                                                         contentInput(new QTextEdit), startTimeEdit(new QDateTimeEdit),
@@ -39,18 +41,17 @@ AddTodoItemDialog::AddTodoItemDialog(QWidget *parent) : titleInput(new QLineEdit
     inputLayout->addWidget(starLabel, 5, 0, Qt::AlignLeft);
     inputLayout->addWidget(starChecker, 5, 1, Qt::AlignLeft);
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(okBtn);
     buttonLayout->addWidget(cancelBtn);
-
-    inputLayout->addLayout(buttonLayout, 6, 0, Qt::AlignRight);
+    inputLayout->addLayout(buttonLayout, 6, 0);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(inputLayout);
 
     setLayout(mainLayout);
 
-    connect(okBtn, &QAbstractButton::clicked, this, &QDialog::accept);
+    connect(okBtn, &QAbstractButton::clicked, &TodoList::addItem);
     connect(cancelBtn, &QAbstractButton::clicked, this, &QDialog::reject);
 
     setWindowTitle("Add Todo Item");

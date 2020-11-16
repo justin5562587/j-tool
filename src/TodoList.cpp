@@ -30,7 +30,7 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), addTodoItemDia
     clearBtn = new QPushButton("Clear");
 
     addItemBtn->addAction(addItemAct);
-    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::addItem);
+    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::showAddDialog);
 
     loadFromFileBtn->addAction(loadFromFileAct);
     connect(loadFromFileBtn, &QAbstractButton::clicked, this, &TodoList::loadFromFile);
@@ -80,9 +80,19 @@ void TodoList::removeItem() {
 //    todoListData->remove(i);
 }
 
-void TodoList::addItem() {
+void TodoList::showAddDialog() {
     addTodoItemDialog->show();
-//    todoListData->push_back(todoItem);
+}
+
+void TodoList::addItem() {
+    QString title = addTodoItemDialog->getTitle();
+    QString description = addTodoItemDialog->getDescription();
+    QString content = addTodoItemDialog->getContent();
+    QDateTime startTime = addTodoItemDialog->getStartTime();
+    QDateTime doneTime = addTodoItemDialog->getDoneTime();
+    bool star = addTodoItemDialog->getStar();
+    TodoItem todoItem = TodoItem(title, description, content, startTime, doneTime, star);
+    todoListData->push_back(todoItem);
 }
 
 void TodoList::loadFromFile() {}

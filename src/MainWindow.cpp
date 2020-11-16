@@ -18,7 +18,8 @@ MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
     centralWidget = new QWidget();
     mainLayout = new QVBoxLayout;
 
-    setWithImageBrowser();
+//    setWithImageBrowser();
+    setWithTodoList();
 
     // set default widget
     setCentralWidget(centralWidget);
@@ -38,13 +39,13 @@ void MainWindow::createMenus() {
 
 // slot
 void MainWindow::setWithImageBrowser() {
-//    mainLayout->addWidget(imageBrowserWidget);
-//    centralWidget->setLayout(mainLayout);
+    mainLayout->addWidget(imageBrowserWidget);
+    centralWidget->setLayout(mainLayout);
 }
 
 void MainWindow::setWithTodoList() {
-//    mainLayout->addWidget(todoListWidget);
-//    centralWidget->setLayout(mainLayout);
+    mainLayout->addWidget(todoListWidget);
+    centralWidget->setLayout(mainLayout);
 }
 
 void MainWindow::removeChildWidgets() {

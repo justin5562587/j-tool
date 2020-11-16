@@ -11,6 +11,7 @@
 #include <QAction>
 
 #include "../include/TodoItem.h"
+#include "../include/AddTodoItemDialog.h"
 
 class TodoList : public QWidget {
 Q_OBJECT
@@ -37,6 +38,8 @@ private:
     QGroupBox* todoListBox;
 
     QVector<TodoItem>* todoListData;
+
+    AddTodoItemDialog* addTodoItemDialog;
 
     QPushButton* loadFromFileBtn;
     QPushButton* saveToFileBtn;

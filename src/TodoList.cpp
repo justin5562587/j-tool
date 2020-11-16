@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QScrollArea>
 
-TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox) {
+TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), addTodoItemDialog(new AddTodoItemDialog) {
     // right-bottom todolist box
     QVBoxLayout *todoItemsLayout = new QVBoxLayout;
     QScrollArea *todoItemsBox = new QScrollArea;
@@ -30,16 +30,16 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox) {
     clearBtn = new QPushButton("Clear");
 
     addItemBtn->addAction(addItemAct);
-    connect(addItemBtn, &QPushButton::clicked, this, &TodoList::addItem);
+    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::addItem);
 
     loadFromFileBtn->addAction(loadFromFileAct);
-    connect(loadFromFileBtn, &QPushButton::clicked, this, &TodoList::loadFromFile);
+    connect(loadFromFileBtn, &QAbstractButton::clicked, this, &TodoList::loadFromFile);
 
     saveToFileBtn->addAction(saveToFileAct);
-    connect(saveToFileBtn, &QPushButton::clicked, this, &TodoList::saveToFile);
+    connect(saveToFileBtn, &QAbstractButton::clicked, this, &TodoList::saveToFile);
 
     clearBtn->addAction(clearAct);
-    connect(clearBtn, &QPushButton::clicked, this, &TodoList::clear);
+    connect(clearBtn, &QAbstractButton::clicked, this, &TodoList::clear);
 
     todoButtonLayout->addWidget(addItemBtn);
     todoButtonLayout->addWidget(loadFromFileBtn);
@@ -56,8 +56,9 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox) {
 
     // left box
     QLabel *leftBox = new QLabel;
-    QPixmap pixmap("../resources/test.jpeg");
-    leftBox->setPixmap(pixmap);
+    leftBox->setText("Welcome to TodoList");
+//    QPixmap pixmap("../resources/test.jpeg");
+//    leftBox->setPixmap(pixmap);
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(leftBox);
@@ -80,6 +81,7 @@ void TodoList::removeItem() {
 }
 
 void TodoList::addItem() {
+    addTodoItemDialog->show();
 //    todoListData->push_back(todoItem);
 }
 

@@ -30,22 +30,22 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), im
     fitWindowBtn = new QPushButton("Fit Window");
 
     openImageBtn->addAction(openImageAct);
-    connect(openImageBtn, &QPushButton::clicked, this, &ImageBrowser::openImage);
+    connect(openImageBtn, &QAbstractButton::clicked, this, &ImageBrowser::openImage);
 
     closeImageBtn->addAction(closeImageAct);
-    connect(closeImageBtn, &QPushButton::clicked, this, &ImageBrowser::closeImage);
+    connect(closeImageBtn, &QAbstractButton::clicked, this, &ImageBrowser::closeImage);
 
     zoomInBtn->addAction(zoomInAct);
-    connect(zoomInBtn, &QPushButton::clicked, this, &ImageBrowser::zoomIn);
+    connect(zoomInBtn, &QAbstractButton::clicked, this, &ImageBrowser::zoomIn);
 
     zoomOutBtn->addAction(zoomOutAct);
-    connect(zoomOutBtn, &QPushButton::clicked, this, &ImageBrowser::zoomOut);
+    connect(zoomOutBtn, &QAbstractButton::clicked, this, &ImageBrowser::zoomOut);
     
     normalizeBtn->addAction(normalizeAct);
-    connect(normalizeBtn, &QPushButton::clicked, this, &ImageBrowser::normalize);
+    connect(normalizeBtn, &QAbstractButton::clicked, this, &ImageBrowser::normalize);
 
     fitWindowBtn->addAction(fitWindowAct);
-    connect(fitWindowBtn, &QPushButton::clicked, this, &ImageBrowser::fitWindow);
+    connect(fitWindowBtn, &QAbstractButton::clicked, this, &ImageBrowser::fitWindow);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     QGroupBox* buttonBox = new QGroupBox;

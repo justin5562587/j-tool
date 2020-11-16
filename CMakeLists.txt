@@ -16,6 +16,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(FILES_HEADER
         ${INCROOT}/TodoList.h
         ${INCROOT}/TodoItem.h
+        ${INCROOT}/AddTodoItemDialog.h
         ${INCROOT}/ImageBrowser.h
         ${INCROOT}/MainWindow.h
         )
@@ -23,6 +24,7 @@ set(FILES_HEADER
 set(FILES_SRC
         ${SRCROOT}/TodoList.cpp
         ${SRCROOT}/TodoItem.cpp
+        ${SRCROOT}/AddTodoItemDialog.cpp
         ${SRCROOT}/ImageBrowser.cpp
         ${SRCROOT}/MainWindow.cpp
         ${SRCROOT}/main.cpp

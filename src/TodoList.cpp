@@ -7,16 +7,16 @@
 #include <QAction>
 #include <QLabel>
 #include <QScrollArea>
+#include <QDebug>
 
-TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), addTodoItemDialog(new AddTodoItemDialog) {
+TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), todoItemsBox(new QScrollArea), todoItemsLayout(new QVBoxLayout),
+                                      addTodoItemDialog(new AddTodoItemDialog), todoListData(new QVector<TodoItem>) {
     // right-bottom todolist box
-    QVBoxLayout *todoItemsLayout = new QVBoxLayout;
-    QScrollArea *todoItemsBox = new QScrollArea;
     todoItemsBox->setLayout(todoItemsLayout);
 
     // right-top button box
-    QHBoxLayout *todoButtonLayout = new QHBoxLayout;
-    QWidget *todoButtonBox = new QWidget;
+    auto todoButtonLayout = new QHBoxLayout;
+    auto *todoButtonBox = new QWidget;
 
     loadFromFileAct = new QAction;
     saveToFileAct = new QAction;
@@ -30,7 +30,7 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), addTodoItemDia
     clearBtn = new QPushButton("Clear");
 
     addItemBtn->addAction(addItemAct);
-    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::showAddDialog);
+    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::addItem);
 
     loadFromFileBtn->addAction(loadFromFileAct);
     connect(loadFromFileBtn, &QAbstractButton::clicked, this, &TodoList::loadFromFile);
@@ -48,19 +48,19 @@ TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), addTodoItemDia
     todoButtonBox->setLayout(todoButtonLayout);
 
     // right box
-    QVBoxLayout *rightLayout = new QVBoxLayout;
-    QWidget *rightBox = new QWidget;
+    auto rightLayout = new QVBoxLayout;
+    auto rightBox = new QWidget;
     rightLayout->addWidget(todoButtonBox);
     rightLayout->addWidget(todoItemsBox);
     rightBox->setLayout(rightLayout);
 
     // left box
-    QLabel *leftBox = new QLabel;
+    auto leftBox = new QLabel;
     leftBox->setText("Welcome to TodoList");
 //    QPixmap pixmap("../resources/test.jpeg");
 //    leftBox->setPixmap(pixmap);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
+    auto mainLayout = new QHBoxLayout;
     mainLayout->addWidget(leftBox);
     mainLayout->addWidget(rightBox);
 
@@ -73,30 +73,40 @@ QGroupBox *TodoList::getSelfWidget() {
 
 // slots
 void TodoList::clear() {
-    todoListData->clear();
+    todoListData->empty();
+    refreshTodoList();
 }
 
 void TodoList::removeItem() {
 //    todoListData->remove(i);
-}
-
-void TodoList::showAddDialog() {
-    addTodoItemDialog->show();
+    refreshTodoList();
 }
 
 void TodoList::addItem() {
-    QString title = addTodoItemDialog->getTitle();
-    QString description = addTodoItemDialog->getDescription();
-    QString content = addTodoItemDialog->getContent();
-    QDateTime startTime = addTodoItemDialog->getStartTime();
-    QDateTime doneTime = addTodoItemDialog->getDoneTime();
-    bool star = addTodoItemDialog->getStar();
-    TodoItem todoItem = TodoItem(title, description, content, startTime, doneTime, star);
-    todoListData->push_back(todoItem);
+    addTodoItemDialog->show();
+
+    if (addTodoItemDialog->exec()) {
+        QString title = addTodoItemDialog->getTitle();
+        QString description = addTodoItemDialog->getDescription();
+        QString content = addTodoItemDialog->getContent();
+        QDateTime startTime = addTodoItemDialog->getStartTime();
+        QDateTime doneTime = addTodoItemDialog->getDoneTime();
+        bool star = addTodoItemDialog->getStar();
+        TodoItem todoItem = TodoItem(title, description, content, startTime, doneTime, star);
+        todoListData->push_back(todoItem);
+
+        refreshTodoList();
+    }
+}
+
+void TodoList::refreshTodoList() {
+    for (auto i = todoListData->begin(); i != todoListData->end(); ++i) {
+        auto todoItemLabel = new QLabel;
+        todoItemLabel->setText((*i).getTitle());
+        todoItemsLayout->addWidget(todoItemLabel);
+    }
 }
 
 void TodoList::loadFromFile() {}
 
-void TodoList::saveToFile() {
-
-}
+void TodoList::saveToFile() {}

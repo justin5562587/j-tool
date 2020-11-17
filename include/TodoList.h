@@ -9,6 +9,8 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QAction>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
 #include "../include/TodoItem.h"
 #include "../include/AddTodoItemDialog.h"
@@ -19,11 +21,7 @@ Q_OBJECT
 public:
     TodoList(QWidget *parent = nullptr);
 
-    QGroupBox* getSelfWidget();
-
-public slots:
-
-    void addItem();
+    QGroupBox *getSelfWidget();
 
 private slots:
 
@@ -31,27 +29,33 @@ private slots:
 
     void saveToFile();
 
-//    void addItem();
-
-    void showAddDialog();
+    void addItem();
 
     void removeItem();
+
+    void refreshTodoList();
 
     void clear();
 
 private:
 
-    QGroupBox* todoListBox;
+    // main layout && widget
+    QGroupBox *todoListBox;
 
-    QVector<TodoItem>* todoListData;
+    QVBoxLayout* todoItemsLayout;
+    QScrollArea *todoItemsBox;
 
-    AddTodoItemDialog* addTodoItemDialog;
+    // data vector
+    QVector<TodoItem> *todoListData;
 
-    QPushButton* loadFromFileBtn;
-    QPushButton* saveToFileBtn;
-    QPushButton* addItemBtn;
-    QPushButton* clearBtn;
-    QPushButton* removeItemBtn; // attached on TodoItem
+    AddTodoItemDialog *addTodoItemDialog;
+
+    // button && actions
+    QPushButton *loadFromFileBtn;
+    QPushButton *saveToFileBtn;
+    QPushButton *addItemBtn;
+    QPushButton *clearBtn;
+    QPushButton *removeItemBtn; // attached on TodoItem
 
     QAction *loadFromFileAct;
     QAction *saveToFileAct;

@@ -3,7 +3,9 @@
 //
 #include "../include/AddTodoItemDialog.h"
 #include "../include/TodoList.h"
+#include "../include/MainWindow.h"
 
+#include <QDebug>
 #include <QLabel>
 #include <QGridLayout>
 #include <QDialogButtonBox>
@@ -51,7 +53,8 @@ AddTodoItemDialog::AddTodoItemDialog(QWidget *parent) : titleInput(new QLineEdit
 
     setLayout(mainLayout);
 
-    connect(okBtn, &QAbstractButton::clicked, &TodoList::addItem);
+//    connect(okBtn, &QAbstractButton::clicked, &TodoList::addItem);
+    connect(okBtn, &QAbstractButton::clicked, this, &QDialog::accept);
     connect(cancelBtn, &QAbstractButton::clicked, this, &QDialog::reject);
 
     setWindowTitle("Add Todo Item");

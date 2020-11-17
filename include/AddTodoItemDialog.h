@@ -31,8 +31,6 @@ public:
 
     bool getStar() const;
 
-private slots:
-
 private:
 
     QLineEdit *titleInput;

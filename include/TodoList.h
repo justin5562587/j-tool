@@ -20,13 +20,9 @@ Q_OBJECT
 public:
     TodoList(QWidget *parent = nullptr);
 
-    QGroupBox *getSelfWidget();
+    QWidget *getSelfWidget();
 
 private slots:
-
-    void loadFromFile();
-
-    void saveToFile();
 
     void addItem();
 
@@ -39,24 +35,18 @@ private slots:
 private:
 
     // main layout && widget
-    QGroupBox *todoListBox;
+    QWidget* mainWidget;
 
-    QListWidget *todoItemsBox;
+    QListView* pendingBox = nullptr;
+    QListView* doneBox = nullptr;
 
     // data vector
-    QVector<TodoItem> *todoListData;
+    QVector<TodoItem> *pendingTodoVector;
+    QVector<TodoItem> *doneTodoVector;
 
     AddTodoItemDialog *addTodoItemDialog;
 
     // button && actions
-    QPushButton *loadFromFileBtn;
-    QPushButton *saveToFileBtn;
-    QPushButton *addItemBtn;
-    QPushButton *clearBtn;
-    QPushButton *removeItemBtn; // attached on TodoItem
-
-    QAction *loadFromFileAct;
-    QAction *saveToFileAct;
     QAction *addItemAct;
     QAction *clearAct;
     QAction *removeItemAct;

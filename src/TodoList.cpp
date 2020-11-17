@@ -6,73 +6,82 @@
 #include <QHBoxLayout>
 #include <QAction>
 #include <QLabel>
-#include <QDebug>
+#include <QButtonGroup>
 
-TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), todoItemsBox(new QListWidget),
-                                      addTodoItemDialog(new AddTodoItemDialog), todoListData(new QVector<TodoItem>) {
-    // right box is TodoItemsBox
+TodoList::TodoList(QWidget *parent) : mainWidget(new QWidget),
+                                      pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
+                                      addTodoItemDialog(new AddTodoItemDialog) {
 
-    // right-top button box
-    auto todoButtonLayout = new QHBoxLayout;
-    auto *todoButtonBox = new QWidget;
+    auto mainLayout = new QVBoxLayout;
 
-    loadFromFileAct = new QAction;
-    saveToFileAct = new QAction;
+    // top section (title)
+    QLabel *titleLabel = new QLabel("Todo List");
+    titleLabel->setStyleSheet("font-size: 20pt");
+
+    // middle section (pendingBox doneBox)
+    QHBoxLayout *middleLayout = new QHBoxLayout;
+    QWidget *middleBox = new QWidget();
+    middleBox->setLayout(middleLayout);
+
+    QVBoxLayout *pendingLayout = new QVBoxLayout;
+    pendingBox = new QListView;
+    pendingBox->setStyleSheet("QListView { font-size: 20pt; font-weight: bold; }"
+                              "QListView::item { background-color: #2ECC71; padding: 10%;"
+                              "border: 1px solid #27AE60; }"
+                              "QListView::item::hover { background-color: #27AE60 }");
+    pendingBox->setLayout(pendingLayout);
+
+    QVBoxLayout *doneLayout = new QVBoxLayout;
+    doneBox = new QListView;
+    doneBox->setStyleSheet("QListView { font-size: 20pt; font-weight: bold; }"
+                           "QListView::item { background-color: #2ECC71; padding: 10%;"
+                           "border: 1px solid #27AE60; }"
+                           "QListView::item::hover { background-color: #27AE60 }");
+    doneBox->setLayout(doneLayout);
+
+    middleLayout->addWidget(pendingBox);
+    middleLayout->addWidget(doneBox);
+
+    // bottom section (todoButtonBox)
+    QHBoxLayout* bottomLayout = new QHBoxLayout;
+    QWidget* bottomBox = new QWidget;
+    bottomBox->setLayout(bottomLayout);
+
+    QPushButton *addBtn = new QPushButton("Add");
+    addBtn->setStyleSheet("font-size: 16px, width: 40px, height: 40px");
+    addBtn->setIcon(QIcon(":/resources/icons/add.png"));
+
+    QPushButton *removeBtn = new QPushButton("Remove");
+    removeBtn->setStyleSheet("font-size: 16px, width: 40px, height: 40px");
+    removeBtn->setIcon(QIcon(":/resources/icons/remove.png"));
+
+    bottomLayout->addWidget(addBtn);
+    bottomLayout->addWidget(removeBtn);
+
     addItemAct = new QAction;
     removeItemAct = new QAction;
-    clearAct = new QAction;
 
-    addItemBtn = new QPushButton("Add");
-    loadFromFileBtn = new QPushButton("Load");
-    saveToFileBtn = new QPushButton("Save");
-    clearBtn = new QPushButton("Clear");
+    addBtn->addAction(addItemAct);
+    connect(addBtn, &QAbstractButton::clicked, this, &TodoList::addItem);
 
-    addItemBtn->addAction(addItemAct);
-    connect(addItemBtn, &QAbstractButton::clicked, this, &TodoList::addItem);
+    removeBtn->addAction(removeItemAct);
+    connect(removeBtn, &QAbstractButton::clicked, this, &TodoList::removeItem);
 
-    loadFromFileBtn->addAction(loadFromFileAct);
-    connect(loadFromFileBtn, &QAbstractButton::clicked, this, &TodoList::loadFromFile);
-
-    saveToFileBtn->addAction(saveToFileAct);
-    connect(saveToFileBtn, &QAbstractButton::clicked, this, &TodoList::saveToFile);
-
-    clearBtn->addAction(clearAct);
-    connect(clearBtn, &QAbstractButton::clicked, this, &TodoList::clear);
-
-    todoButtonLayout->addWidget(addItemBtn);
-    todoButtonLayout->addWidget(loadFromFileBtn);
-    todoButtonLayout->addWidget(saveToFileBtn);
-    todoButtonLayout->addWidget(clearBtn);
-    todoButtonBox->setLayout(todoButtonLayout);
-
-    // right box
-    auto rightLayout = new QVBoxLayout;
-    auto rightBox = new QWidget;
-    rightLayout->addWidget(todoButtonBox);
-    rightLayout->addWidget(todoItemsBox);
-    rightBox->setLayout(rightLayout);
-
-    // left box
-    auto leftBox = new QLabel;
-    leftBox->setText("Welcome to TodoList");
-//    QPixmap pixmap("../resources/test.jpeg");
-//    leftBox->setPixmap(pixmap);
-
-    auto mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(leftBox);
-    mainLayout->addWidget(rightBox);
-
-    todoListBox->setLayout(mainLayout);
+    //  set mainLayout
+    mainLayout->addWidget(titleLabel);
+    mainLayout->addWidget(middleBox);
+    mainLayout->addWidget(bottomBox);
+    mainWidget->setLayout(mainLayout);
 }
 
-QGroupBox *TodoList::getSelfWidget() {
-    return todoListBox;
+QWidget *TodoList::getSelfWidget() {
+    return mainWidget;
 }
 
 // slots
 void TodoList::clear() {
-    todoListData->clear();
-    refreshTodoList();
+//    todoListData->clear();
+//    refreshTodoList();
 }
 
 void TodoList::removeItem() {
@@ -91,20 +100,16 @@ void TodoList::addItem() {
         QDateTime doneTime = addTodoItemDialog->getDoneTime();
         bool star = addTodoItemDialog->getStar();
         TodoItem todoItem = TodoItem(title, description, content, startTime, doneTime, star);
-        todoListData->push_back(todoItem);
+        pendingTodoVector->push_back(todoItem);
 
         refreshTodoList();
     }
 }
 
 void TodoList::refreshTodoList() {
-    for (auto i = todoListData->begin(); i != todoListData->end(); ++i) {
+    for (auto i = pendingTodoVector->begin(); i != pendingTodoVector->end(); ++i) {
 //        auto todoItemLabel = new QLabel;
 //        todoItemLabel->setText((*i).getTitle());
-        todoItemsBox->addItem((*i).getTitle());
+//        pendingTodoVector->addItem((*i).getTitle());
     }
 }
-
-void TodoList::loadFromFile() {}
-
-void TodoList::saveToFile() {}

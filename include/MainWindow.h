@@ -37,8 +37,8 @@ private:
 
     // inside widgets
     ImageBrowser imageBrowser;
-    QGroupBox *imageBrowserWidget;
+    QWidget *imageBrowserWidget;
 
     TodoList todoList;
-    QGroupBox *todoListWidget;
+    QWidget *todoListWidget;
 };

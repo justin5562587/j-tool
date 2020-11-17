@@ -19,8 +19,6 @@ public:
 
     MainWindow();
 
-    void removeChildWidgets();
-
 private slots:
 
     // extra

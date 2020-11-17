@@ -53,7 +53,6 @@ AddTodoItemDialog::AddTodoItemDialog(QWidget *parent) : titleInput(new QLineEdit
 
     setLayout(mainLayout);
 
-//    connect(okBtn, &QAbstractButton::clicked, &TodoList::addItem);
     connect(okBtn, &QAbstractButton::clicked, this, &QDialog::accept);
     connect(cancelBtn, &QAbstractButton::clicked, this, &QDialog::reject);
 

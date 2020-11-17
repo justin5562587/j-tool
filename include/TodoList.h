@@ -9,8 +9,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QAction>
-#include <QScrollArea>
-#include <QVBoxLayout>
+#include <QListWidget>
 
 #include "../include/TodoItem.h"
 #include "../include/AddTodoItemDialog.h"
@@ -42,8 +41,7 @@ private:
     // main layout && widget
     QGroupBox *todoListBox;
 
-    QVBoxLayout* todoItemsLayout;
-    QScrollArea *todoItemsBox;
+    QListWidget *todoItemsBox;
 
     // data vector
     QVector<TodoItem> *todoListData;

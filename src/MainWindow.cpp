@@ -4,7 +4,6 @@
 #include "../include/MainWindow.h"
 
 #include <QMenu>
-#include <QFileDialog>
 #include <QMessageBox>
 #include <QHBoxLayout>
 
@@ -18,7 +17,6 @@ MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
     centralWidget = new QWidget();
     mainLayout = new QVBoxLayout;
 
-//    setWithImageBrowser();
     setWithTodoList();
 
     // set default widget
@@ -48,12 +46,12 @@ void MainWindow::setWithTodoList() {
     centralWidget->setLayout(mainLayout);
 }
 
-void MainWindow::removeChildWidgets() {
-    QList<QWidget *> widgets = findChildren<QWidget *>();
-    foreach(QWidget * widget, widgets){
-        delete widget;
-    }
-}
+//void MainWindow::removeChildWidgets() {
+//    QList<QWidget *> widgets = findChildren<QWidget *>();
+//    foreach(QWidget * widget, widgets){
+//        delete widget;
+//    }
+//}
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),

@@ -6,13 +6,11 @@
 #include <QHBoxLayout>
 #include <QAction>
 #include <QLabel>
-#include <QScrollArea>
 #include <QDebug>
 
-TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), todoItemsBox(new QScrollArea), todoItemsLayout(new QVBoxLayout),
+TodoList::TodoList(QWidget *parent) : todoListBox(new QGroupBox), todoItemsBox(new QListWidget),
                                       addTodoItemDialog(new AddTodoItemDialog), todoListData(new QVector<TodoItem>) {
-    // right-bottom todolist box
-    todoItemsBox->setLayout(todoItemsLayout);
+    // right box is TodoItemsBox
 
     // right-top button box
     auto todoButtonLayout = new QHBoxLayout;
@@ -73,7 +71,7 @@ QGroupBox *TodoList::getSelfWidget() {
 
 // slots
 void TodoList::clear() {
-    todoListData->empty();
+    todoListData->clear();
     refreshTodoList();
 }
 
@@ -101,9 +99,9 @@ void TodoList::addItem() {
 
 void TodoList::refreshTodoList() {
     for (auto i = todoListData->begin(); i != todoListData->end(); ++i) {
-        auto todoItemLabel = new QLabel;
-        todoItemLabel->setText((*i).getTitle());
-        todoItemsLayout->addWidget(todoItemLabel);
+//        auto todoItemLabel = new QLabel;
+//        todoItemLabel->setText((*i).getTitle());
+        todoItemsBox->addItem((*i).getTitle());
     }
 }
 

@@ -8,5 +8,11 @@ PDFProcessor::PDFProcessor() {
 }
 
 // slots
+void PDFProcessor::loadPDF() {
 
+}
+
+void PDFProcessor::renderPDF() {
+
+}
 

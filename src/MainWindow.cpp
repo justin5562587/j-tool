@@ -29,6 +29,8 @@ void MainWindow::createMenus() {
     mainMenu->addAction("Image Browser", this, &MainWindow::setWithImageBrowser);
     mainMenu->addSeparator();
     mainMenu->addAction("Todo List", this, &MainWindow::setWithTodoList);
+    mainMenu->addSeparator();
+    mainMenu->addAction("PDF Processor", this, &MainWindow::setWithPDFProcessor);
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -44,6 +46,10 @@ void MainWindow::setWithImageBrowser() {
 void MainWindow::setWithTodoList() {
     mainLayout->addWidget(todoListWidget);
     centralWidget->setLayout(mainLayout);
+}
+
+void MainWindow::setWithPDFProcessor() {
+    // todo
 }
 
 //void MainWindow::removeChildWidgets() {

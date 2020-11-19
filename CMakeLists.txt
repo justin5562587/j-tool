@@ -12,7 +12,6 @@ set(SRCROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 # add the  header path
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-
 set(FILES_HEADER
         ${INCROOT}/TodoList.h
         ${INCROOT}/TodoItem.h
@@ -33,14 +32,18 @@ set(FILES_SRC
         )
 
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
-set(POPPLER_QT5 "/Users/justin/cpp/THIRD_PART_LIBRARY/poppler-20.11.0/poppler-qt5.pc.cmake")
+set(POPPLER_QT5 "/Users/justin/cpp/THIRD_PART_LIBRARY/poppler-20.11.0/cmake/modules")
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(POPPLER_QT5 REQUIRED poppler-qt5)
+#find_package(PkgConfig REQUIRED)
+#pkg_search_module(POPPLER_QT5 REQUIRED poppler-qt5)
 
 find_package(Qt5 COMPONENTS Gui Widgets REQUIRED)
 #find_package(poppler_qt5)
 
+# add self custom utils
+add_subdirectory(utils)
+
 add_executable(j_tool ${FILES_HEADER} ${FILES_SRC})
 
-target_link_libraries(j_tool Qt5::Gui Qt5::Widgets)
+#target_link_libraries(j_tool Qt5::Gui Qt5::Widgets)
+target_link_libraries(j_tool Qt5::Gui Qt5::Widgets j-utils)

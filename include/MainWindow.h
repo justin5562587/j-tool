@@ -28,6 +28,8 @@ private slots:
 
     void setWithTodoList();
 
+    void setWithPDFProcessor();
+
 private:
     void createMenus();
 

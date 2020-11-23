@@ -9,8 +9,11 @@ A integrated desktop tools for programmers
 - Multimedia player
 
 ## Reference guides
-[Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)
+- [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)
 
-[Qt Overview](https://doc.qt.io/qt-5/overviews-main.html)
+- [Qt Overview](https://doc.qt.io/qt-5/overviews-main.html)
 
-https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Find-Libraries
+- https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Find-Libraries
+
+## Reference books
+- **CMake CMake Cookbook** -- 2018 *Bast, Radovan; Di Remigio, Roberto*

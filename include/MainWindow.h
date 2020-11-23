@@ -12,6 +12,7 @@
 #include <QMenuBar>
 #include <QVBoxLayout>
 
+
 class MainWindow : public QMainWindow {
 Q_OBJECT
 

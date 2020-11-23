@@ -3,11 +3,18 @@
 //
 #include "../include/MainWindow.h"
 
+#include "../utils/Message.h"
+
 #include <QMenu>
 #include <QMessageBox>
 #include <QHBoxLayout>
 
 MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
+
+    std::string message = "test message";
+    Message message1 = Message(message);
+    message1.console();
+
     imageBrowserWidget = imageBrowser.getSelfWidget();
     todoListWidget = todoList.getSelfWidget();
 

@@ -1,7 +1,7 @@
 //
 // Created by justin on 2020/11/13.
 //
-#include "../include/TodoList.h"
+#include "./TodoList.h"
 
 #include <QHBoxLayout>
 #include <QAction>

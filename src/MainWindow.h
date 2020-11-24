@@ -1,17 +1,15 @@
 //
 // Created by justin on 2020/11/03.
 //
-
 #pragma once
 
-#include "../include/ImageBrowser.h"
-#include "../include/TodoList.h"
+#include "./ImageBrowser/ImageBrowser.h"
+#include "./TodoList/TodoList.h"
 
 #include <QMainWindow>
 #include <QItemSelection>
 #include <QMenuBar>
 #include <QVBoxLayout>
-
 
 class MainWindow : public QMainWindow {
 Q_OBJECT

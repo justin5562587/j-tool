@@ -4,15 +4,15 @@
 
 #pragma once
 
+#include "./TodoItem.h"
+#include "./AddTodoItemDialog.h"
+
 #include <QWidget>
 #include <QVector>
 #include <QGroupBox>
 #include <QPushButton>
 #include <QAction>
 #include <QListWidget>
-
-#include "../include/TodoItem.h"
-#include "../include/AddTodoItemDialog.h"
 
 class TodoList : public QWidget {
 Q_OBJECT

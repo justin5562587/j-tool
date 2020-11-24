@@ -1,9 +1,8 @@
 //
 // Created by justin on 2020/11/16.
 //
-#include "../include/AddTodoItemDialog.h"
-#include "../include/TodoList.h"
-#include "../include/MainWindow.h"
+#include "./AddTodoItemDialog.h"
+#include "./TodoList.h"
 
 #include <QDebug>
 #include <QLabel>

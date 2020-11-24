@@ -1,19 +1,13 @@
 //
 // Created by justin on 2020/11/03.
 //
-#include "../include/MainWindow.h"
-
-#include "../utils/Message.h"
+#include "./MainWindow.h"
 
 #include <QMenu>
 #include <QMessageBox>
 #include <QHBoxLayout>
 
 MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
-
-    std::string message = "test message";
-    Message message1 = Message(message);
-    message1.console();
 
     imageBrowserWidget = imageBrowser.getSelfWidget();
     todoListWidget = todoList.getSelfWidget();

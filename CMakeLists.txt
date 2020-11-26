@@ -32,5 +32,10 @@ add_subdirectory(${SRC_DIR}/TodoList)
 #add_subdirectory(${SRC_DIR}/PDFProcessor)
 #add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 
+set(QT_LIBS Qt5::Gui Qt5::Widgets)
+
+target_link_libraries(j-image-browser ${QT_LIBS})
+target_link_libraries(j-todo-list ${QT_LIBS})
+
 add_executable(j_tool ${MAIN_SRC})
-target_link_libraries(j_tool j-image-browser j-todo-list Qt5::Gui Qt5::Widgets)
+target_link_libraries(j_tool j-image-browser j-todo-list ${QT_LIBS})

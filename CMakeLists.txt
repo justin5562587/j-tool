@@ -12,9 +12,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-# add the  header path
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extra)
-
 set(MAIN_SRC
         ${SRC_DIR}/MainWindow.cpp
         ${SRC_DIR}/MainWindow.h
@@ -36,4 +33,4 @@ add_subdirectory(${SRC_DIR}/TodoList)
 #add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 
 add_executable(j_tool ${MAIN_SRC})
-target_link_libraries(j_tool ${MAIN_SRC} j-image-browser j-pdf-processor j-todo-list Qt5::Gui Qt5::Widgets)
+target_link_libraries(j_tool j-image-browser j-todo-list Qt5::Gui Qt5::Widgets)

@@ -1,5 +1,8 @@
 #pragma once
 
-#define GIT_HASH @GIT_HASH@
 
-#define PROJECT_VERSION @CMAKE_PROJECT_VERSION@
+#include <string>
+
+const std::string GIT_HASH = @GIT_HASH@;
+
+//#define PROJECT_VERSION @CMAKE_PROJECT_VERSION@

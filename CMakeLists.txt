@@ -9,24 +9,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # add switch
 #option(USE_LIBRARY "Compile j-utils into project?" ON)
 
-# get git hash
-set(GIT_HASH "unknown")
-find_package(Git REQUIRED)
-if (GIT_FOUND)
-    execute_process(
-            COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h
-            OUTPUT_VARIABLE GIT_HASH
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
-    )
-endif()
-
-configure_file(
-        version.h.in
-        generated/version.h
-        @ONLY
-)
-
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 set(MAIN_SRC
@@ -60,6 +42,27 @@ set(QT_LIBS Qt5::Gui Qt5::Widgets)
 target_link_libraries(j-image-browser ${QT_LIBS})
 target_link_libraries(j-todo-list ${QT_LIBS})
 
+# config result executable
 add_executable(j_tool ${MAIN_SRC})
-target_include_directories(j_tool PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_link_libraries(j_tool j-image-browser j-todo-list ${QT_LIBS})
+
+add_custom_command(
+        OUTPUT
+            ${CMAKE_CURRENT_BINARY_DIR}/generated/version.h
+            ALL
+        COMMAND
+            ${CMAKE_COMMAND} -D TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/get-version-info.cmake
+        WORKING_DIRECTORY
+            ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(
+        get_version_info
+        ALL
+        DEPENDS
+            ${CMAKE_CURRENT_BINARY_DIR}/generated/version.h
+)
+
+add_dependencies(j_tool get_version_info)
+
+target_include_directories(j_tool PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated)

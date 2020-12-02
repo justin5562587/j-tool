@@ -17,6 +17,8 @@ A integrated desktop tools for programmers
 
 - [How to find libraries with Cmake](https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Find-Libraries)
 
+- [ffmpeg tutorial](http://dranger.com/ffmpeg/tutorial01.html)
+
 ## Reference books
 - **CMake CMake Cookbook** -- 2018 *Bast, Radovan; Di Remigio, Roberto*
 

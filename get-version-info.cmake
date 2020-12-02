@@ -12,8 +12,6 @@ if (GIT_FOUND)
     )
 endif ()
 
-message(STATUS "Git hash is ${GIT_HASH}")
-
 configure_file(
         ${CMAKE_CURRENT_LIST_DIR}/version.h.in
         ${TARGET_DIR}/generated/version.h

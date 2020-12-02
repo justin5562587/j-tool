@@ -6,9 +6,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# add switch
-#option(USE_LIBRARY "Compile j-utils into project?" ON)
-
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 set(MAIN_SRC
@@ -29,22 +26,26 @@ find_package(Qt5 COMPONENTS Gui Widgets REQUIRED)
 #)
 
 # add custom utils
-#add_subdirectory(utils)
+option(USE_LIBRARY "Compile j-utils into project?" OFF)
+if (USE_J_UTILS)
+    add_subdirectory(utils)
+endif()
 
 # add custom core components
 add_subdirectory(${SRC_DIR}/ImageBrowser)
 add_subdirectory(${SRC_DIR}/TodoList)
+add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 #add_subdirectory(${SRC_DIR}/PDFProcessor)
-#add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 
 set(QT_LIBS Qt5::Gui Qt5::Widgets)
 
-target_link_libraries(j-image-browser ${QT_LIBS})
-target_link_libraries(j-todo-list ${QT_LIBS})
+target_link_libraries(j_image_browser PUBLIC ${QT_LIBS})
+target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS})
+target_link_libraries(j_todo_list PUBLIC ${QT_LIBS})
 
 # config result executable
 add_executable(j_tool ${MAIN_SRC})
-target_link_libraries(j_tool j-image-browser j-todo-list ${QT_LIBS})
+target_link_libraries(j_tool j_image_browser j_todo_list j_multimedia_player)
 
 add_custom_command(
         OUTPUT

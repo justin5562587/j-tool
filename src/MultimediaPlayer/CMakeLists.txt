@@ -14,8 +14,8 @@ find_library(AVUTIL_LIBRARY avutil)
 find_path(AVDEVICE_INCLUDE_DIR libavdevice/avdevice.h)
 find_library(AVDEVICE_LIBRARY avdevice)
 
-set(SDL2_DIR "/Users/justin/cpp/THIRD_PART_LIBRARY/SDL2-2.0.12")
-find_package(SDL2 REQUIRED)
+#set(SDL2_DIR "/Users/justin/cpp/THIRD_PART_LIBRARY/SDL2-2.0.12")
+#find_package(SDL2 REQUIRED)
 
 target_include_directories(
         j_multimedia_player

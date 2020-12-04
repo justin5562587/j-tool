@@ -15,7 +15,7 @@ set(MAIN_SRC
         )
 
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
-find_package(Qt5 COMPONENTS Gui Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Gui Widgets MultimediaWidgets REQUIRED)
 
 #set(Poppler_ROOT "/Users/justin/cpp/THIRD_PART_LIBRARY/poppler-20.11.0")
 #find_package(PkgConfig REQUIRED)
@@ -40,8 +40,8 @@ add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 set(QT_LIBS Qt5::Gui Qt5::Widgets)
 
 target_link_libraries(j_image_browser PUBLIC ${QT_LIBS})
-target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS})
 target_link_libraries(j_todo_list PUBLIC ${QT_LIBS})
+target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS} Qt5::MultimediaWidgets)
 
 # config result executable
 add_executable(j_tool ${MAIN_SRC})

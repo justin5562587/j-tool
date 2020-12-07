@@ -7,21 +7,18 @@
 #include <QMessageBox>
 #include <QHBoxLayout>
 
-MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList() {
-
+MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList(), multimediaPlayer() {
     imageBrowserWidget = imageBrowser.getSelfWidget();
     todoListWidget = todoList.getSelfWidget();
+    multimediaPlayerWidget = multimediaPlayer.getSelfWidget();
 
     createMenus();
     setWindowTitle("J-Tool");
 
-    centralWidget = new QWidget();
-    mainLayout = new QVBoxLayout;
+//    centralWidget = new QWidget();
+//    mainLayout = new QVBoxLayout;
 
-    setWithTodoList();
-
-    // set default widget
-    setCentralWidget(centralWidget);
+    setCentralWidget(multimediaPlayerWidget);
 }
 
 void MainWindow::createMenus() {
@@ -31,7 +28,7 @@ void MainWindow::createMenus() {
     mainMenu->addSeparator();
     mainMenu->addAction("Todo List", this, &MainWindow::setWithTodoList);
     mainMenu->addSeparator();
-    mainMenu->addAction("PDF Processor", this, &MainWindow::setWithPDFProcessor);
+    mainMenu->addAction("Multimedia Player", this, &MainWindow::setWithMultimediaPlayer);
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -40,17 +37,15 @@ void MainWindow::createMenus() {
 
 // slot
 void MainWindow::setWithImageBrowser() {
-    mainLayout->addWidget(imageBrowserWidget);
-    centralWidget->setLayout(mainLayout);
+    setCentralWidget(imageBrowserWidget);
 }
 
 void MainWindow::setWithTodoList() {
-    mainLayout->addWidget(todoListWidget);
-    centralWidget->setLayout(mainLayout);
+    setCentralWidget(todoListWidget);
 }
 
-void MainWindow::setWithPDFProcessor() {
-    // todo
+void MainWindow::setWithMultimediaPlayer() {
+    setCentralWidget(multimediaPlayerWidget);
 }
 
 //void MainWindow::removeChildWidgets() {

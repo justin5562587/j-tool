@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 #include <QWidget>
 #include <QMediaPlayer>
 #include <QMediaPlaylist>

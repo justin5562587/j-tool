@@ -5,6 +5,7 @@
 
 #include "./ImageBrowser/ImageBrowser.h"
 #include "./TodoList/TodoList.h"
+#include "./MultimediaPlayer/MultimediaPlayer.h"
 
 #include <QMainWindow>
 #include <QItemSelection>
@@ -27,7 +28,7 @@ private slots:
 
     void setWithTodoList();
 
-    void setWithPDFProcessor();
+    void setWithMultimediaPlayer();
 
 private:
     void createMenus();
@@ -42,4 +43,7 @@ private:
 
     TodoList todoList;
     QWidget *todoListWidget;
+
+    MultimediaPlayer multimediaPlayer;
+    QWidget* multimediaPlayerWidget;
 };

@@ -5,30 +5,27 @@
 
 #include <QMenu>
 #include <QMessageBox>
-#include <QHBoxLayout>
 
 MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList(), multimediaPlayer() {
-    imageBrowserWidget = imageBrowser.getSelfWidget();
-    todoListWidget = todoList.getSelfWidget();
-    multimediaPlayerWidget = multimediaPlayer.getSelfWidget();
-
     createMenus();
     setWindowTitle("J-Tool");
 
-//    centralWidget = new QWidget();
-//    mainLayout = new QVBoxLayout;
+    imageBrowserWidget = imageBrowser.getSelfWidget();
+    todoListWidget = todoList.getSelfWidget();
+    multimediaPlayerWidget= multimediaPlayer.getSelfWidget();
 
-    setCentralWidget(multimediaPlayerWidget);
+    // default call setCentralWidget
+    setCentralWithMultimediaPlayer();
 }
 
 void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Model");
-    mainMenu->addAction("Image Browser", this, &MainWindow::setWithImageBrowser);
+    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
     mainMenu->addSeparator();
-    mainMenu->addAction("Todo List", this, &MainWindow::setWithTodoList);
+    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
     mainMenu->addSeparator();
-    mainMenu->addAction("Multimedia Player", this, &MainWindow::setWithMultimediaPlayer);
+    mainMenu->addAction("Multimedia Player", this, &MainWindow::setCentralWithMultimediaPlayer);
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -36,24 +33,32 @@ void MainWindow::createMenus() {
 }
 
 // slot
-void MainWindow::setWithImageBrowser() {
-    setCentralWidget(imageBrowserWidget);
+void MainWindow::setCentralWithImageBrowser() {
+    QWidget* centralWidget = new QWidget();
+    QVBoxLayout* centralLayout = new QVBoxLayout();
+    centralLayout->addWidget(imageBrowserWidget);
+    centralWidget->setLayout(centralLayout);
+
+    setCentralWidget(centralWidget);
 }
 
-void MainWindow::setWithTodoList() {
-    setCentralWidget(todoListWidget);
+void MainWindow::setCentralWithTodoList() {
+    QWidget* centralWidget = new QWidget();
+    QVBoxLayout* centralLayout = new QVBoxLayout();
+    centralLayout->addWidget(todoListWidget);
+    centralWidget->setLayout(centralLayout);
+
+    setCentralWidget(centralWidget);
 }
 
-void MainWindow::setWithMultimediaPlayer() {
-    setCentralWidget(multimediaPlayerWidget);
-}
+void MainWindow::setCentralWithMultimediaPlayer() {
+    QWidget* centralWidget = new QWidget();
+    QVBoxLayout* centralLayout = new QVBoxLayout();
+    centralLayout->addWidget(multimediaPlayerWidget);
+    centralWidget->setLayout(centralLayout);
 
-//void MainWindow::removeChildWidgets() {
-//    QList<QWidget *> widgets = findChildren<QWidget *>();
-//    foreach(QWidget * widget, widgets){
-//        delete widget;
-//    }
-//}
+    setCentralWidget(centralWidget);
+}
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),

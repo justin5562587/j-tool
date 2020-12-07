@@ -20,22 +20,17 @@ public:
     MainWindow();
 
 private slots:
-
     // extra
     void about();
 
-    void setWithImageBrowser();
+    void setCentralWithImageBrowser();
 
-    void setWithTodoList();
+    void setCentralWithTodoList();
 
-    void setWithMultimediaPlayer();
+    void setCentralWithMultimediaPlayer();
 
 private:
     void createMenus();
-
-    QWidget* centralWidget;
-
-    QVBoxLayout* mainLayout;
 
     // inside widgets
     ImageBrowser imageBrowser;

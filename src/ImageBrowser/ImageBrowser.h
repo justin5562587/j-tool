@@ -38,13 +38,12 @@ private slots:
 
 private:
 
-    void createActions();
+    double scaleFactor = 1;
 
     QGroupBox *imageBrowserBox;
     QImage image;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
-    double scaleFactor = 1;
 
     QPushButton *openImageBtn;
     QPushButton *closeImageBtn;

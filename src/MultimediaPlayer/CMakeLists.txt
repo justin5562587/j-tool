@@ -1,15 +1,6 @@
-#aux_source_directory(. MULTIMEDIA_PLAYER_SRC)
+aux_source_directory(. MULTIMEDIA_PLAYER_SRC)
 
-#add_library(j_multimedia_player STATIC ${MULTIMEDIA_PLAYER_SRC})
-add_library(j_multimedia_player STATIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/MultimediaPlayer.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/MultimediaPlayer.cpp
-        )
-#target_sources(
-#        j_multimedia_player
-#        ${CMAKE_CURRENT_SOURCE_DIR}/MultimediaPlayer.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/MultimediaPlayer.cpp
-#)
+add_library(j_multimedia_player STATIC ${MULTIMEDIA_PLAYER_SRC})
 
 #find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h)
 #find_library(AVCODEC_LIBRARY avcodec)

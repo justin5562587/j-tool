@@ -3,6 +3,7 @@
 //
 #include "MultimediaPlayer.h"
 #include "PlayControl.h"
+#include "VideoWidget.h"
 
 #include <QVideoWidget>
 #include <QHBoxLayout>
@@ -13,7 +14,9 @@
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : mainWidget(new QWidget) {
     mediaPlayer = new QMediaPlayer(mainWidget, QMediaPlayer::VideoSurface);
 
-    QVideoWidget *videoWidget = new QVideoWidget;
+    // set VideoWidget
+    QVideoWidget *videoWidget = new QVideoWidget(mainWidget);
+    mediaPlayer->setVideoOutput(videoWidget);
 
     openBtn = new QPushButton("Open");
     connect(openBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::openFile);
@@ -21,6 +24,8 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : mainWidget(new QWidget) {
     errorLabel = new QLabel();
     errorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
+
+    // set PlayControl
     PlayControl* playControl = new PlayControl(this);
     playControl->setState(m_player->state());
     playControl->setVolume(m_player->volume());

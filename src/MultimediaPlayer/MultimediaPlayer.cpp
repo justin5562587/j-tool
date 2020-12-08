@@ -2,10 +2,10 @@
 // Created by justin on 2020/11/19.
 //
 #include "MultimediaPlayer.h"
+#include "PlayControl.h"
 
 #include <QVideoWidget>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QStyle>
@@ -18,26 +18,27 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : mainWidget(new QWidget) {
     openBtn = new QPushButton("Open");
     connect(openBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::openFile);
 
-    playBtn = new QPushButton("Play");
-    playBtn->setEnabled(false);
-    connect(playBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::play);
-
-    positionSlider = new QSlider(Qt::Horizontal);
-    positionSlider->setRange(0, 0);
-    connect(positionSlider, &QAbstractSlider::sliderMoved, this, &MultimediaPlayer::setPosition);
-
     errorLabel = new QLabel();
     errorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
-    QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->setContentsMargins(0, 0, 0, 0);
-    controlLayout->addWidget(openBtn);
-    controlLayout->addWidget(playBtn);
-    controlLayout->addWidget(positionSlider);
+    PlayControl* playControl = new PlayControl(this);
+    playControl->setState(m_player->state());
+    playControl->setVolume(m_player->volume());
+    playControl->setMuted(playControl->isMuted());
+
+    connect(playControl, &PlayControl::play, m_player, &MultimediaPlayer::play);
+//    connect(playControl, &PlayControl::pause, m_player, &QMediaPlayer::pause);
+//    connect(playControl, &PlayControl::stop, m_player, &QMediaPlayer::stop);
+//    connect(playControl, &PlayControl::next, m_playlist, &QMediaPlaylist::next);
+//    connect(playControl, &PlayControl::previous, this, &Player::previousClicked);
+//    connect(playControl, &PlayControl::changeVolume, m_player, &QMediaPlayer::setVolume);
+//    connect(playControl, &PlayControl::changeMuting, m_player, &QMediaPlayer::setMuted);
+//    connect(playControl, &PlayControl::changeRate, m_player, &QMediaPlayer::setPlaybackRate);
+//    connect(playControl, &PlayControl::stop, m_videoWidget, QOverload<>::of(&QVideoWidget::update));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(videoWidget);
-    mainLayout->addLayout(controlLayout);
+    mainLayout->addWidget(playControl);
     mainLayout->addWidget(errorLabel);
 
     mediaPlayer->setVideoOutput(videoWidget);

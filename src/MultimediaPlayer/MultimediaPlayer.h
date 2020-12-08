@@ -11,9 +11,13 @@
 
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
+
 class QSlider;
+
 class QLabel;
+
 class QUrl;
+
 QT_END_NAMESPACE
 
 class MultimediaPlayer : public QWidget {
@@ -21,7 +25,7 @@ Q_OBJECT
 
 public:
 
-    MultimediaPlayer(QWidget* parent = nullptr);
+    explicit MultimediaPlayer(QWidget *parent = nullptr);
 
     MultimediaPlayer(const MultimediaPlayer &) = delete;
 
@@ -29,41 +33,72 @@ public:
 
     ~MultimediaPlayer();
 
-    void setUrl(const QUrl& url);
+    bool isPlayerAvailable();
 
-    QWidget* getSelfWidget();
+    void addToPlayList(const QList<QUrl> &urls);
 
-public slots:
+    void setCustomAudioRole(const QString &role);
 
-    void openFile();
+    QWidget *getSelfWidget();
 
-    void play();
+signals:
+
+    void fullScreenChanged(bool fullScreen);
 
 private slots:
-
-    void mediaStateChanged(QMediaPlayer::State state);
-
-    void positionChanged(qint64 position);
-
+    void open();
     void durationChanged(qint64 duration);
-
-    void setPosition(int position);
-
-    void handleError();
+    void positionChanged(qint64 progress);
+    void metaDataChanged();
+    void previousClicked();
+    void seek();
+    void jump(const QModelIndex& index);
+    void playlistPositionChanged(int);
+    void statusChanged(QMediaPlayer::MediaStatus status);
+    void stateChanged(QMediaPlayer::State state);
+    void bufferingProgress(int progress);
+    void videoAvailableChanged(bool available);
+    void displayErrorMessage();
+    void showColorDialog();
 
 private:
 
+    void clearHistogram();
+
+    void setTrackInfo(const QString &info);
+
+    void setStatusInfo(const QString &info);
+
+    void handleCursor(QMediaPlayer::MediaStatus status);
+
+    void updateDurationInfo(qint64 currentInfo);
+
     // main widget
-    QWidget* mainWidget;
+    QWidget *mainWidget;
 
-    QMediaPlayer* mediaPlayer;
+    QMediaPlayer *m_player = nullptr;
+    QMediaPlaylist *m_playlist = nullptr;
+    QVideoWidget *m_videoWidget = nullptr;
+    QLabel *m_coverLabel = nullptr;
+    QSlider *m_slider = nullptr;
+    QLabel *m_labelDuration = nullptr;
+    QPushButton *m_fullScreenButton = nullptr;
+    QPushButton *m_colorButton = nullptr;
+    QDialog *m_colorDialog = nullptr;
+    QLabel *m_statusLabel = nullptr;
+    QStatusBar *m_statusBar = nullptr;
 
-    QPushButton* openBtn;
-    QPushButton* playBtn;
+    QLabel *m_labelHistogram = nullptr;
+    HistogramWidget *m_videoHistogram = nullptr;
+    HistogramWidget *m_audioHistogram = nullptr;
+    QVideoProbe *m_videoProbe = nullptr;
+    QAudioProbe *m_audioProbe = nullptr;
 
-    QSlider* positionSlider;
-
-    QLabel* errorLabel;
+    PlaylistModel *m_playlistModel = nullptr;
+    QAbstractItemView *m_playlistView = nullptr;
+    QString m_trackInfo;
+    QString m_statusInfo;
+    qint64 m_duration;
 
 
 };

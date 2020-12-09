@@ -12,7 +12,6 @@ MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList(), multimedia
 
     imageBrowserWidget = imageBrowser.getSelfWidget();
     todoListWidget = todoList.getSelfWidget();
-    multimediaPlayerWidget= multimediaPlayer.getSelfWidget();
 
     // default call setCentralWidget
     setCentralWithMultimediaPlayer();
@@ -54,7 +53,7 @@ void MainWindow::setCentralWithTodoList() {
 void MainWindow::setCentralWithMultimediaPlayer() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(multimediaPlayerWidget);
+    centralLayout->addWidget(&multimediaPlayer);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);

@@ -30,7 +30,7 @@ public:
 
     ~HistogramWidget();
 
-    void setLevels(int levels) { m_levels = levels };
+    void setLevels(int levels) { m_levels = levels; };
 
 public slots:
 

@@ -10,15 +10,31 @@
 #include <QSlider>
 
 QT_BEGIN_NAMESPACE
-class QAbstractButton;
-
-class QSlider;
+class QAbstractItemView;
 
 class QLabel;
 
-class QUrl;
+class QMediaPlayer;
+
+class QModelIndex;
+
+class QPushButton;
+
+class QSlider;
+
+class QStatusBar;
+
+class QVideoProbe;
+
+class QVideoWidget;
+
+class QAudioProbe;
 
 QT_END_NAMESPACE
+
+class PlaylistModel;
+
+class HistogramWidget;
 
 class MultimediaPlayer : public QWidget {
 Q_OBJECT
@@ -33,13 +49,11 @@ public:
 
     ~MultimediaPlayer();
 
-    bool isPlayerAvailable();
+    bool isPlayerAvailable() const;
 
-    void addToPlayList(const QList<QUrl> &urls);
+    void addToPlaylist(const QList<QUrl> &urls);
 
     void setCustomAudioRole(const QString &role);
-
-    QWidget *getSelfWidget();
 
 signals:
 
@@ -51,7 +65,7 @@ private slots:
     void positionChanged(qint64 progress);
     void metaDataChanged();
     void previousClicked();
-    void seek();
+    void seek(int seconds);
     void jump(const QModelIndex& index);
     void playlistPositionChanged(int);
     void statusChanged(QMediaPlayer::MediaStatus status);
@@ -72,9 +86,6 @@ private:
     void handleCursor(QMediaPlayer::MediaStatus status);
 
     void updateDurationInfo(qint64 currentInfo);
-
-    // main widget
-    QWidget *mainWidget;
 
     QMediaPlayer *m_player = nullptr;
     QMediaPlaylist *m_playlist = nullptr;

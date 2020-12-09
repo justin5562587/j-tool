@@ -10,7 +10,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), imageLabel(new QLabel), scrollArea(new QScrollArea) {
+ImageBrowser::ImageBrowser(QWidget *parent) : imageLabel(new QLabel), scrollArea(new QScrollArea) {
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setScaledContents(true);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -69,11 +69,7 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageBrowserBox(new QGroupBox), im
     mainLayout->addWidget(buttonBox);
     mainLayout->addWidget(contentBox);
 
-    imageBrowserBox->setLayout(mainLayout);
-}
-
-QGroupBox * ImageBrowser::getSelfWidget() {
-    return imageBrowserBox;
+    setLayout(mainLayout);
 }
 
 // slots

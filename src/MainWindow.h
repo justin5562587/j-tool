@@ -32,13 +32,10 @@ private slots:
 private:
     void createMenus();
 
-    // inside widgets
+    // core components
     ImageBrowser imageBrowser;
-    QWidget *imageBrowserWidget;
 
     TodoList todoList;
-    QWidget *todoListWidget;
 
     MultimediaPlayer multimediaPlayer;
-    QWidget* multimediaPlayerWidget;
 };

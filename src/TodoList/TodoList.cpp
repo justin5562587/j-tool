@@ -8,8 +8,7 @@
 #include <QLabel>
 #include <QButtonGroup>
 
-TodoList::TodoList(QWidget *parent) : mainWidget(new QWidget),
-                                      pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
+TodoList::TodoList(QWidget *parent) : pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
                                       addTodoItemDialog(new AddTodoItemDialog) {
 
     auto mainLayout = new QVBoxLayout;
@@ -43,8 +42,8 @@ TodoList::TodoList(QWidget *parent) : mainWidget(new QWidget),
     middleLayout->addWidget(doneBox);
 
     // bottom section (todoButtonBox)
-    QHBoxLayout* bottomLayout = new QHBoxLayout;
-    QWidget* bottomBox = new QWidget;
+    QHBoxLayout *bottomLayout = new QHBoxLayout;
+    QWidget *bottomBox = new QWidget;
     bottomBox->setLayout(bottomLayout);
 
     QPushButton *addBtn = new QPushButton("Add");
@@ -71,11 +70,7 @@ TodoList::TodoList(QWidget *parent) : mainWidget(new QWidget),
     mainLayout->addWidget(titleLabel);
     mainLayout->addWidget(middleBox);
     mainLayout->addWidget(bottomBox);
-    mainWidget->setLayout(mainLayout);
-}
-
-QWidget *TodoList::getSelfWidget() {
-    return mainWidget;
+    setLayout(mainLayout);
 }
 
 // slots

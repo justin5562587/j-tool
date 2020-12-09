@@ -15,8 +15,6 @@ Q_OBJECT
 public:
     ImageBrowser(QWidget *parent = nullptr);
 
-    QGroupBox *getSelfWidget();
-
 private slots:
 
     void openImage();
@@ -40,7 +38,6 @@ private:
 
     double scaleFactor = 1;
 
-    QGroupBox *imageBrowserBox;
     QImage image;
     QLabel *imageLabel;
     QScrollArea *scrollArea;

@@ -10,9 +10,6 @@ MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList(), multimedia
     createMenus();
     setWindowTitle("J-Tool");
 
-    imageBrowserWidget = imageBrowser.getSelfWidget();
-    todoListWidget = todoList.getSelfWidget();
-
     // default call setCentralWidget
     setCentralWithMultimediaPlayer();
 }
@@ -35,7 +32,7 @@ void MainWindow::createMenus() {
 void MainWindow::setCentralWithImageBrowser() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(imageBrowserWidget);
+    centralLayout->addWidget(&imageBrowser);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);
@@ -44,7 +41,7 @@ void MainWindow::setCentralWithImageBrowser() {
 void MainWindow::setCentralWithTodoList() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(todoListWidget);
+    centralLayout->addWidget(&todoList);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);

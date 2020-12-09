@@ -20,8 +20,6 @@ Q_OBJECT
 public:
     TodoList(QWidget *parent = nullptr);
 
-    QWidget *getSelfWidget();
-
 private slots:
 
     void addItem();
@@ -33,9 +31,6 @@ private slots:
     void clear();
 
 private:
-
-    // main layout && widget
-    QWidget* mainWidget;
 
     QListView* pendingBox = nullptr;
     QListView* doneBox = nullptr;

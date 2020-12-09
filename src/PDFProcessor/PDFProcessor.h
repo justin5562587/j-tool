@@ -23,10 +23,6 @@ private slots:
     void renderPDF();
 
 private:
-
-    // main widget && layout
-    QWidget *mainWidget;
-
     // actions
     QAction *loadPDFAct;
     QAction *renderPDFAct;

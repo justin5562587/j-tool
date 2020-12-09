@@ -9,7 +9,6 @@
 
 QT_BEGIN_NAMESPACE
 class QMediaPlaylist;
-
 QT_END_NAMESPACE
 
 class PlaylistModel : public QAbstractItemModel {

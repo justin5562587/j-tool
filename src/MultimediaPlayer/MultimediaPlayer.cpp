@@ -60,7 +60,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_slider, &QSlider::sliderMoved, this, &MultimediaPlayer::seek);
 
     m_labelHistogram = new QLabel(this);
-    m_labelDuration->setText("Histogram: ");
+    m_labelHistogram->setText("Histogram: ");
     m_videoHistogram = new HistogramWidget(this);
     m_audioHistogram = new HistogramWidget(this);
     QHBoxLayout *histogramLayout = new QHBoxLayout;

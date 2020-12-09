@@ -26,5 +26,3 @@ A integrated desktop tools for programmers
 
 ## Reference Books
 - **CMake CMake Cookbook** -- 2018 *Bast, Radovan; Di Remigio, Roberto*
-
-https://doc.qt.io/qt-5/qtmultimedia-multimediawidgets-player-example.html

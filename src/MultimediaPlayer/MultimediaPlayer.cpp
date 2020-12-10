@@ -22,6 +22,7 @@
 #include <QStatusBar>
 #include <QTime>
 #include <QFormLayout>
+#include <QFile>
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_player = new QMediaPlayer(this);
@@ -144,6 +145,11 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
         m_colorButton->setEnabled(false);
         m_fullScreenButton->setEnabled(false);
     }
+
+    QFile styleFile("./style/index.qss");
+    styleFile.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(styleFile.readAll());
+    setStyleSheet(styleSheet);
 
     metaDataChanged();
 }

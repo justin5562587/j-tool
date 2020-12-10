@@ -6,7 +6,11 @@
 #include <QMenu>
 #include <QMessageBox>
 
-MainWindow::MainWindow() : QMainWindow(), imageBrowser(), todoList(), multimediaPlayer() {
+MainWindow::MainWindow() : QMainWindow() {
+    m_imageBrowser = new ImageBrowser(this);
+    m_todoList = new TodoList(this);
+    m_multimediaPlayer = new MultimediaPlayer(this);
+
     createMenus();
     setWindowTitle("J-Tool");
 
@@ -32,7 +36,7 @@ void MainWindow::createMenus() {
 void MainWindow::setCentralWithImageBrowser() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(&imageBrowser);
+    centralLayout->addWidget(m_imageBrowser);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);
@@ -41,7 +45,7 @@ void MainWindow::setCentralWithImageBrowser() {
 void MainWindow::setCentralWithTodoList() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(&todoList);
+    centralLayout->addWidget(m_todoList);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);
@@ -50,7 +54,7 @@ void MainWindow::setCentralWithTodoList() {
 void MainWindow::setCentralWithMultimediaPlayer() {
     QWidget* centralWidget = new QWidget();
     QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(&multimediaPlayer);
+    centralLayout->addWidget(m_multimediaPlayer);
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);

@@ -23,7 +23,7 @@
 #include <QTime>
 #include <QFormLayout>
 
-MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent), m_mediaInfo(new MediaInfoWidget(this)) {
+MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
 
@@ -109,7 +109,9 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent), m_mediaIn
     QBoxLayout *displayLayout = new QHBoxLayout();
     displayLayout->addWidget(m_videoWidget, 2);
     displayLayout->addWidget(m_playlistView);
-    displayLayout->addWidget(&m_mediaInfo);
+
+    m_mediaInfoWidget = new MediaInfoWidget(this);
+    displayLayout->addWidget(m_mediaInfoWidget);
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);
@@ -159,7 +161,7 @@ void MultimediaPlayer::play() {
     m_player->play();
     // todo show information of current playing media
     QVector<QString> otherKeys = std::initializer_list<QString>({ "Resolution" });
-    m_mediaInfo.populateWidget(m_player, otherKeys);
+    m_mediaInfoWidget->populateWidget(m_player, otherKeys);
 }
 
 void MultimediaPlayer::open() {

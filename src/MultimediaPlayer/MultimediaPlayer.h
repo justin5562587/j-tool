@@ -115,5 +115,5 @@ private:
     QString m_statusInfo;
     qint64 m_duration;
 
-    MediaInfoWidget m_mediaInfo;
+    MediaInfoWidget* m_mediaInfoWidget;
 };

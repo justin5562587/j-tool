@@ -33,9 +33,9 @@ private:
     void createMenus();
 
     // core components
-    ImageBrowser imageBrowser;
+    ImageBrowser* m_imageBrowser = nullptr;
 
-    TodoList todoList;
+    TodoList* m_todoList = nullptr;
 
-    MultimediaPlayer multimediaPlayer;
+    MultimediaPlayer* m_multimediaPlayer = nullptr;
 };

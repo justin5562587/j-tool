@@ -34,30 +34,15 @@ void MainWindow::createMenus() {
 
 // slot
 void MainWindow::setCentralWithImageBrowser() {
-    QWidget* centralWidget = new QWidget();
-    QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(m_imageBrowser);
-    centralWidget->setLayout(centralLayout);
-
-    setCentralWidget(centralWidget);
+    setCentralWidget(m_imageBrowser);
 }
 
 void MainWindow::setCentralWithTodoList() {
-    QWidget* centralWidget = new QWidget();
-    QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(m_todoList);
-    centralWidget->setLayout(centralLayout);
-
-    setCentralWidget(centralWidget);
+    setCentralWidget(m_todoList);
 }
 
 void MainWindow::setCentralWithMultimediaPlayer() {
-    QWidget* centralWidget = new QWidget();
-    QVBoxLayout* centralLayout = new QVBoxLayout();
-    centralLayout->addWidget(m_multimediaPlayer);
-    centralWidget->setLayout(centralLayout);
-
-    setCentralWidget(centralWidget);
+    setCentralWidget(m_multimediaPlayer);
 }
 
 void MainWindow::about() {

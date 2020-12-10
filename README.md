@@ -31,3 +31,5 @@ A integrated desktop tools for programmers or officers
 |:----------|:-------------|------:|
 | CMake CMake Cookbook |  Bast, Radovan; Di Remigio, Roberto | 2018 |
 | Fundamentals of Multimedia | Ze-Nian Li | 2014 |
+
+https://stackoverflow.com/questions/4810729/qt-setstylesheet-from-a-resource-qss-file

@@ -12,6 +12,7 @@
 
 PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     playBtn = new QToolButton(this);
+    playBtn->setShortcut(QKeySequence(Qt::Key_Space));
     playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     connect(playBtn, &QAbstractButton::clicked, this, &PlayControl::playClicked);
 

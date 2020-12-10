@@ -37,8 +37,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_player, &QMediaPlayer::mediaStatusChanged, this, &MultimediaPlayer::statusChanged);
     connect(m_player, &QMediaPlayer::bufferStatusChanged, this, &MultimediaPlayer::bufferingProgress);
     connect(m_player, &QMediaPlayer::videoAvailableChanged, this, &MultimediaPlayer::videoAvailableChanged);
-    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
-            &MultimediaPlayer::displayErrorMessage);
+    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &MultimediaPlayer::displayErrorMessage);
     connect(m_player, &QMediaPlayer::stateChanged, this, &MultimediaPlayer::stateChanged);
 
     m_videoWidget = new QVideoWidget(this);
@@ -161,7 +160,7 @@ void MultimediaPlayer::play() {
     m_player->play();
     // todo show information of current playing media
     QVector<QString> otherKeys = std::initializer_list<QString>({ "Resolution" });
-    m_mediaInfoWidget->populateWidget(m_player, otherKeys);
+    m_mediaInfoWidget->populateWidgets(m_player, otherKeys);
 }
 
 void MultimediaPlayer::open() {

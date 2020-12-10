@@ -34,8 +34,6 @@ private:
 
     // core components
     ImageBrowser* m_imageBrowser = nullptr;
-
     TodoList* m_todoList = nullptr;
-
     MultimediaPlayer* m_multimediaPlayer = nullptr;
 };

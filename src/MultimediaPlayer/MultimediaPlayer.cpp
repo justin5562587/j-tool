@@ -6,6 +6,7 @@
 #include "PlaylistModel.h"
 #include "HistogramWidget.h"
 #include "VideoWidget.h"
+#include "MediaInfoWidget.h"
 
 #include <QVideoWidget>
 #include <QHBoxLayout>
@@ -22,10 +23,9 @@
 #include <QTime>
 #include <QFormLayout>
 
-MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
+MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent), m_mediaInfo(new MediaInfoWidget(this)) {
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
-    qInfo() << "Supported audio roles:";
 
     m_playlist = new QMediaPlaylist();
     m_player->setPlaylist(m_playlist);
@@ -85,7 +85,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     playControl->setVolume(m_player->volume());
     playControl->setMuted(playControl->isMuted());
 
-    connect(playControl, &PlayControl::play, m_player, &QMediaPlayer::play);
+    connect(playControl, &PlayControl::play, this, &MultimediaPlayer::play);
     connect(playControl, &PlayControl::pause, m_player, &QMediaPlayer::pause);
     connect(playControl, &PlayControl::stop, m_player, &QMediaPlayer::stop);
     connect(playControl, &PlayControl::next, m_playlist, &QMediaPlaylist::next);
@@ -109,6 +109,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     QBoxLayout *displayLayout = new QHBoxLayout();
     displayLayout->addWidget(m_videoWidget, 2);
     displayLayout->addWidget(m_playlistView);
+    displayLayout->addWidget(&m_mediaInfo);
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);
@@ -144,7 +145,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     }
 
     metaDataChanged();
-//    mainWidget->setLayout(mainLayout);
 }
 
 MultimediaPlayer::~MultimediaPlayer() {
@@ -152,6 +152,14 @@ MultimediaPlayer::~MultimediaPlayer() {
 
 bool MultimediaPlayer::isPlayerAvailable() const {
     return m_player->isAvailable();
+}
+
+// todo
+void MultimediaPlayer::play() {
+    m_player->play();
+    // todo show information of current playing media
+    QVector<QString> otherKeys = std::initializer_list<QString>({ "Resolution" });
+    m_mediaInfo.populateWidget(m_player, otherKeys);
 }
 
 void MultimediaPlayer::open() {
@@ -165,14 +173,16 @@ void MultimediaPlayer::open() {
     }
     fileDialog.setDirectory(
             QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
-    if (fileDialog.exec() == QDialog::Accepted)
+    if (fileDialog.exec() == QDialog::Accepted) {
         addToPlaylist(fileDialog.selectedUrls());
+    }
 }
 
 static bool isPlaylist(const QUrl &url) // Check for ".m3u" playlists.
 {
-    if (!url.isLocalFile())
+    if (!url.isLocalFile()) {
         return false;
+    }
     const QFileInfo fileInfo(url.toLocalFile());
     return fileInfo.exists() && !fileInfo.suffix().compare(QLatin1String("m3u"), Qt::CaseInsensitive);
 }
@@ -221,10 +231,11 @@ void MultimediaPlayer::metaDataChanged() {
 void MultimediaPlayer::previousClicked() {
     // Go to previous track if we are within the first 5 seconds of playback
     // Otherwise, seek to the beginning.
-    if (m_player->position() <= 5000)
+    if (m_player->position() <= 5000) {
         m_playlist->previous();
-    else
+    } else {
         m_player->setPosition(0);
+    }
 }
 
 void MultimediaPlayer::jump(const QModelIndex &index) {

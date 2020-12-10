@@ -1,7 +1,7 @@
 //
 // Created by justin on 2020/11/05.
 //
-#include "./ImageBrowser.h"
+#include "ImageBrowser.h"
 
 #include <QHBoxLayout>
 #include <QAction>
@@ -10,7 +10,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-ImageBrowser::ImageBrowser(QWidget *parent) : imageLabel(new QLabel), scrollArea(new QScrollArea) {
+ImageBrowser::ImageBrowser(QWidget *parent) : QWidget(parent), imageLabel(new QLabel), scrollArea(new QScrollArea) {
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setScaledContents(true);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -48,26 +48,21 @@ ImageBrowser::ImageBrowser(QWidget *parent) : imageLabel(new QLabel), scrollArea
     connect(fitWindowBtn, &QAbstractButton::clicked, this, &ImageBrowser::fitWindow);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout;
-    QGroupBox* buttonBox = new QGroupBox;
-
     buttonLayout->addWidget(openImageBtn);
     buttonLayout->addWidget(closeImageBtn);
     buttonLayout->addWidget(zoomInBtn);
     buttonLayout->addWidget(zoomOutBtn);
     buttonLayout->addWidget(normalizeBtn);
     buttonLayout->addWidget(fitWindowBtn);
-    buttonBox->setLayout(buttonLayout);
 
     QHBoxLayout* contentLayout = new QHBoxLayout;
-    QGroupBox* contentBox = new QGroupBox;
     scrollArea->setWidget(imageLabel);
     scrollArea->setBackgroundRole(QPalette::Dark);
     contentLayout->addWidget(scrollArea);
-    contentBox->setLayout(contentLayout);
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(buttonBox);
-    mainLayout->addWidget(contentBox);
+    mainLayout->addLayout(buttonLayout);
+    mainLayout->addLayout(contentLayout);
 
     setLayout(mainLayout);
 }

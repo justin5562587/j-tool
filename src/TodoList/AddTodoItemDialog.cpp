@@ -1,8 +1,8 @@
 //
 // Created by justin on 2020/11/16.
 //
-#include "./AddTodoItemDialog.h"
-#include "./TodoList.h"
+#include "AddTodoItemDialog.h"
+#include "TodoList.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -42,7 +42,7 @@ AddTodoItemDialog::AddTodoItemDialog(QWidget *parent) : titleInput(new QLineEdit
     inputLayout->addWidget(starLabel, 5, 0, Qt::AlignLeft);
     inputLayout->addWidget(starChecker, 5, 1, Qt::AlignLeft);
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(okBtn);
     buttonLayout->addWidget(cancelBtn);
     inputLayout->addLayout(buttonLayout, 6, 0);

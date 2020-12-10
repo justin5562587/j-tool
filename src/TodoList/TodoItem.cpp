@@ -1,7 +1,7 @@
 //
 // Created by justin on 2020/11/13.
 //
-#include "./TodoItem.h"
+#include "TodoItem.h"
 
 TodoItem::TodoItem(const QString &title, const QString &des, const QString &content, const QDateTime &startTime,
                    const QDateTime doneTime, bool star) :

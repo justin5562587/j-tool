@@ -1,26 +1,25 @@
 //
 // Created by justin on 2020/11/13.
 //
-#include "./TodoList.h"
+#include "TodoList.h"
 
 #include <QHBoxLayout>
 #include <QAction>
 #include <QLabel>
 #include <QButtonGroup>
 
-TodoList::TodoList(QWidget *parent) : pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
+TodoList::TodoList(QWidget *parent) : QWidget(parent),
+                                      pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
                                       addTodoItemDialog(new AddTodoItemDialog) {
 
     auto mainLayout = new QVBoxLayout;
 
     // top section (title)
-    QLabel *titleLabel = new QLabel("Todo List");
+    QLabel *titleLabel = new QLabel("Todo List", this);
     titleLabel->setStyleSheet("font-size: 20pt");
 
     // middle section (pendingBox doneBox)
     QHBoxLayout *middleLayout = new QHBoxLayout;
-    QWidget *middleBox = new QWidget();
-    middleBox->setLayout(middleLayout);
 
     QVBoxLayout *pendingLayout = new QVBoxLayout;
     pendingBox = new QListView;
@@ -43,16 +42,12 @@ TodoList::TodoList(QWidget *parent) : pendingTodoVector(new QVector<TodoItem>), 
 
     // bottom section (todoButtonBox)
     QHBoxLayout *bottomLayout = new QHBoxLayout;
-    QWidget *bottomBox = new QWidget;
-    bottomBox->setLayout(bottomLayout);
 
     QPushButton *addBtn = new QPushButton("Add");
-    addBtn->setStyleSheet("font-size: 16px, width: 40px, height: 40px");
-    addBtn->setIcon(QIcon(":/resources/icons/add.png"));
+//    addBtn->setIcon(QIcon(":/resources/icons/add.png"));
 
     QPushButton *removeBtn = new QPushButton("Remove");
-    removeBtn->setStyleSheet("font-size: 16px, width: 40px, height: 40px");
-    removeBtn->setIcon(QIcon(":/resources/icons/remove.png"));
+//    removeBtn->setIcon(QIcon(":/resources/icons/remove.png"));
 
     bottomLayout->addWidget(addBtn);
     bottomLayout->addWidget(removeBtn);
@@ -68,8 +63,8 @@ TodoList::TodoList(QWidget *parent) : pendingTodoVector(new QVector<TodoItem>), 
 
     //  set mainLayout
     mainLayout->addWidget(titleLabel);
-    mainLayout->addWidget(middleBox);
-    mainLayout->addWidget(bottomBox);
+    mainLayout->addLayout(middleLayout);
+    mainLayout->addLayout(bottomLayout);
     setLayout(mainLayout);
 }
 

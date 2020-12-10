@@ -1,12 +1,14 @@
 # j-tool
-A integrated desktop tools for programmers
+A integrated desktop tools for programmers or officers
 
-## Functionalities
-- Contact Menu
-- Image Browser
-- PDF Processor
-- File Converter
-- Multimedia player
+## Functionalities / Core Components
+- Image Browser *_doing*
+- Todo List *_doing*
+- Multimedia player *__doing__*
+- Format Convertor *_todo*
+- Contact Menu *_todo*
+- PDF Processor *_todo*
+- File Converter *_todo*
 
 ## Reference Guides
 - [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)
@@ -25,4 +27,7 @@ A integrated desktop tools for programmers
 - [Website for File examples](https://file-examples.com/)
 
 ## Reference Books
-- **CMake CMake Cookbook** -- 2018 *Bast, Radovan; Di Remigio, Roberto*
+| Book Name | Author | Year |
+|:----------|:-------------|------:|
+| CMake CMake Cookbook |  Bast, Radovan; Di Remigio, Roberto | 2018 |
+| Fundamentals of Multimedia | Ze-Nian Li | 2014 |

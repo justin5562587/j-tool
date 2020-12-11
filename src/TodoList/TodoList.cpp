@@ -7,6 +7,10 @@
 #include <QAction>
 #include <QLabel>
 #include <QButtonGroup>
+#include <QFile>
+//#include <>
+#include <QDebug>
+
 
 TodoList::TodoList(QWidget *parent) : QWidget(parent),
                                       pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
@@ -44,10 +48,11 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     QHBoxLayout *bottomLayout = new QHBoxLayout;
 
     QPushButton *addBtn = new QPushButton("Add");
-//    addBtn->setIcon(QIcon(":/resources/icons/add.png"));
+    addBtn->setIcon(QIcon(":/icons/add.png"));
+    addBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     QPushButton *removeBtn = new QPushButton("Remove");
-//    removeBtn->setIcon(QIcon(":/resources/icons/remove.png"));
+    removeBtn->setIcon(QIcon(":/icons/remove.png"));
 
     bottomLayout->addWidget(addBtn);
     bottomLayout->addWidget(removeBtn);
@@ -61,10 +66,24 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     removeBtn->addAction(removeItemAct);
     connect(removeBtn, &QAbstractButton::clicked, this, &TodoList::removeItem);
 
+    QLabel* imageLabel = new QLabel;
+    QPixmap pix(":/images/test.jpeg");
+    imageLabel->setPixmap(pix);
+    imageLabel->setText("test label");
+
     //  set mainLayout
     mainLayout->addWidget(titleLabel);
     mainLayout->addLayout(middleLayout);
     mainLayout->addLayout(bottomLayout);
+    mainLayout->addWidget(imageLabel);
+
+//    QFile styleFile(":/qss/style.qss");
+//    QFile styleFile(":/images/test.jpeg");
+//    styleFile.open(QIODevice::ReadOnly);
+//    qDebug() << (styleFile.exists() ? "exist" : "not found");
+//    QString styleSheet = QLatin1String(styleFile.readAll());
+//    setStyleSheet(styleSheet);
+
     setLayout(mainLayout);
 }
 

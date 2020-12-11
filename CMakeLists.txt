@@ -45,8 +45,10 @@ target_link_libraries(j_todo_list PUBLIC ${QT_LIBS})
 target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS} Qt5::MultimediaWidgets Qt5::Multimedia)
 target_link_libraries(j_format_convertor PUBLIC ${QT_LIBS})
 
+qt5_add_resources(RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/source.qrc)
+
 # config result executable
-add_executable(j_tool ${MAIN_SRC})
+add_executable(j_tool ${MAIN_SRC} ${RESOURCE_FILES})
 target_link_libraries(j_tool j_image_browser j_todo_list j_multimedia_player j_format_convertor)
 
 add_custom_command(

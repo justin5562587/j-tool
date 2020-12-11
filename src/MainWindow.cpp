@@ -5,17 +5,29 @@
 
 #include <QMenu>
 #include <QMessageBox>
+#include <QDirIterator>
 
 MainWindow::MainWindow() : QMainWindow() {
     m_imageBrowser = new ImageBrowser(this);
     m_todoList = new TodoList(this);
-    m_multimediaPlayer = new MultimediaPlayer(this);
+//    m_multimediaPlayer = new MultimediaPlayer(this);
 
     createMenus();
     setWindowTitle("J-Tool");
 
-    // default call setCentralWidget
-    setCentralWithMultimediaPlayer();
+//    setCentralWithMultimediaPlayer();
+//    setCentralWithTodoList();
+
+    QDirIterator it(":/", QDirIterator::Subdirectories);
+    while (it.hasNext())
+        qDebug() << it.next();
+
+    QLabel* imageLabel = new QLabel;
+//    QPixmap pix(":/images/test.jpeg");
+    QPixmap pix(":/qt-project.org/qmessagebox/images/qtlogo-64.png");
+    imageLabel->setPixmap(pix);
+    imageLabel->setText("test label");
+    setCentralWidget(imageLabel);
 }
 
 void MainWindow::createMenus() {

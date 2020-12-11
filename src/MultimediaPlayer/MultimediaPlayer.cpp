@@ -146,7 +146,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
         m_fullScreenButton->setEnabled(false);
     }
 
-    QFile styleFile("./style/index.qss");
+    QFile styleFile(":/qss/style.qss");
     styleFile.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(styleFile.readAll());
     setStyleSheet(styleSheet);

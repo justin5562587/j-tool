@@ -67,9 +67,9 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     connect(removeBtn, &QAbstractButton::clicked, this, &TodoList::removeItem);
 
     QLabel* imageLabel = new QLabel;
-    QPixmap pix(":/images/test.jpeg");
+    QPixmap pix(":/resources/images/test.jpeg");
     imageLabel->setPixmap(pix);
-    imageLabel->setText("test label");
+//    imageLabel->setText("test label");
 
     //  set mainLayout
     mainLayout->addWidget(titleLabel);
@@ -77,12 +77,11 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     mainLayout->addLayout(bottomLayout);
     mainLayout->addWidget(imageLabel);
 
-//    QFile styleFile(":/qss/style.qss");
-//    QFile styleFile(":/images/test.jpeg");
-//    styleFile.open(QIODevice::ReadOnly);
-//    qDebug() << (styleFile.exists() ? "exist" : "not found");
-//    QString styleSheet = QLatin1String(styleFile.readAll());
-//    setStyleSheet(styleSheet);
+    QFile styleFile(":/resources/qss/style.qss");
+    styleFile.open(QIODevice::ReadOnly);
+    qDebug() << (styleFile.exists() ? "exist" : "not found");
+    QString styleSheet = QLatin1String(styleFile.readAll());
+    setStyleSheet(styleSheet);
 
     setLayout(mainLayout);
 }

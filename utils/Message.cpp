@@ -27,3 +27,8 @@ void Message::setMessage(std::string &newMessage) {
 std::string &Message::getMessage() const {
     return message;
 }
+
+//    QDirIterator it(":/", QDirIterator::Subdirectories);
+//    while (it.hasNext()) {
+//        qDebug() << it.next();
+//    }

@@ -1,8 +1,0 @@
-<!DOCTYPE RCC>
-
-<RCC>
-    <qresource prefix="/">
-        <file>images/test.jpeg</file>
-        <file>qss/style.qss</file>
-    </qresource>
-</RCC>

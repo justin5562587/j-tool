@@ -9,6 +9,7 @@ A integrated desktop tools for programmers or officers
 - Multimedia player *__doing__*
     1. Save playback history
     2. More advanced control buttons (screen size control)
+    3. Dark/Light mode https://github.com/ColinDuquesnoy/QDarkStyleSheet
     
 - Format Convertor *_todo*
 
@@ -19,6 +20,9 @@ A integrated desktop tools for programmers or officers
 - File Converter *_todo*
 
 - Screenshot *_todo*
+
+## TodoList
+- Add dashbroad in MainWindow
 
 ## Reference Guides
 - [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)

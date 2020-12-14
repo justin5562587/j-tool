@@ -28,10 +28,11 @@ void VideoWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 void VideoWidget::mousePressEvent(QMouseEvent *event) {
-    setFullScreen(!isFullScreen());
+//    setFullScreen(!isFullScreen());
     event->accept();
 }
 
 void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+    setFullScreen(!isFullScreen());
     QVideoWidget::mousePressEvent(event);
 }

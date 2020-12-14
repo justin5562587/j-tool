@@ -11,6 +11,7 @@
 #include <QItemSelection>
 #include <QMenuBar>
 #include <QVBoxLayout>
+#include <QStackedWidget>
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -31,6 +32,9 @@ private slots:
 
 private:
     void createMenus();
+    void createMenusForMultimediaPlayer();
+
+    QStackedWidget* stackedWidget;
 
     ImageBrowser* m_imageBrowser = nullptr;
     TodoList* m_todoList = nullptr;

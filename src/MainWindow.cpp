@@ -6,16 +6,25 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QDirIterator>
+#include <QStackedWidget>
 
 MainWindow::MainWindow() : QMainWindow() {
+    stackedWidget = new QStackedWidget(this);
+    m_multimediaPlayer = new MultimediaPlayer(this);
+    m_imageBrowser = new ImageBrowser(this);
+    m_todoList = new TodoList(this);
+    stackedWidget->addWidget(m_multimediaPlayer);
+    stackedWidget->addWidget(m_imageBrowser);
+    stackedWidget->addWidget(m_todoList);
+
     createMenus();
     setWindowTitle("J-Tool");
-    setCentralWithMultimediaPlayer();
+    setCentralWidget(stackedWidget);
 }
 
 void MainWindow::createMenus() {
     // main menu
-    QMenu *mainMenu = menuBar()->addMenu("Model");
+    QMenu *mainMenu = menuBar()->addMenu("Models");
     mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
     mainMenu->addSeparator();
     mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
@@ -25,22 +34,27 @@ void MainWindow::createMenus() {
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About"), this, &MainWindow::about);
+
+    // create menus of cores
+    createMenusForMultimediaPlayer();
+}
+
+void MainWindow::createMenusForMultimediaPlayer() {
+    QMenu *menu = menuBar()->addMenu("Multimedia Player");
+    menu->addAction("Open", m_multimediaPlayer, &MultimediaPlayer::open);
 }
 
 // slot
+void MainWindow::setCentralWithMultimediaPlayer() {
+    stackedWidget->setCurrentIndex(0);
+}
+
 void MainWindow::setCentralWithImageBrowser() {
-    m_imageBrowser = new ImageBrowser(this);
-    setCentralWidget(m_imageBrowser);
+    stackedWidget->setCurrentIndex(1);
 }
 
 void MainWindow::setCentralWithTodoList() {
-    m_todoList = new TodoList(this);
-    setCentralWidget(m_todoList);
-}
-
-void MainWindow::setCentralWithMultimediaPlayer() {
-    m_multimediaPlayer = new MultimediaPlayer(this);
-    setCentralWidget(m_multimediaPlayer);
+    stackedWidget->setCurrentIndex(2);
 }
 
 void MainWindow::about() {

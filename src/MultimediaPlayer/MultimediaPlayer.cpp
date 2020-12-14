@@ -41,13 +41,14 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &MultimediaPlayer::displayErrorMessage);
     connect(m_player, &QMediaPlayer::stateChanged, this, &MultimediaPlayer::stateChanged);
 
-    m_videoWidget = new QVideoWidget(this);
+    m_videoWidget = new VideoWidget(this);
     m_player->setVideoOutput(m_videoWidget);
 
     m_playlistModel = new PlaylistModel(this);
     m_playlistModel->setPlaylist(m_playlist);
 
     m_playlistView = new QListView(this);
+//    m_playlistView->setItemDelegate();
     m_playlistView->setModel(m_playlistModel);
     m_playlistView->setCurrentIndex(m_playlistModel->index(m_playlist->currentIndex(), 0));
 
@@ -100,10 +101,10 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_player, &QMediaPlayer::volumeChanged, playControl, &PlayControl::setVolume);
     connect(m_player, &QMediaPlayer::mutedChanged, playControl, &PlayControl::setMuted);
 
-    m_fullScreenButton = new QPushButton("FullScreen", this);
+    m_fullScreenButton = new QPushButton("Full Screen", this);
     m_fullScreenButton->setCheckable(true);
 
-    m_colorButton = new QPushButton(tr("Color Options..."), this);
+    m_colorButton = new QPushButton("Color Options", this);
     m_colorButton->setEnabled(false);
     connect(m_colorButton, &QPushButton::clicked, this, &MultimediaPlayer::showColorDialog);
 
@@ -117,11 +118,9 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->addWidget(openBtn);
-    controlLayout->addStretch(1);
-    controlLayout->addWidget(playControl);
-    controlLayout->addStretch(1);
     controlLayout->addWidget(m_fullScreenButton);
     controlLayout->addWidget(m_colorButton);
+    controlLayout->addWidget(playControl);
 
     QHBoxLayout *sliderDurationLayout = new QHBoxLayout;
     sliderDurationLayout->addWidget(m_slider);
@@ -375,7 +374,6 @@ void MultimediaPlayer::updateDurationInfo(qint64 currentInfo) {
     }
     m_labelDuration->setText(tStr);
 }
-
 
 void MultimediaPlayer::showColorDialog() {
     if (!m_colorDialog) {

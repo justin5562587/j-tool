@@ -1,14 +1,19 @@
-QLabel {
-    font-size: 24px;
-    color: red;
+QPushButton {
+    border-radius: 4px;
+    background-color: #1c7cba;
+    color: #fff;
+    height: 30px;
+    min-width: 80px;
+    padding: 0 20px;
 }
 
-QPushButton#openBtn {
-    border-radius: 4px;
-    color: #fff;
-    border: none;
-    background-color: #3da0e0;
-    min-width: 80px;
-    height: 30px;
+QPushButton:disabled {
+    background-color: #8f8f8f;
+}
 
+QToolButton {
+    border-radius: 4px;
+    height: 30px;
+    width: 30px;
+    border: 1px solid #8f8f8f;
 }

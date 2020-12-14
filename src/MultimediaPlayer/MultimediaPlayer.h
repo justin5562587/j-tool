@@ -61,8 +61,10 @@ signals:
 
     void fullScreenChanged(bool fullScreen);
 
-private slots:
+public slots:
     void open();
+
+private slots:
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);
     void metaDataChanged();

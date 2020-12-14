@@ -63,19 +63,13 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     removeBtn->addAction(removeItemAct);
     connect(removeBtn, &QAbstractButton::clicked, this, &TodoList::removeItem);
 
-//    QLabel* imageLabel = new QLabel;
-//    QPixmap pix(":/resources/images/1.jpg");
-//    imageLabel->setPixmap(pix);
-//    imageLabel->setText("test label");
-
     //  set mainLayout
     mainLayout->addWidget(titleLabel);
     mainLayout->addLayout(middleLayout);
     mainLayout->addLayout(bottomLayout);
-//    mainLayout->addWidget(imageLabel);
 
     // load specific style
-    QFile styleFile(":/resources/qss/todoList.qss");
+    QFile styleFile(":/qss/todoList.qss");
     styleFile.open(QIODevice::ReadOnly);
     QString styleSheet = QLatin1String(styleFile.readAll());
     setStyleSheet(styleSheet);

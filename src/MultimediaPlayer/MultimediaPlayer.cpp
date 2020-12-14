@@ -77,6 +77,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_audioProbe->setSource(m_player);
 
     QPushButton *openBtn = new QPushButton("Open", this);
+    openBtn->setObjectName("openBtn");
     connect(openBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::open);
 
     // set PlayControl
@@ -146,7 +147,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
         m_fullScreenButton->setEnabled(false);
     }
 
-    QFile styleFile(":/resources/qss/multimediaPlayer.qss");
+    QFile styleFile(":/qss/multimediaPlayer.qss");
     styleFile.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(styleFile.readAll());
     setStyleSheet(styleSheet);

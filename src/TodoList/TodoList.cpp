@@ -8,9 +8,7 @@
 #include <QLabel>
 #include <QButtonGroup>
 #include <QFile>
-//#include <>
 #include <QDebug>
-
 
 TodoList::TodoList(QWidget *parent) : QWidget(parent),
                                       pendingTodoVector(new QVector<TodoItem>), doneTodoVector(new QVector<TodoItem>),
@@ -48,11 +46,10 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     QHBoxLayout *bottomLayout = new QHBoxLayout;
 
     QPushButton *addBtn = new QPushButton("Add");
-    addBtn->setIcon(QIcon(":/icons/add.png"));
-    addBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    addBtn->setIcon(QIcon(":/resources/icons/add.png"));
 
     QPushButton *removeBtn = new QPushButton("Remove");
-    removeBtn->setIcon(QIcon(":/icons/remove.png"));
+    removeBtn->setIcon(QIcon(":/resources/icons/remove.png"));
 
     bottomLayout->addWidget(addBtn);
     bottomLayout->addWidget(removeBtn);
@@ -66,16 +63,16 @@ TodoList::TodoList(QWidget *parent) : QWidget(parent),
     removeBtn->addAction(removeItemAct);
     connect(removeBtn, &QAbstractButton::clicked, this, &TodoList::removeItem);
 
-    QLabel* imageLabel = new QLabel;
-    QPixmap pix(":/resources/images/1.jpg");
-    imageLabel->setPixmap(pix);
+//    QLabel* imageLabel = new QLabel;
+//    QPixmap pix(":/resources/images/1.jpg");
+//    imageLabel->setPixmap(pix);
 //    imageLabel->setText("test label");
 
     //  set mainLayout
     mainLayout->addWidget(titleLabel);
     mainLayout->addLayout(middleLayout);
     mainLayout->addLayout(bottomLayout);
-    mainLayout->addWidget(imageLabel);
+//    mainLayout->addWidget(imageLabel);
 
     // load specific style
     QFile styleFile(":/resources/qss/todoList.qss");

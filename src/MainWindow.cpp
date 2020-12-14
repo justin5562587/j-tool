@@ -8,14 +8,9 @@
 #include <QDirIterator>
 
 MainWindow::MainWindow() : QMainWindow() {
-    m_imageBrowser = new ImageBrowser(this);
-    m_todoList = new TodoList(this);
-    m_multimediaPlayer = new MultimediaPlayer(this);
-
     createMenus();
     setWindowTitle("J-Tool");
-
-    setCentralWithTodoList();
+    setCentralWithMultimediaPlayer();
 }
 
 void MainWindow::createMenus() {
@@ -34,14 +29,17 @@ void MainWindow::createMenus() {
 
 // slot
 void MainWindow::setCentralWithImageBrowser() {
+    m_imageBrowser = new ImageBrowser(this);
     setCentralWidget(m_imageBrowser);
 }
 
 void MainWindow::setCentralWithTodoList() {
+    m_todoList = new TodoList(this);
     setCentralWidget(m_todoList);
 }
 
 void MainWindow::setCentralWithMultimediaPlayer() {
+    m_multimediaPlayer = new MultimediaPlayer(this);
     setCentralWidget(m_multimediaPlayer);
 }
 

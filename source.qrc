@@ -3,6 +3,7 @@
         <file>resources/images/1.jpg</file>
         <file>resources/images/2.jpg</file>
         <file>resources/images/3.jpg</file>
-        <file>resources/qss/style.qss</file>
+        <file>resources/qss/todoList.qss</file>
+        <file>resources/qss/multimediaPlayer.qss</file>
     </qresource>
 </RCC>

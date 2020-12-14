@@ -1,10 +1,6 @@
 aux_source_directory(. MULTIMEDIA_PLAYER_SRC)
 
-set(CMAKE_AUTORCC ON)
-
-qt5_add_resources(QRC_FILES resources/source.qrc)
-
-add_library(j_multimedia_player STATIC ${MULTIMEDIA_PLAYER_SRC} ${QRC_FILES})
+add_library(j_multimedia_player STATIC ${MULTIMEDIA_PLAYER_SRC})
 
 #find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h)
 #find_library(AVCODEC_LIBRARY avcodec)

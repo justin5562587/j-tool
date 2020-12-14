@@ -1,4 +1,0 @@
-QLabel {
-    font-size: 20px;
-    color: #3da0e0;
-}

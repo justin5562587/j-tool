@@ -3,12 +3,22 @@ A integrated desktop tools for programmers or officers
 
 ## Functionalities / Core Components
 - Image Browser *_doing*
+
 - Todo List *_doing*
+
 - Multimedia player *__doing__*
+    1. Save playback history
+    2. More advanced control buttons (screen size control)
+    
 - Format Convertor *_todo*
+
 - Contact Menu *_todo*
+
 - PDF Processor *_todo*
+
 - File Converter *_todo*
+
+- Screenshot *_todo*
 
 ## Reference Guides
 - [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)

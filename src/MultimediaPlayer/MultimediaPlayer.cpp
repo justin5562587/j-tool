@@ -7,6 +7,7 @@
 #include "HistogramWidget.h"
 #include "VideoWidget.h"
 #include "MediaInfoWidget.h"
+#include "PlayListItemDelegate.h"
 
 #include <QVideoWidget>
 #include <QHBoxLayout>
@@ -48,7 +49,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_playlistModel->setPlaylist(m_playlist);
 
     m_playlistView = new QListView(this);
-//    m_playlistView->setItemDelegate();
+    m_playlistView->setItemDelegate(new PlayListItemDelegate(this));
     m_playlistView->setModel(m_playlistModel);
     m_playlistView->setCurrentIndex(m_playlistModel->index(m_playlist->currentIndex(), 0));
 

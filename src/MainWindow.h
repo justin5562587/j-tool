@@ -3,8 +3,8 @@
 //
 #pragma once
 
-#include "./ImageBrowser/ImageBrowser.h"
-#include "./TodoList/TodoList.h"
+//#include "./ImageBrowser/ImageBrowser.h"
+//#include "./TodoList/TodoList.h"
 #include "./MultimediaPlayer/MultimediaPlayer.h"
 
 #include <QMainWindow>
@@ -24,9 +24,9 @@ private slots:
 
     void about();
 
-    void setCentralWithImageBrowser();
+//    void setCentralWithImageBrowser();
 
-    void setCentralWithTodoList();
+//    void setCentralWithTodoList();
 
     void setCentralWithMultimediaPlayer();
 
@@ -36,7 +36,7 @@ private:
 
     QStackedWidget* stackedWidget;
 
-    ImageBrowser* m_imageBrowser = nullptr;
-    TodoList* m_todoList = nullptr;
+//    ImageBrowser* m_imageBrowser = nullptr;
+//    TodoList* m_todoList = nullptr;
     MultimediaPlayer* m_multimediaPlayer = nullptr;
 };

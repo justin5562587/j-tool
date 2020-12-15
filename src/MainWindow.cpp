@@ -11,11 +11,11 @@
 MainWindow::MainWindow() : QMainWindow() {
     stackedWidget = new QStackedWidget(this);
     m_multimediaPlayer = new MultimediaPlayer(this);
-    m_imageBrowser = new ImageBrowser(this);
-    m_todoList = new TodoList(this);
+//    m_imageBrowser = new ImageBrowser(this);
+//    m_todoList = new TodoList(this);
     stackedWidget->addWidget(m_multimediaPlayer);
-    stackedWidget->addWidget(m_imageBrowser);
-    stackedWidget->addWidget(m_todoList);
+//    stackedWidget->addWidget(m_imageBrowser);
+//    stackedWidget->addWidget(m_todoList);
 
     createMenus();
     setWindowTitle("J-Tool");
@@ -25,10 +25,10 @@ MainWindow::MainWindow() : QMainWindow() {
 void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Models");
-    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
-    mainMenu->addSeparator();
-    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
-    mainMenu->addSeparator();
+//    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
+//    mainMenu->addSeparator();
+//    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
+//    mainMenu->addSeparator();
     mainMenu->addAction("Multimedia Player", this, &MainWindow::setCentralWithMultimediaPlayer);
 
     // help
@@ -49,13 +49,13 @@ void MainWindow::setCentralWithMultimediaPlayer() {
     stackedWidget->setCurrentIndex(0);
 }
 
-void MainWindow::setCentralWithImageBrowser() {
-    stackedWidget->setCurrentIndex(1);
-}
-
-void MainWindow::setCentralWithTodoList() {
-    stackedWidget->setCurrentIndex(2);
-}
+//void MainWindow::setCentralWithImageBrowser() {
+//    stackedWidget->setCurrentIndex(1);
+//}
+//
+//void MainWindow::setCentralWithTodoList() {
+//    stackedWidget->setCurrentIndex(2);
+//}
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),

@@ -63,6 +63,8 @@ signals:
 
 public slots:
     void open();
+    void clear();
+    void screenShot();
 
 private slots:
     void durationChanged(qint64 duration);
@@ -99,8 +101,11 @@ private:
     QLabel *m_coverLabel = nullptr;
     QSlider *m_slider = nullptr;
     QLabel *m_labelDuration = nullptr;
-    QPushButton *m_fullScreenButton = nullptr;
-    QPushButton *m_colorButton = nullptr;
+    QPushButton *m_openBtn = nullptr;
+    QPushButton *m_clearBtn = nullptr;
+    QPushButton *m_screenShotBtn = nullptr;
+    QPushButton *m_fullScreenBtn = nullptr;
+    QPushButton *m_colorBtn = nullptr;
     QDialog *m_colorDialog = nullptr;
     QLabel *m_statusLabel = nullptr;
     QStatusBar *m_statusBar = nullptr;

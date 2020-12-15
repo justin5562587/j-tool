@@ -24,6 +24,8 @@
 #include <QTime>
 #include <QFormLayout>
 #include <QFile>
+#include <QScreen>
+#include <QImageWriter>
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_player = new QMediaPlayer(this);
@@ -39,7 +41,8 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_player, &QMediaPlayer::mediaStatusChanged, this, &MultimediaPlayer::statusChanged);
     connect(m_player, &QMediaPlayer::bufferStatusChanged, this, &MultimediaPlayer::bufferingProgress);
     connect(m_player, &QMediaPlayer::videoAvailableChanged, this, &MultimediaPlayer::videoAvailableChanged);
-    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, &MultimediaPlayer::displayErrorMessage);
+    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
+            &MultimediaPlayer::displayErrorMessage);
     connect(m_player, &QMediaPlayer::stateChanged, this, &MultimediaPlayer::stateChanged);
 
     m_videoWidget = new VideoWidget(this);
@@ -78,10 +81,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_audioProbe, &QAudioProbe::audioBufferProbed, m_audioHistogram, &HistogramWidget::processBuffer);
     m_audioProbe->setSource(m_player);
 
-    QPushButton *openBtn = new QPushButton("Open", this);
-    openBtn->setObjectName("openBtn");
-    connect(openBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::open);
-
     // set PlayControl
     PlayControl *playControl = new PlayControl(this);
     playControl->setState(m_player->state());
@@ -102,12 +101,25 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(m_player, &QMediaPlayer::volumeChanged, playControl, &PlayControl::setVolume);
     connect(m_player, &QMediaPlayer::mutedChanged, playControl, &PlayControl::setMuted);
 
-    m_fullScreenButton = new QPushButton("Full Screen", this);
-    m_fullScreenButton->setCheckable(true);
+    m_openBtn = new QPushButton("Open", this);
+    m_openBtn->setObjectName("openBtn");
+    connect(m_openBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::open);
 
-    m_colorButton = new QPushButton("Color Options", this);
-    m_colorButton->setEnabled(false);
-    connect(m_colorButton, &QPushButton::clicked, this, &MultimediaPlayer::showColorDialog);
+    m_clearBtn = new QPushButton("Clear", this);
+    m_clearBtn->setObjectName("clearBtn");
+    m_clearBtn->setEnabled(false);
+    connect(m_clearBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::clear);
+
+    m_screenShotBtn = new QPushButton("Screen Shot", this);
+    m_screenShotBtn->setEnabled(false);
+    connect(m_screenShotBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::screenShot);
+
+    m_fullScreenBtn = new QPushButton("Full Screen", this);
+    m_fullScreenBtn->setCheckable(true);
+
+    m_colorBtn = new QPushButton("Color Options", this);
+    m_colorBtn->setEnabled(false);
+    connect(m_colorBtn, &QPushButton::clicked, this, &MultimediaPlayer::showColorDialog);
 
     QBoxLayout *displayLayout = new QHBoxLayout();
     displayLayout->addWidget(m_videoWidget, 2);
@@ -118,9 +130,11 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);
-    controlLayout->addWidget(openBtn);
-    controlLayout->addWidget(m_fullScreenButton);
-    controlLayout->addWidget(m_colorButton);
+    controlLayout->addWidget(m_openBtn);
+    controlLayout->addWidget(m_clearBtn);
+    controlLayout->addWidget(m_screenShotBtn);
+    controlLayout->addWidget(m_fullScreenBtn);
+    controlLayout->addWidget(m_colorBtn);
     controlLayout->addWidget(playControl);
 
     QHBoxLayout *sliderDurationLayout = new QHBoxLayout;
@@ -142,9 +156,11 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
         // set all Widgets disabled
         playControl->setEnabled(false);
         m_playlistView->setEnabled(false);
-        openBtn->setEnabled(false);
-        m_colorButton->setEnabled(false);
-        m_fullScreenButton->setEnabled(false);
+        m_openBtn->setEnabled(false);
+        m_clearBtn->setEnabled(false);
+        m_colorBtn->setEnabled(false);
+        m_screenShotBtn->setEnabled(false);
+        m_fullScreenBtn->setEnabled(false);
     }
 
     QFile styleFile(":/qss/multimediaPlayer.qss");
@@ -162,12 +178,13 @@ bool MultimediaPlayer::isPlayerAvailable() const {
     return m_player->isAvailable();
 }
 
-// todo
 void MultimediaPlayer::play() {
+    m_screenShotBtn->setEnabled(true);
     m_player->play();
+
     // todo show information of current playing media
-    QVector<QString> otherKeys = std::initializer_list<QString>({ "Resolution" });
-    m_mediaInfoWidget->populateWidgets(m_player, otherKeys);
+//    QVector<QString> otherKeys = std::initializer_list<QString>({"Resolution"});
+//    m_mediaInfoWidget->populateWidgets(m_player, otherKeys);
 }
 
 void MultimediaPlayer::open() {
@@ -175,19 +192,69 @@ void MultimediaPlayer::open() {
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
     fileDialog.setWindowTitle(tr("Open Files"));
     QStringList supportedMimeTypes = m_player->supportedMimeTypes();
+
     if (!supportedMimeTypes.isEmpty()) {
         supportedMimeTypes.append("audio/x-m3u"); // MP3 playlists
-        fileDialog.setMimeTypeFilters(supportedMimeTypes);
+//        fileDialog.setMimeTypeFilters(supportedMimeTypes);
     }
     fileDialog.setDirectory(
-            QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
+            QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).value(0, QDir::homePath())
+//            QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath())
+    );
     if (fileDialog.exec() == QDialog::Accepted) {
         addToPlaylist(fileDialog.selectedUrls());
     }
 }
 
-static bool isPlaylist(const QUrl &url) // Check for ".m3u" playlists.
-{
+void MultimediaPlayer::clear() {
+    m_player->stop();
+    m_playlist->clear();
+    m_clearBtn->setEnabled(false);
+}
+
+// todo
+void MultimediaPlayer::screenShot() {
+    QRect contentRect = m_videoWidget->contentsRect();
+//    QPixmap screenContent = m_videoWidget->grab(contentRect);
+
+    QPixmap screenContent(contentRect.size());
+//    m_videoWidget->render(&screenContent);
+    m_videoWidget->render(&screenContent, QPoint(), QRegion(contentRect));
+//    m_videoWidget->render
+
+
+//    QScreen* screen = m_videoWidget->screen();
+//    QPixmap screenContent = screen->grabWindow(QWidget::winId());
+
+    const QString format = "png";
+
+    QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    QFileDialog fileDialog(this, "Save Screen Shot as", saveDir);
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog.setFileMode(QFileDialog::AnyFile);
+    fileDialog.setDirectory(saveDir);
+
+    QStringList mimeTypes;
+    const QList<QByteArray> baMimeTypes = QImageWriter::supportedMimeTypes();
+    for (const QByteArray &bf : baMimeTypes) {
+        mimeTypes.append(bf);
+    }
+    fileDialog.setMimeTypeFilters(mimeTypes);
+    fileDialog.selectMimeTypeFilter("image/" + format);
+    fileDialog.setDefaultSuffix(format);
+
+    if (fileDialog.exec() != QDialog::Accepted) return;
+
+    const QString fileName = fileDialog.selectedFiles().first();
+
+    if (!screenContent.save(fileName)) {
+        QMessageBox::warning(this, tr("Save Error"), tr("The image could not be saved to \"%1\".")
+                .arg(QDir::toNativeSeparators(fileName)));
+    }
+}
+
+// Check for ".m3u" playlists.
+static bool isPlaylist(const QUrl &url) {
     if (!url.isLocalFile()) {
         return false;
     }
@@ -197,11 +264,13 @@ static bool isPlaylist(const QUrl &url) // Check for ".m3u" playlists.
 
 void MultimediaPlayer::addToPlaylist(const QList<QUrl> &urls) {
     for (auto &url: urls) {
-        if (isPlaylist(url))
+        if (isPlaylist(url)) {
             m_playlist->load(url);
-        else
+        } else {
             m_playlist->addMedia(url);
+        }
     }
+    m_clearBtn->setEnabled(true);
 }
 
 void MultimediaPlayer::setCustomAudioRole(const QString &role) {
@@ -214,9 +283,9 @@ void MultimediaPlayer::durationChanged(qint64 duration) {
 }
 
 void MultimediaPlayer::positionChanged(qint64 progress) {
-    if (!m_slider->isSliderDown())
+    if (!m_slider->isSliderDown()) {
         m_slider->setValue(progress / 1000);
-
+    }
     updateDurationInfo(progress / 1000);
 }
 
@@ -249,7 +318,7 @@ void MultimediaPlayer::previousClicked() {
 void MultimediaPlayer::jump(const QModelIndex &index) {
     if (index.isValid()) {
         m_playlist->setCurrentIndex(index.row());
-        m_player->play();
+        play();
     }
 }
 
@@ -316,17 +385,17 @@ void MultimediaPlayer::bufferingProgress(int progress) {
 
 void MultimediaPlayer::videoAvailableChanged(bool available) {
     if (!available) {
-        disconnect(m_fullScreenButton, &QPushButton::clicked, m_videoWidget, &QVideoWidget::setFullScreen);
-        disconnect(m_videoWidget, &QVideoWidget::fullScreenChanged, m_fullScreenButton, &QPushButton::setChecked);
+        disconnect(m_fullScreenBtn, &QPushButton::clicked, m_videoWidget, &QVideoWidget::setFullScreen);
+        disconnect(m_videoWidget, &QVideoWidget::fullScreenChanged, m_fullScreenBtn, &QPushButton::setChecked);
         m_videoWidget->setFullScreen(false);
     } else {
-        connect(m_fullScreenButton, &QPushButton::clicked, m_videoWidget, &QVideoWidget::setFullScreen);
-        connect(m_videoWidget, &QVideoWidget::fullScreenChanged, m_fullScreenButton, &QPushButton::setChecked);
+        connect(m_fullScreenBtn, &QPushButton::clicked, m_videoWidget, &QVideoWidget::setFullScreen);
+        connect(m_videoWidget, &QVideoWidget::fullScreenChanged, m_fullScreenBtn, &QPushButton::setChecked);
 
-        if (m_fullScreenButton->isChecked())
+        if (m_fullScreenBtn->isChecked())
             m_videoWidget->setFullScreen(true);
     }
-    m_colorButton->setEnabled(available);
+    m_colorBtn->setEnabled(available);
 }
 
 void MultimediaPlayer::setTrackInfo(const QString &info) {

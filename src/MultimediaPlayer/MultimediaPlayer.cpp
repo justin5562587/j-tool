@@ -214,18 +214,9 @@ void MultimediaPlayer::clear() {
 
 // todo
 void MultimediaPlayer::screenShot() {
-    QAbstractVideoSurface* videoSurface = m_videoWidget->videoSurface();
     QRect contentRect = m_videoWidget->contentsRect();
-//    QPixmap screenContent = m_videoWidget->grab(contentRect);
-
     QPixmap screenContent(contentRect.size());
-//    m_videoWidget->render(&screenContent);
     m_videoWidget->render(&screenContent, QPoint(), QRegion(contentRect));
-//    m_videoWidget->render
-
-
-//    QScreen* screen = m_videoWidget->screen();
-//    QPixmap screenContent = screen->grabWindow(QWidget::winId());
 
     const QString format = "png";
 

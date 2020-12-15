@@ -6,7 +6,6 @@
 
 #include <QAbstractVideoSurface>
 
-
 class VideoWidgetSurface : public QAbstractVideoSurface {
 Q_OBJECT
 

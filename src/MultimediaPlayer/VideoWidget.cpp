@@ -8,9 +8,9 @@
 VideoWidget::VideoWidget(QWidget *parent) : QVideoWidget(parent) {
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-//    QPalette p = palette();
-//    p.setColor(QPalette::Window, Qt::blue);
-//    setPalette(p);
+    QPalette p = palette();
+    p.setColor(QPalette::Window, Qt::blue);
+    setPalette(p);
     setObjectName("CustomVideoWidget");
     setAttribute(Qt::WA_OpaquePaintEvent);
 }

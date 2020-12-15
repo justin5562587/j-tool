@@ -13,8 +13,6 @@ A integrated desktop tools for programmers or officers
     
 - Format Convertor *_todo*
 
-- Contact Menu *_todo*
-
 - PDF Processor *_todo*
 
 - File Converter *_todo*
@@ -22,7 +20,7 @@ A integrated desktop tools for programmers or officers
 - Screenshot *_todo*
 
 ## TodoList
-- Add dashbroad in MainWindow
+- Add dashboard in MainWindow
 
 ## Reference Guides
 - [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)

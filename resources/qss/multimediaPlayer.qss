@@ -36,7 +36,3 @@ QSlider::handle:horizontal {
     margin: -2px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
     border-radius: 3px;
 }
-
-QVideoWidget#CustomVideoWidget {
-    background-color: red;
-}

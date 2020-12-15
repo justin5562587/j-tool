@@ -214,6 +214,7 @@ void MultimediaPlayer::clear() {
 
 // todo
 void MultimediaPlayer::screenShot() {
+    QAbstractVideoSurface* videoSurface = m_videoWidget->videoSurface();
     QRect contentRect = m_videoWidget->contentsRect();
 //    QPixmap screenContent = m_videoWidget->grab(contentRect);
 

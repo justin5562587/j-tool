@@ -1,0 +1,35 @@
+QWidget#infoWrapper {
+
+}
+
+QWidget#infoSection {
+    background-color: #ffffff;
+    width: 200px;
+    padding: 40px;
+    border-width: 2px;
+    border-color: #8f8f8f;
+}
+
+QLabel#infoTitle {
+    font-size: 30px;
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+QLabel#infoDescription {
+    font-size: 16px;
+    color: #111111;
+    margin-bottom: 10px;
+}
+
+QLabel#infoTime {
+    font-size: 14px;
+    color: #8f8f8f;
+    margin-bottom: 5px;
+}
+
+QPushButton#infoToBtn {
+    height: 40px;
+    color: #111;
+    font-size: 20px;
+}

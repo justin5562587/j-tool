@@ -1,0 +1,26 @@
+{
+  "coreInfos": [
+    {
+      "core": "j_multimedia_player",
+      "title": "Multimedia Player",
+      "description": "SomeDescription",
+      "lastUpdate": "2020/10/20",
+      "features": [
+        "awesome",
+        "best",
+        "good"
+      ]
+    },
+    {
+      "core": "j_image_browser",
+      "title": "Image Browser",
+      "description": "SomeDescription",
+      "lastUpdate": "2020/10/20",
+      "features": [
+        "awesome",
+        "best",
+        "good"
+      ]
+    }
+  ]
+}

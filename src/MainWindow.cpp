@@ -7,24 +7,40 @@
 #include <QMessageBox>
 #include <QDirIterator>
 #include <QStackedWidget>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 MainWindow::MainWindow() : QMainWindow() {
-    stackedWidget = new QStackedWidget(this);
+    QFile styleFile(":/qss/global.qss");
+    styleFile.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(styleFile.readAll());
+    setStyleSheet(styleSheet);
+
+    renderInfoSections();
+
+    m_stackedWidget = new QStackedWidget(this);
+    m_stackedWidget->addWidget(m_infoWrapper);
+
     m_multimediaPlayer = new MultimediaPlayer(this);
+    m_stackedWidget->addWidget(m_multimediaPlayer);
+
 //    m_imageBrowser = new ImageBrowser(this);
+//    m_stackedWidget->addWidget(m_imageBrowser);
+
 //    m_todoList = new TodoList(this);
-    stackedWidget->addWidget(m_multimediaPlayer);
-//    stackedWidget->addWidget(m_imageBrowser);
-//    stackedWidget->addWidget(m_todoList);
+//    m_stackedWidget->addWidget(m_todoList);
 
     createMenus();
     setWindowTitle("J-Tool");
-    setCentralWidget(stackedWidget);
+    setCentralWidget(m_stackedWidget);
 }
 
 void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Models");
+    mainMenu->addAction("Main Window", this, &MainWindow::setCentralWithInfoWrapper);
+    mainMenu->addSeparator();
 //    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
 //    mainMenu->addSeparator();
 //    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
@@ -45,19 +61,71 @@ void MainWindow::createMenusForMultimediaPlayer() {
 }
 
 // slot
+void MainWindow::setCentralWithInfoWrapper() {
+    m_stackedWidget->setCurrentIndex(0);
+}
+
 void MainWindow::setCentralWithMultimediaPlayer() {
-    stackedWidget->setCurrentIndex(0);
+    m_stackedWidget->setCurrentIndex(1);
 }
 
 //void MainWindow::setCentralWithImageBrowser() {
-//    stackedWidget->setCurrentIndex(1);
+//    m_stackedWidget->setCurrentIndex(2);
 //}
 //
 //void MainWindow::setCentralWithTodoList() {
-//    stackedWidget->setCurrentIndex(2);
+//    m_stackedWidget->setCurrentIndex(3);
 //}
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),
                        tr("J-Tool is a highly integrated desktop application designed for programmer"));
+}
+
+void MainWindow::renderInfoSections() {
+    QHBoxLayout *layout = new QHBoxLayout;
+
+    QFile file(":/json/info.json");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString val = file.readAll();
+    file.close();
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(val.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+    QJsonArray items = jsonObject.value("coreInfos").toArray();
+
+    auto begin = items.begin();
+    auto end = items.end();
+    while(begin != end) {
+        auto item = (*begin).toObject();
+
+        QWidget* infoSection= new QWidget;
+        infoSection->setObjectName("infoSection");
+        QVBoxLayout *sectionLayout = new QVBoxLayout;
+        infoSection->setLayout(sectionLayout);
+
+        QLabel *title = new QLabel(item["title"].toString());
+        title->setObjectName("infoTitle");
+
+        QLabel *description = new QLabel(item["description"].toString());
+        description->setObjectName("infoDescription");
+
+        QLabel *latestUpdate = new QLabel(item["lastUpdate"].toString());
+        latestUpdate->setObjectName("infoTime");
+
+        QPushButton *toBtn = new QPushButton("Use");
+        toBtn->setObjectName("infoToBtn");
+        connect(toBtn, &QAbstractButton::clicked, this, &MainWindow::setCentralWithMultimediaPlayer);
+
+        sectionLayout->addWidget(title);
+        sectionLayout->addWidget(description);
+        sectionLayout->addWidget(latestUpdate);
+        sectionLayout->addWidget(toBtn);
+
+        layout->addWidget(infoSection);
+        ++begin;
+    }
+
+    m_infoWrapper = new QWidget(this);
+    m_infoWrapper->setObjectName("infoWrapper");
+    m_infoWrapper->setLayout(layout);
 }

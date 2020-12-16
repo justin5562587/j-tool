@@ -41,10 +41,10 @@ void MainWindow::createMenus() {
     QMenu *mainMenu = menuBar()->addMenu("Models");
     mainMenu->addAction("Main Window", this, &MainWindow::setCentralWithInfoWrapper);
     mainMenu->addSeparator();
-//    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
-//    mainMenu->addSeparator();
-//    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
-//    mainMenu->addSeparator();
+    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
+    mainMenu->addSeparator();
+    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
+    mainMenu->addSeparator();
     mainMenu->addAction("Multimedia Player", this, &MainWindow::setCentralWithMultimediaPlayer);
 
     // help
@@ -69,13 +69,13 @@ void MainWindow::setCentralWithMultimediaPlayer() {
     m_stackedWidget->setCurrentIndex(1);
 }
 
-//void MainWindow::setCentralWithImageBrowser() {
-//    m_stackedWidget->setCurrentIndex(2);
-//}
-//
-//void MainWindow::setCentralWithTodoList() {
-//    m_stackedWidget->setCurrentIndex(3);
-//}
+void MainWindow::setCentralWithImageBrowser() {
+    m_stackedWidget->setCurrentIndex(1);
+}
+
+void MainWindow::setCentralWithTodoList() {
+    m_stackedWidget->setCurrentIndex(1);
+}
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),
@@ -99,6 +99,8 @@ void MainWindow::renderInfoSections() {
         auto item = (*begin).toObject();
 
         QWidget* infoSection= new QWidget;
+        infoSection->setFixedHeight(250);
+        infoSection->setFixedWidth(450);
         infoSection->setObjectName("infoSection");
         QVBoxLayout *sectionLayout = new QVBoxLayout;
         infoSection->setLayout(sectionLayout);
@@ -108,11 +110,12 @@ void MainWindow::renderInfoSections() {
 
         QLabel *description = new QLabel(item["description"].toString());
         description->setObjectName("infoDescription");
+        description->setWordWrap(true);
 
-        QLabel *latestUpdate = new QLabel(item["lastUpdate"].toString());
+        QLabel *latestUpdate = new QLabel("Last Update: " + item["lastUpdate"].toString());
         latestUpdate->setObjectName("infoTime");
 
-        QPushButton *toBtn = new QPushButton("Use");
+        QPushButton *toBtn = new QPushButton("Goto");
         toBtn->setObjectName("infoToBtn");
         connect(toBtn, &QAbstractButton::clicked, this, &MainWindow::setCentralWithMultimediaPlayer);
 
@@ -122,6 +125,7 @@ void MainWindow::renderInfoSections() {
         sectionLayout->addWidget(toBtn);
 
         layout->addWidget(infoSection);
+        layout->addStretch();
         ++begin;
     }
 

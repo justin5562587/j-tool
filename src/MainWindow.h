@@ -26,8 +26,8 @@ private slots:
 
     void setCentralWithInfoWrapper();
 
-//    void setCentralWithImageBrowser();
-//    void setCentralWithTodoList();
+    void setCentralWithImageBrowser();
+    void setCentralWithTodoList();
     void setCentralWithMultimediaPlayer();
 
     void renderInfoSections();

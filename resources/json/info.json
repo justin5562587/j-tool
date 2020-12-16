@@ -3,7 +3,7 @@
     {
       "core": "j_multimedia_player",
       "title": "Multimedia Player",
-      "description": "SomeDescription",
+      "description": "Capable of playing both video and audio and various types of multimedia",
       "lastUpdate": "2020/10/20",
       "features": [
         "awesome",
@@ -14,7 +14,18 @@
     {
       "core": "j_image_browser",
       "title": "Image Browser",
-      "description": "SomeDescription",
+      "description": "Capable of viewing images conveniently",
+      "lastUpdate": "2020/10/20",
+      "features": [
+        "awesome",
+        "best",
+        "good"
+      ]
+    },
+    {
+      "core": "j_pdf_processor",
+      "title": "PDF Processor",
+      "description": "Capable of reading and rearranging PDF",
       "lastUpdate": "2020/10/20",
       "features": [
         "awesome",

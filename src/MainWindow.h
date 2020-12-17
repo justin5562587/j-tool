@@ -12,6 +12,7 @@
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QSignalMapper>
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -24,11 +25,7 @@ private slots:
 
     void about();
 
-    void setCentralWithInfoWrapper();
-
-    void setCentralWithImageBrowser();
-    void setCentralWithTodoList();
-    void setCentralWithMultimediaPlayer();
+    void setCentralWidgetWith(int stackedWidgetIndex);
 
     void renderInfoSections();
 
@@ -36,6 +33,8 @@ private:
     void createMenus();
 
     void createMenusForMultimediaPlayer();
+
+    QSignalMapper* m_signalMapper;
 
     QWidget *m_infoWrapper = nullptr;
 //    QVector<QWidget *> m_infoSections = QVector<QWidget *>();

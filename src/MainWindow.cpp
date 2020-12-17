@@ -6,10 +6,10 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QDirIterator>
-#include <QStackedWidget>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QString>
 
 MainWindow::MainWindow() : QMainWindow() {
     QFile styleFile(":/qss/global.qss");
@@ -39,13 +39,29 @@ MainWindow::MainWindow() : QMainWindow() {
 void MainWindow::createMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Models");
-    mainMenu->addAction("Main Window", this, &MainWindow::setCentralWithInfoWrapper);
-    mainMenu->addSeparator();
-    mainMenu->addAction("Image Browser", this, &MainWindow::setCentralWithImageBrowser);
-    mainMenu->addSeparator();
-    mainMenu->addAction("Todo List", this, &MainWindow::setCentralWithTodoList);
-    mainMenu->addSeparator();
-    mainMenu->addAction("Multimedia Player", this, &MainWindow::setCentralWithMultimediaPlayer);
+    m_signalMapper = new QSignalMapper(this);
+
+    QAction* mainMenuAction1 = mainMenu->addAction("Main Window");
+    mainMenuAction1->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+    connect(mainMenuAction1, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+
+    QAction* mainMenuAction2 = mainMenu->addAction("Image Browser");
+    mainMenuAction2->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+    connect(mainMenuAction2, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+
+    QAction* mainMenuAction3 = mainMenu->addAction("Todo List");
+    mainMenuAction3->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+    connect(mainMenuAction3, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+
+    QAction* mainMenuAction4 = mainMenu->addAction("Multimedia Player");
+    mainMenuAction4->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
+    connect(mainMenuAction4, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+
+    m_signalMapper->setMapping(mainMenuAction1, 0);
+    m_signalMapper->setMapping(mainMenuAction2, 1);
+    m_signalMapper->setMapping(mainMenuAction3, 1);
+    m_signalMapper->setMapping(mainMenuAction4, 1);
+    connect (m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int))) ;
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -61,25 +77,13 @@ void MainWindow::createMenusForMultimediaPlayer() {
 }
 
 // slot
-void MainWindow::setCentralWithInfoWrapper() {
-    m_stackedWidget->setCurrentIndex(0);
-}
-
-void MainWindow::setCentralWithMultimediaPlayer() {
-    m_stackedWidget->setCurrentIndex(1);
-}
-
-void MainWindow::setCentralWithImageBrowser() {
-    m_stackedWidget->setCurrentIndex(1);
-}
-
-void MainWindow::setCentralWithTodoList() {
-    m_stackedWidget->setCurrentIndex(1);
+void MainWindow::setCentralWidgetWith(int stackedWidgetIndex) {
+    m_stackedWidget->setCurrentIndex(stackedWidgetIndex);
 }
 
 void MainWindow::about() {
     QMessageBox::about(this, tr("About J-Tool"),
-                       tr("J-Tool is a highly integrated desktop application designed for programmer"));
+                       tr("J-Tool is a highly integrated desktop application with multiple functionalities designed for programmer, officer and etc."));
 }
 
 void MainWindow::renderInfoSections() {
@@ -117,7 +121,7 @@ void MainWindow::renderInfoSections() {
 
         QPushButton *toBtn = new QPushButton("Goto");
         toBtn->setObjectName("infoToBtn");
-        connect(toBtn, &QAbstractButton::clicked, this, &MainWindow::setCentralWithMultimediaPlayer);
+        connect(toBtn, &QAbstractButton::clicked, this, &MainWindow::setCentralWidgetWith);
 
         sectionLayout->addWidget(title);
         sectionLayout->addWidget(description);

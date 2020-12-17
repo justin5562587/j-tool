@@ -21,6 +21,9 @@ A integrated desktop tools for programmers or officers
 
 ## TodoList
 - Add dashboard in MainWindow
+- Add Date/Time in MainWindow
+- Config poppler
+- Add User Data Writer/Loader into local disk
 
 ## Reference Guides
 - [Configuration of CMake and Qt5](https://zhuanlan.zhihu.com/p/34667993)

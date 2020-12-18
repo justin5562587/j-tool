@@ -15,23 +15,20 @@ set(MAIN_SRC
         )
 
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
-find_package(Qt5 COMPONENTS Gui Widgets MultimediaWidgets Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS Gui Widgets MultimediaWidgets Multimedia Quick REQUIRED)
 
 option(USE_LIBRARY "Compile j-utils into project?" OFF)
 if (USE_J_UTILS)
     add_subdirectory(utils)
 endif()
 
-#add_subdirectory(${SRC_DIR}/ImageBrowser)
 add_subdirectory(${SRC_DIR}/MultimediaPlayer)
-#add_subdirectory(${SRC_DIR}/FormatConvertor)
 add_subdirectory(${SRC_DIR}/PDFProcessor)
 
 set(QT_LIBS Qt5::Gui Qt5::Widgets)
 
-#target_link_libraries(j_image_browser PUBLIC ${QT_LIBS})
 target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS} Qt5::MultimediaWidgets Qt5::Multimedia)
-target_link_libraries(j_pdf_processor PUBLIC ${QT_LIBS})
+target_link_libraries(j_pdf_processor PUBLIC ${QT_LIBS} Qt5::Quick)
 
 qt5_add_resources(RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/source.qrc)
 

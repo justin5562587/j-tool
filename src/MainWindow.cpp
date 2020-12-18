@@ -25,11 +25,8 @@ MainWindow::MainWindow() : QMainWindow() {
     m_multimediaPlayer = new MultimediaPlayer(this);
     m_stackedWidget->addWidget(m_multimediaPlayer);
 
-//    m_imageBrowser = new ImageBrowser(this);
-//    m_stackedWidget->addWidget(m_imageBrowser);
-
-//    m_todoList = new TodoList(this);
-//    m_stackedWidget->addWidget(m_todoList);
+    m_pdfProcessor = new PDFProcessor(this);
+    m_stackedWidget->addWidget(m_pdfProcessor);
 
     createMenus();
     setWindowTitle("J-Tool");
@@ -45,22 +42,17 @@ void MainWindow::createMenus() {
     mainMenuAction1->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
     connect(mainMenuAction1, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
 
-    QAction* mainMenuAction2 = mainMenu->addAction("Image Browser");
+    QAction* mainMenuAction2 = mainMenu->addAction("PDF Processor");
     mainMenuAction2->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
     connect(mainMenuAction2, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
 
-    QAction* mainMenuAction3 = mainMenu->addAction("Todo List");
-    mainMenuAction3->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+    QAction* mainMenuAction3 = mainMenu->addAction("Multimedia Player");
+    mainMenuAction3->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
     connect(mainMenuAction3, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
 
-    QAction* mainMenuAction4 = mainMenu->addAction("Multimedia Player");
-    mainMenuAction4->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
-    connect(mainMenuAction4, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-
-    m_signalMapper->setMapping(mainMenuAction1, 0);
-    m_signalMapper->setMapping(mainMenuAction2, 1);
-    m_signalMapper->setMapping(mainMenuAction3, 1);
-    m_signalMapper->setMapping(mainMenuAction4, 1);
+    m_signalMapper->setMapping(mainMenuAction1, 1);
+    m_signalMapper->setMapping(mainMenuAction2, 2);
+    m_signalMapper->setMapping(mainMenuAction3, 3);
     connect (m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int))) ;
 
     // help

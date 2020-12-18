@@ -6,6 +6,7 @@
 //#include "./ImageBrowser/ImageBrowser.h"
 //#include "./TodoList/TodoList.h"
 #include "./MultimediaPlayer/MultimediaPlayer.h"
+#include "./PDFProcessor//PDFProcessor.h"
 
 #include <QMainWindow>
 #include <QItemSelection>
@@ -43,4 +44,5 @@ private:
 //    ImageBrowser* m_imageBrowser = nullptr;
 //    TodoList* m_todoList = nullptr;
     MultimediaPlayer *m_multimediaPlayer = nullptr;
+    PDFProcessor* m_pdfProcessor = nullptr;
 };

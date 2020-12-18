@@ -17,40 +17,26 @@ set(MAIN_SRC
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
 find_package(Qt5 COMPONENTS Gui Widgets MultimediaWidgets Multimedia REQUIRED)
 
-#set(Poppler_ROOT "/Users/justin/cpp/THIRD_PART_LIBRARY/poppler-20.11.0")
-#find_package(PkgConfig REQUIRED)
-#pkg_check_modules(
-#        Poppler
-#        REQUIRED poppler
-#        IMPORTED_TARGET
-#)
-
-# add custom utils
 option(USE_LIBRARY "Compile j-utils into project?" OFF)
 if (USE_J_UTILS)
     add_subdirectory(utils)
 endif()
 
-# add custom core components
 #add_subdirectory(${SRC_DIR}/ImageBrowser)
-#add_subdirectory(${SRC_DIR}/TodoList)
 add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 #add_subdirectory(${SRC_DIR}/FormatConvertor)
-#add_subdirectory(${SRC_DIR}/PDFProcessor)
+add_subdirectory(${SRC_DIR}/PDFProcessor)
 
 set(QT_LIBS Qt5::Gui Qt5::Widgets)
 
 #target_link_libraries(j_image_browser PUBLIC ${QT_LIBS})
-#target_link_libraries(j_todo_list PUBLIC ${QT_LIBS})
 target_link_libraries(j_multimedia_player PUBLIC ${QT_LIBS} Qt5::MultimediaWidgets Qt5::Multimedia)
-#target_link_libraries(j_format_convertor PUBLIC ${QT_LIBS})
+target_link_libraries(j_pdf_processor PUBLIC ${QT_LIBS})
 
 qt5_add_resources(RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/source.qrc)
 
-# config result executable
 add_executable(j_tool ${MAIN_SRC} ${RESOURCE_FILES})
-#target_link_libraries(j_tool j_image_browser j_todo_list j_multimedia_player j_format_convertor)
-target_link_libraries(j_tool j_multimedia_player)
+target_link_libraries(j_tool j_multimedia_player j_pdf_processor)
 
 add_custom_command(
         OUTPUT

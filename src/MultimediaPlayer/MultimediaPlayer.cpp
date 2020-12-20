@@ -112,6 +112,9 @@
 //}
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
+    setFixedWidth(1000);
+    setFixedHeight(800);
+
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
 

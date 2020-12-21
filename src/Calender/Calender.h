@@ -2,6 +2,9 @@
 // Created by justin on 2020/12/21.
 //
 #pragma once
+
+#include "DigitalClock.h"
+
 #include <QWidget>
 #include <QDateTime>
 
@@ -16,7 +19,6 @@ class QGroupBox;
 class QLabel;
 QT_END_NAMESPACE
 
-//! [0]
 class Calender : public QWidget
 {
 Q_OBJECT
@@ -27,60 +29,35 @@ public:
 private slots:
     void localeChanged(int index);
     void firstDayChanged(int index);
-    void selectionModeChanged(int index);
-    void horizontalHeaderChanged(int index);
-    void verticalHeaderChanged(int index);
     void selectedDateChanged();
-    void minimumDateChanged(QDate date);
-    void maximumDateChanged(QDate date);
     void weekdayFormatChanged();
     void weekendFormatChanged();
-    void reformatHeaders();
     void reformatCalendarPage();
 
 private:
     void createPreviewGroupBox();
     void createGeneralOptionsGroupBox();
-    void createDatesGroupBox();
     void createTextFormatsGroupBox();
     QComboBox *createColorComboBox();
 
-    QGroupBox *previewGroupBox;
-    QGridLayout *previewLayout;
     QCalendarWidget *calendar;
 
     QGroupBox *generalOptionsGroupBox;
+    QLabel *currentDateLabel;
+    QDateEdit *currentDateEdit;
     QLabel *localeLabel;
     QLabel *firstDayLabel;
-//! [0]
-    QLabel *selectionModeLabel;
-    QLabel *horizontalHeaderLabel;
-    QLabel *verticalHeaderLabel;
+
     QComboBox *localeCombo;
     QComboBox *firstDayCombo;
-    QComboBox *selectionModeCombo;
     QCheckBox *gridCheckBox;
     QCheckBox *navigationCheckBox;
-    QComboBox *horizontalHeaderCombo;
-    QComboBox *verticalHeaderCombo;
-
-    QGroupBox *datesGroupBox;
-    QLabel *currentDateLabel;
-    QLabel *minimumDateLabel;
-    QLabel *maximumDateLabel;
-    QDateEdit *currentDateEdit;
-    QDateEdit *minimumDateEdit;
-    QDateEdit *maximumDateEdit;
 
     QGroupBox *textFormatsGroupBox;
     QLabel *weekdayColorLabel;
     QLabel *weekendColorLabel;
-    QLabel *headerTextFormatLabel;
     QComboBox *weekdayColorCombo;
     QComboBox *weekendColorCombo;
-    QComboBox *headerTextFormatCombo;
 
-    QCheckBox *firstFridayCheckBox;
-//! [1]
-    QCheckBox *mayFirstCheckBox;
+    DigitalClock* m_digitalClock = nullptr;
 };

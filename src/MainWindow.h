@@ -6,7 +6,7 @@
 //#include "./ImageBrowser/ImageBrowser.h"
 //#include "./TodoList/TodoList.h"
 #include "./MultimediaPlayer/MultimediaPlayer.h"
-#include "./PDFProcessor//PDFProcessor.h"
+#include "./PDFProcessor/PDFMain.h"
 
 #include <QMainWindow>
 #include <QItemSelection>
@@ -31,7 +31,11 @@ private slots:
     void renderInfoSections();
 
 private:
-    void createMenus();
+    void initializeWidget();
+
+    void initializeActions();
+
+    void initializeMenus();
 
     void createMenusForMultimediaPlayer();
 
@@ -44,5 +48,10 @@ private:
 //    ImageBrowser* m_imageBrowser = nullptr;
 //    TodoList* m_todoList = nullptr;
     MultimediaPlayer *m_multimediaPlayer = nullptr;
-    PDFProcessor* m_pdfProcessor = nullptr;
+    PDFMain* m_pdfProcessor = nullptr;
+
+    QVector<QAction* >* m_toActVector;
+    QAction* m_toMainWindowAct;
+    QAction* m_toMultimediaPlayerAct;
+    QAction* m_toPdfProcessorAct;
 };

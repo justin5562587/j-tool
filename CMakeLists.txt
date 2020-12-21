@@ -32,7 +32,7 @@ target_link_libraries(j_pdf_processor PUBLIC ${SHARED_QT_LIBS})
 
 qt5_add_resources(RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/source.qrc)
 
-add_executable(j_tool ${SRC_DIR}/main.cpp ${RESOURCE_FILES})
+add_executable(j_tool ${MAIN_SRC} ${RESOURCE_FILES})
 target_link_libraries(j_tool j_multimedia_player j_pdf_processor)
 
 add_custom_command(

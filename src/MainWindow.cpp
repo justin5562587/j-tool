@@ -17,43 +17,65 @@ MainWindow::MainWindow() : QMainWindow() {
     QString styleSheet = QLatin1String(styleFile.readAll());
     setStyleSheet(styleSheet);
 
+    initializeActions();
+    initializeMenus();
     renderInfoSections();
+    initializeWidget();
+}
 
+void MainWindow::initializeWidget() {
     m_stackedWidget = new QStackedWidget(this);
+
     m_stackedWidget->addWidget(m_infoWrapper);
 
     m_multimediaPlayer = new MultimediaPlayer(this);
     m_stackedWidget->addWidget(m_multimediaPlayer);
 
-    m_pdfProcessor = new PDFProcessor(this);
+    m_pdfProcessor = new PDFMain(this);
     m_stackedWidget->addWidget(m_pdfProcessor);
 
-    createMenus();
     setWindowTitle("J-Tool");
     setCentralWidget(m_stackedWidget);
 }
 
-void MainWindow::createMenus() {
+void MainWindow::initializeActions() {
+    m_signalMapper = new QSignalMapper(this);
+    m_toActVector = new QVector<QAction *>();
+
+    m_toMainWindowAct = new QAction;
+    m_toMainWindowAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
+    connect(m_toMainWindowAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(m_toMainWindowAct);
+
+    m_toMultimediaPlayerAct = new QAction();
+    m_toMultimediaPlayerAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+    connect(m_toMultimediaPlayerAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(m_toMultimediaPlayerAct);
+
+    m_toPdfProcessorAct = new QAction();
+    m_toPdfProcessorAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+    connect(m_toPdfProcessorAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(m_toPdfProcessorAct);
+
+    m_signalMapper->setMapping(m_toMainWindowAct, 0);
+    m_signalMapper->setMapping(m_toMultimediaPlayerAct, 1);
+    m_signalMapper->setMapping(m_toPdfProcessorAct, 2);
+
+    connect(m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int)));
+}
+
+void MainWindow::initializeMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Models");
-    m_signalMapper = new QSignalMapper(this);
 
-    QAction* mainMenuAction1 = mainMenu->addAction("Main Window");
-    mainMenuAction1->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
-    connect(mainMenuAction1, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    mainMenu->addAction(m_toMainWindowAct);
+    m_toMainWindowAct->setText("Main Window");
 
-    QAction* mainMenuAction2 = mainMenu->addAction("PDF Processor");
-    mainMenuAction2->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
-    connect(mainMenuAction2, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    mainMenu->addAction(m_toMultimediaPlayerAct);
+    m_toMultimediaPlayerAct->setText("Multimedia Player");
 
-    QAction* mainMenuAction3 = mainMenu->addAction("Multimedia Player");
-    mainMenuAction3->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
-    connect(mainMenuAction3, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-
-    m_signalMapper->setMapping(mainMenuAction1, 1);
-    m_signalMapper->setMapping(mainMenuAction2, 2);
-    m_signalMapper->setMapping(mainMenuAction3, 3);
-    connect (m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int))) ;
+    mainMenu->addAction(m_toPdfProcessorAct);
+    m_toPdfProcessorAct->setText("PDF Processor");
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -91,10 +113,10 @@ void MainWindow::renderInfoSections() {
 
     auto begin = items.begin();
     auto end = items.end();
-    while(begin != end) {
+    while (begin != end) {
         auto item = (*begin).toObject();
 
-        QWidget* infoSection= new QWidget;
+        QWidget *infoSection = new QWidget;
         infoSection->setFixedHeight(250);
         infoSection->setFixedWidth(450);
         infoSection->setObjectName("infoSection");
@@ -112,8 +134,13 @@ void MainWindow::renderInfoSections() {
         latestUpdate->setObjectName("infoTime");
 
         QPushButton *toBtn = new QPushButton("Goto");
+        int val = item["toActVectorIndex"].toInt();
+        QAction* qAction = m_toActVector->at(val);
+
+        toBtn->addAction(qAction);
+//        connect;
+//        connect(toBtn, &QAbstractButton::clicked, qAction, SLOT(trigger()));
         toBtn->setObjectName("infoToBtn");
-        connect(toBtn, &QAbstractButton::clicked, this, &MainWindow::setCentralWidgetWith);
 
         sectionLayout->addWidget(title);
         sectionLayout->addWidget(description);

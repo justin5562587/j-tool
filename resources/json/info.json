@@ -5,17 +5,7 @@
       "title": "Multimedia Player",
       "description": "Capable of playing both video and audio and various types of multimedia",
       "lastUpdate": "2020/10/20",
-      "features": [
-        "awesome",
-        "best",
-        "good"
-      ]
-    },
-    {
-      "core": "j_image_browser",
-      "title": "Image Browser",
-      "description": "Capable of viewing images conveniently",
-      "lastUpdate": "2020/10/20",
+      "toActVectorIndex": 1,
       "features": [
         "awesome",
         "best",
@@ -27,6 +17,7 @@
       "title": "PDF Processor",
       "description": "Capable of reading and rearranging PDF",
       "lastUpdate": "2020/10/20",
+      "toActVectorIndex": 2,
       "features": [
         "awesome",
         "best",

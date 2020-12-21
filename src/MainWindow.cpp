@@ -34,8 +34,8 @@ void MainWindow::initializeWidget() {
     m_pdfProcessor = new PDFMain(this);
     m_stackedWidget->addWidget(m_pdfProcessor);
 
-    m_calender = new Calender(this);
-    m_stackedWidget->addWidget(m_calender);
+    m_calendar = new Calendar(this);
+    m_stackedWidget->addWidget(m_calendar);
 
     setWindowTitle("J-Tool");
     setCentralWidget(m_stackedWidget);
@@ -79,6 +79,8 @@ void MainWindow::initializeMenus() {
 
     mainMenu->addAction(m_toMainWindowAct);
     m_toMainWindowAct->setText("Main Window");
+
+    mainMenu->addSeparator();
 
     mainMenu->addAction(m_toMultimediaPlayerAct);
     m_toMultimediaPlayerAct->setText("Multimedia Player");

@@ -12,19 +12,17 @@ QT_BEGIN_NAMESPACE
 class QCalendarWidget;
 class QCheckBox;
 class QComboBox;
-class QDate;
 class QDateEdit;
 class QGridLayout;
-class QGroupBox;
 class QLabel;
 QT_END_NAMESPACE
 
-class Calender : public QWidget
+class Calendar : public QWidget
 {
 Q_OBJECT
 
 public:
-    Calender(QWidget *parent = nullptr);
+    Calendar(QWidget *parent = nullptr);
 
 private slots:
     void localeChanged(int index);
@@ -35,29 +33,21 @@ private slots:
     void reformatCalendarPage();
 
 private:
-    void createPreviewGroupBox();
-    void createGeneralOptionsGroupBox();
-    void createTextFormatsGroupBox();
+    void createTimeWidget();
+    void createOptionsWidget();
     QComboBox *createColorComboBox();
 
     QCalendarWidget *calendar;
 
-    QGroupBox *generalOptionsGroupBox;
-    QLabel *currentDateLabel;
+    QWidget *optionsWidget;
     QDateEdit *currentDateEdit;
-    QLabel *localeLabel;
-    QLabel *firstDayLabel;
 
     QComboBox *localeCombo;
     QComboBox *firstDayCombo;
     QCheckBox *gridCheckBox;
-    QCheckBox *navigationCheckBox;
-
-    QGroupBox *textFormatsGroupBox;
-    QLabel *weekdayColorLabel;
-    QLabel *weekendColorLabel;
     QComboBox *weekdayColorCombo;
     QComboBox *weekendColorCombo;
+    QCheckBox *navigationCheckBox;
 
     DigitalClock* m_digitalClock = nullptr;
 };

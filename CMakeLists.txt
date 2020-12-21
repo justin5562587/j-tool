@@ -24,18 +24,18 @@ endif()
 
 add_subdirectory(${SRC_DIR}/MultimediaPlayer)
 add_subdirectory(${SRC_DIR}/PDFProcessor)
-add_subdirectory(${SRC_DIR}/Calender)
+add_subdirectory(${SRC_DIR}/Calendar)
 
 set(SHARED_QT_LIBS Qt5::Gui Qt5::Widgets)
 
 target_link_libraries(j_multimedia_player PUBLIC ${SHARED_QT_LIBS} Qt5::MultimediaWidgets Qt5::Multimedia)
 target_link_libraries(j_pdf_processor PUBLIC ${SHARED_QT_LIBS})
-target_link_libraries(j_calender PUBLIC ${SHARED_QT_LIBS})
+target_link_libraries(j_calendar PUBLIC ${SHARED_QT_LIBS})
 
 qt5_add_resources(RESOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/source.qrc)
 
 add_executable(j_tool ${MAIN_SRC} ${RESOURCE_FILES})
-target_link_libraries(j_tool j_multimedia_player j_pdf_processor j_calender)
+target_link_libraries(j_tool j_multimedia_player j_pdf_processor j_calendar)
 
 add_custom_command(
         OUTPUT

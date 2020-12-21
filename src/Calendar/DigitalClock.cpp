@@ -14,17 +14,15 @@ DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent) {
     connect(timer, &QTimer::timeout, this, &DigitalClock::showTime);
     timer->start(1000);
 
+    setDigitCount(19);
     showTime();
 
     setWindowTitle(tr("Digital Clock"));
-    resize(150, 60);
+//    resize(150, 60);
 }
 
 void DigitalClock::showTime() {
-    QTime time = QTime::currentTime();
-    QString text = time.toString("hh:mm");
-    if ((time.second() % 2) == 0) {
-        text[2] = ' ';
-    }
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString text = dateTime.toString("yyyy-MM-dd HH:mm:ss");
     display(text);
 }

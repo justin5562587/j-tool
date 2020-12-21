@@ -3,8 +3,6 @@
 //
 #pragma once
 
-#include "MediaInfoWidget.h"
-
 #include <QWidget>
 #include <QMediaPlayer>
 #include <QPushButton>
@@ -121,6 +119,4 @@ private:
     QString m_trackInfo;
     QString m_statusInfo;
     qint64 m_duration;
-
-    MediaInfoWidget* m_mediaInfoWidget;
 };

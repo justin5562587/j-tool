@@ -6,7 +6,6 @@
 #include "PlaylistModel.h"
 #include "HistogramWidget.h"
 #include "VideoWidget.h"
-#include "MediaInfoWidget.h"
 #include "PlayListItemDelegate.h"
 
 #include <QVideoWidget>
@@ -211,9 +210,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     QBoxLayout *displayLayout = new QHBoxLayout();
     displayLayout->addWidget(m_videoWidget, 2);
     displayLayout->addWidget(m_playlistView);
-
-    m_mediaInfoWidget = new MediaInfoWidget(this);
-    displayLayout->addWidget(m_mediaInfoWidget);
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);

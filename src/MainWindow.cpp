@@ -1,7 +1,7 @@
 //
 // Created by justin on 2020/11/03.
 //
-#include "./MainWindow.h"
+#include "MainWindow.h"
 
 #include <QMenu>
 #include <QMessageBox>
@@ -25,8 +25,8 @@ MainWindow::MainWindow() : QMainWindow() {
     m_multimediaPlayer = new MultimediaPlayer(this);
     m_stackedWidget->addWidget(m_multimediaPlayer);
 
-//    m_pdfProcessor = new PDFProcessor(this);
-//    m_stackedWidget->addWidget(m_pdfProcessor);
+    m_pdfProcessor = new PDFProcessor(this);
+    m_stackedWidget->addWidget(m_pdfProcessor);
 
     createMenus();
     setWindowTitle("J-Tool");

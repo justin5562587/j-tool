@@ -7,13 +7,16 @@
 #include <QWidget>
 
 class QLabel;
+
 class QLineEdit;
+
 class QPdfDocument;
+
 class QPdfPageNavigation;
+
 class QToolButton;
 
-class PageSelector : public QWidget
-{
+class PageSelector : public QWidget {
 Q_OBJECT
 
 public:
@@ -22,7 +25,9 @@ public:
     void setPageNavigation(QPdfPageNavigation *pageNavigation);
 
 private slots:
+
     void onCurrentPageChanged(int page);
+
     void pageNumberEdited();
 
 private:

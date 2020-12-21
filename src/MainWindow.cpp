@@ -34,6 +34,9 @@ void MainWindow::initializeWidget() {
     m_pdfProcessor = new PDFMain(this);
     m_stackedWidget->addWidget(m_pdfProcessor);
 
+    m_calender = new Calender(this);
+    m_stackedWidget->addWidget(m_calender);
+
     setWindowTitle("J-Tool");
     setCentralWidget(m_stackedWidget);
 }
@@ -57,9 +60,15 @@ void MainWindow::initializeActions() {
     connect(m_toPdfProcessorAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
     m_toActVector->push_back(m_toPdfProcessorAct);
 
+    m_toCalenderAct = new QAction();
+    m_toCalenderAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+    connect(m_toCalenderAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(m_toCalenderAct);
+
     m_signalMapper->setMapping(m_toMainWindowAct, 0);
     m_signalMapper->setMapping(m_toMultimediaPlayerAct, 1);
     m_signalMapper->setMapping(m_toPdfProcessorAct, 2);
+    m_signalMapper->setMapping(m_toCalenderAct, 3);
 
     connect(m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int)));
 }
@@ -76,6 +85,9 @@ void MainWindow::initializeMenus() {
 
     mainMenu->addAction(m_toPdfProcessorAct);
     m_toPdfProcessorAct->setText("PDF Processor");
+
+    mainMenu->addAction(m_toCalenderAct);
+    m_toCalenderAct->setText("Calender");
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));

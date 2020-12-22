@@ -148,13 +148,9 @@ void MainWindow::renderInfoSections() {
         latestUpdate->setObjectName("infoTime");
 
         QPushButton *toBtn = new QPushButton("Goto");
-        int val = item["toActVectorIndex"].toInt();
-        QAction* qAction = m_toActVector->at(val);
-
-        toBtn->addAction(qAction);
-//        connect;
-//        connect(toBtn, &QAbstractButton::clicked, qAction, SLOT(trigger()));
         toBtn->setObjectName("infoToBtn");
+        connect(toBtn, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+        m_signalMapper->setMapping(toBtn, item["stackedWidgetIndex"].toInt());
 
         sectionLayout->addWidget(title);
         sectionLayout->addWidget(description);

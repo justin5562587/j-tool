@@ -5,7 +5,7 @@
       "title": "Multimedia Player",
       "description": "Capable of playing both video and audio and various types of multimedia",
       "lastUpdate": "2020/10/20",
-      "toActVectorIndex": 1,
+      "stackedWidgetIndex": 1,
       "features": [
         "awesome",
         "best",
@@ -17,7 +17,19 @@
       "title": "PDF Processor",
       "description": "Capable of reading and rearranging PDF",
       "lastUpdate": "2020/10/20",
-      "toActVectorIndex": 2,
+      "stackedWidgetIndex": 2,
+      "features": [
+        "awesome",
+        "best",
+        "good"
+      ]
+    },
+    {
+      "core": "j_calendar",
+      "title": "Calendar",
+      "description": "Calendar with common options",
+      "lastUpdate": "2020/12/21",
+      "stackedWidgetIndex": 3,
       "features": [
         "awesome",
         "best",

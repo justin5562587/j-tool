@@ -84,8 +84,6 @@ void Calendar::reformatCalendarPage() {
 
 void Calendar::createTimeWidget() {
     calendar = new QCalendarWidget;
-    calendar->setFixedWidth(800);
-    calendar->setFixedHeight(400);
     calendar->setMinimumDate(QDate(1900, 1, 1));
     calendar->setMaximumDate(QDate(3000, 1, 1));
     calendar->setGridVisible(true);

@@ -37,6 +37,9 @@ void MainWindow::initializeWidget() {
     m_calendar = new Calendar(this);
     m_stackedWidget->addWidget(m_calendar);
 
+    m_screenShot = new ScreenShot(this);
+    m_stackedWidget->addWidget(m_screenShot);
+
     setWindowTitle("J-Tool");
     setCentralWidget(m_stackedWidget);
 }
@@ -45,30 +48,36 @@ void MainWindow::initializeActions() {
     m_signalMapper = new QSignalMapper(this);
     m_toActVector = new QVector<QAction *>();
 
-    m_toMainWindowAct = new QAction;
-    m_toMainWindowAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
-    connect(m_toMainWindowAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-    m_toActVector->push_back(m_toMainWindowAct);
+    QAction* toMainWindowAct = new QAction;
+    toMainWindowAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
+    connect(toMainWindowAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(toMainWindowAct);
 
-    m_toMultimediaPlayerAct = new QAction();
-    m_toMultimediaPlayerAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
-    connect(m_toMultimediaPlayerAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-    m_toActVector->push_back(m_toMultimediaPlayerAct);
+    QAction* toMultimediaPlayerAct = new QAction();
+    toMultimediaPlayerAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+    connect(toMultimediaPlayerAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(toMultimediaPlayerAct);
 
-    m_toPdfProcessorAct = new QAction();
-    m_toPdfProcessorAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
-    connect(m_toPdfProcessorAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-    m_toActVector->push_back(m_toPdfProcessorAct);
+    QAction* toPdfProcessorAct = new QAction();
+    toPdfProcessorAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+    connect(toPdfProcessorAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(toPdfProcessorAct);
 
-    m_toCalenderAct = new QAction();
-    m_toCalenderAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
-    connect(m_toCalenderAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-    m_toActVector->push_back(m_toCalenderAct);
+    QAction* toCalenderAct = new QAction();
+    toCalenderAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+    connect(toCalenderAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(toCalenderAct);
 
-    m_signalMapper->setMapping(m_toMainWindowAct, 0);
-    m_signalMapper->setMapping(m_toMultimediaPlayerAct, 1);
-    m_signalMapper->setMapping(m_toPdfProcessorAct, 2);
-    m_signalMapper->setMapping(m_toCalenderAct, 3);
+    QAction* toScreenShot = new QAction();
+    toScreenShot->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
+    connect(toScreenShot, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
+    m_toActVector->push_back(toScreenShot);
+
+    m_signalMapper->setMapping(toMainWindowAct, 0);
+    m_signalMapper->setMapping(toMultimediaPlayerAct, 1);
+    m_signalMapper->setMapping(toPdfProcessorAct, 2);
+    m_signalMapper->setMapping(toCalenderAct, 3);
+    m_signalMapper->setMapping(toScreenShot, 4);
 
     connect(m_signalMapper, SIGNAL(mapped(int)), this, SLOT(setCentralWidgetWith(int)));
 }
@@ -77,19 +86,22 @@ void MainWindow::initializeMenus() {
     // main menu
     QMenu *mainMenu = menuBar()->addMenu("Models");
 
-    mainMenu->addAction(m_toMainWindowAct);
-    m_toMainWindowAct->setText("Main Window");
+    mainMenu->addAction(m_toActVector->at(0));
+    m_toActVector->at(0)->setText("Main Window");
 
     mainMenu->addSeparator();
 
-    mainMenu->addAction(m_toMultimediaPlayerAct);
-    m_toMultimediaPlayerAct->setText("Multimedia Player");
+    mainMenu->addAction(m_toActVector->at(1));
+    m_toActVector->at(1)->setText("Multimedia Player");
 
-    mainMenu->addAction(m_toPdfProcessorAct);
-    m_toPdfProcessorAct->setText("PDF Processor");
+    mainMenu->addAction(m_toActVector->at(2));
+    m_toActVector->at(2)->setText("PDF Processor");
 
-    mainMenu->addAction(m_toCalenderAct);
-    m_toCalenderAct->setText("Calender");
+    mainMenu->addAction(m_toActVector->at(3));
+    m_toActVector->at(3)->setText("Calender");
+
+    mainMenu->addAction(m_toActVector->at(4));
+    m_toActVector->at(4)->setText("ScreenShot");
 
     // help
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));

@@ -6,6 +6,7 @@
 #include "./MultimediaPlayer/MultimediaPlayer.h"
 #include "./Calendar/Calendar.h"
 #include "./PDFProcessor/PDFMain.h"
+#include "./ScreenShot/ScreenShot.h"
 
 #include <QMainWindow>
 #include <QItemSelection>
@@ -41,18 +42,12 @@ private:
     QSignalMapper* m_signalMapper;
 
     QWidget *m_infoWrapper = nullptr;
-//    QVector<QWidget *> m_infoSections = QVector<QWidget *>();
 
     QStackedWidget *m_stackedWidget;
-//    ImageBrowser* m_imageBrowser = nullptr;
-//    TodoList* m_todoList = nullptr;
     MultimediaPlayer *m_multimediaPlayer = nullptr;
     Calendar* m_calendar = nullptr;
     PDFMain* m_pdfProcessor = nullptr;
+    ScreenShot* m_screenShot = nullptr;
 
     QVector<QAction* >* m_toActVector;
-    QAction* m_toMainWindowAct;
-    QAction* m_toMultimediaPlayerAct;
-    QAction* m_toPdfProcessorAct;
-    QAction* m_toCalenderAct;
 };

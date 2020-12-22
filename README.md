@@ -19,6 +19,8 @@ A integrated desktop tools for programmers or officers
 
 - Screenshot *_todo*
 
+- Calendar
+
 ## TodoList
 - Add dashboard in MainWindow
 - Add Date/Time in MainWindow

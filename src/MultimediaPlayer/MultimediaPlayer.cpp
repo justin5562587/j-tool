@@ -26,6 +26,8 @@
 #include <QScreen>
 #include <QImageWriter>
 
+#include "./frameProcessor.cpp"
+
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
 //    test_ffmpeg();
     setFixedWidth(1000);
@@ -254,9 +256,11 @@ static bool isPlaylist(const QUrl &url) {
     return fileInfo.exists() && !fileInfo.suffix().compare(QLatin1String("m3u"), Qt::CaseInsensitive);
 }
 
+// todo
 void MultimediaPlayer::addToPlaylist(const QList<QUrl> &urls) {
     for (auto &url: urls) {
         if (isPlaylist(url)) {
+            logInfoAboutFile(url.toString().toStdString());
             m_playlist->load(url);
         } else {
             m_playlist->addMedia(url);

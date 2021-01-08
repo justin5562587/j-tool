@@ -1,3 +1,3 @@
-aux_source_directory(. IMAGE_BROWSER_SRC)
+aux_source_directory(. RESOURCES_SRC)
 
-add_library(j_image_browser STATIC ${IMAGE_BROWSER_SRC})
+add_library(j_image_browser STATIC ${RESOURCES_SRC})

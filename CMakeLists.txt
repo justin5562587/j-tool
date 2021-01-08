@@ -17,6 +17,8 @@ set(MAIN_SRC
 set(Qt5_DIR "/Users/justin/Qt/5.15.1/clang_64/lib/cmake/QT5")
 find_package(Qt5 COMPONENTS Gui Widgets MultimediaWidgets Multimedia REQUIRED)
 
+find_package(SDL2 REQUIRED)
+
 option(USE_J_UTILS "Add j-utils into project?" OFF)
 if (USE_J_UTILS)
     add_subdirectory(utils)

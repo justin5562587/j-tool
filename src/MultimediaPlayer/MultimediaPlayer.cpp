@@ -185,7 +185,7 @@ void MultimediaPlayer::play() {
     m_player->play();
 
     const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
-    getPixmapWithTimestamp(filename, 10000);
+    getPixmapWithTimestamp(filename, 10);
 
     // todo show information of current playing media
 //    QVector<QString> otherKeys = std::initializer_list<QString>({"Resolution"});

@@ -4,5 +4,8 @@
 #pragma once
 
 #include <string>
+#include <map>
 
-int logInfoAboutFile(const std::string &fileUrl);
+int getInfoAboutFile(std::map<std::string, std::string> *fileInfo, const std::string &filename);
+
+int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp);

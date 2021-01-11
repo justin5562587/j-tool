@@ -50,3 +50,5 @@ A integrated desktop tools for programmers or officers
 | Fundamentals of Multimedia | Ze-Nian Li | 2014 |
 
 https://stackoverflow.com/questions/38468644/getting-video-frame-in-provided-time-qt
+
+avseek_example https://cpp.hotexamples.com/zh/examples/-/-/av_seek_frame/cpp-av_seek_frame-function-examples.html

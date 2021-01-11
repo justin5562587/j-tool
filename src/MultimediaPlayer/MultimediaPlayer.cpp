@@ -26,7 +26,7 @@
 #include <QScreen>
 #include <QImageWriter>
 
-#include "./frameProcessor.cpp"
+#include "./frameProcessor.h"
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
 //    test_ffmpeg();
@@ -184,6 +184,9 @@ void MultimediaPlayer::play() {
     m_screenShotBtn->setEnabled(true);
     m_player->play();
 
+    const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
+    getPixmapWithTimestamp(filename, 10000);
+
     // todo show information of current playing media
 //    QVector<QString> otherKeys = std::initializer_list<QString>({"Resolution"});
 //    m_mediaInfoWidget->populateWidgets(m_player, otherKeys);
@@ -256,11 +259,9 @@ static bool isPlaylist(const QUrl &url) {
     return fileInfo.exists() && !fileInfo.suffix().compare(QLatin1String("m3u"), Qt::CaseInsensitive);
 }
 
-// todo
 void MultimediaPlayer::addToPlaylist(const QList<QUrl> &urls) {
     for (auto &url: urls) {
         if (isPlaylist(url)) {
-            logInfoAboutFile(url.toString().toStdString());
             m_playlist->load(url);
         } else {
             m_playlist->addMedia(url);

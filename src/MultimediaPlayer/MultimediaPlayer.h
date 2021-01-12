@@ -57,6 +57,8 @@ public:
 
 signals:
 
+    void activeAdvancedControl(QMediaPlaylist *mediaPlaylist);
+
     void fullScreenChanged(bool fullScreen);
 
 public slots:

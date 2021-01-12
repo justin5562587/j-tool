@@ -3,9 +3,11 @@
 //
 
 #include "AdvancedControl.h"
+#include "./frameProcessor.h"
 
 #include <QPushButton>
 #include <QBoxLayout>
+#include <QDebug>
 
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_screenshotBtn = new QPushButton("ScreenShot", this);
@@ -22,12 +24,31 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-void AdvancedControl::screenshot() {
-
+void AdvancedControl::active(QMediaPlaylist *mediaPlaylist) {
+    m_mediaPlaylist = mediaPlaylist;
+    m_screenshotBtn->setEnabled(true);
+    m_videoCodecBtn->setEnabled(true);
+    m_audioCodecBtn->setEnabled(true);
 }
 
-void AdvancedControl::logVideoCodec() {}
+void AdvancedControl::inactiveAndFree() {
+    m_mediaPlaylist = nullptr;
+    m_screenshotBtn->setEnabled(false);
+    m_videoCodecBtn->setEnabled(false);
+    m_audioCodecBtn->setEnabled(false);
+}
 
-void AdvancedControl::logAudioCodec() {}
+void AdvancedControl::screenshot() {
+    const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
+    getPixmapWithTimestamp(filename, 10);
+}
+
+void AdvancedControl::logVideoCodec() {
+    qInfo() << "log video codec info";
+}
+
+void AdvancedControl::logAudioCodec() {
+    qInfo() << "log audio codec info";
+}
 
 

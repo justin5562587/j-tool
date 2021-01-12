@@ -27,8 +27,6 @@
 #include <QScreen>
 #include <QImageWriter>
 
-#include "./frameProcessor.h"
-
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
@@ -132,6 +130,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     controlLayout->addWidget(playControl);
 
     AdvancedControl *advancedControl= new AdvancedControl(this);
+    connect(this, &MultimediaPlayer::activeAdvancedControl, advancedControl, &AdvancedControl::active);
 
     QHBoxLayout *sliderDurationLayout = new QHBoxLayout;
     sliderDurationLayout->addWidget(m_slider);
@@ -177,12 +176,10 @@ bool MultimediaPlayer::isPlayerAvailable() const {
 void MultimediaPlayer::play() {
     m_player->play();
 
-    const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
-    getPixmapWithTimestamp(filename, 10);
+    // todo active advanced control
+    emit activeAdvancedControl(m_playlist);
 
     // todo show information of current playing media
-//    QVector<QString> otherKeys = std::initializer_list<QString>({"Resolution"});
-//    m_mediaInfoWidget->populateWidgets(m_player, otherKeys);
 }
 
 void MultimediaPlayer::open() {
@@ -212,6 +209,8 @@ void MultimediaPlayer::clear() {
 
 void MultimediaPlayer::screenShot() {
     // todo render current frame of playing video
+
+
 
     QRect contentRect = m_videoWidget->contentsRect();
     QPixmap screenContent(contentRect.size());

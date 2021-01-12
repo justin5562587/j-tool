@@ -106,6 +106,8 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
             } else {
                 ret = avcodec_receive_frame(pCodecCtx, pFrame);
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret < 0) {
+//                    char err[1024] = { 0 };
+//                    av_strerror(ret, err, 1024);
                     std::cout << "receive frame failed" << std::endl;
                     return -1;
                 }

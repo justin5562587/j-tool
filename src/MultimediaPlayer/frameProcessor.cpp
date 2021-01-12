@@ -13,6 +13,31 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
+}
+
+void saveFrame(AVFrame *avFrame, int width, int height) {
+    FILE *pFile;
+    char szFilename[32];
+    int y;
+
+    // Open file
+    sprintf(szFilename, "frame%d.ppm");
+    pFile = fopen(szFilename, "wb");
+    if (pFile == NULL) {
+        return;
+    }
+
+    // Write header
+    fprintf(pFile, "P6\n%d %d\n255\n", width, height);
+
+    // Write pixel data
+    for (y = 0; y < height; y++) {
+        fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
+    }
+
+    // Close file
+    fclose(pFile);
 }
 
 int getInfoAboutFile(AVFormatContext *pFormatCtx, std::map<std::string, std::string> *fileInfo) {
@@ -22,8 +47,53 @@ int getInfoAboutFile(AVFormatContext *pFormatCtx, std::map<std::string, std::str
     return 0;
 }
 
-int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
-                          int64_t timestamp) {
+int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat) {
+    AVFrame *pFrameRet = av_frame_alloc();
+    int numBytes = av_image_get_buffer_size(dstFormat, pCodecCtx->width, pCodecCtx->height, 32);
+    uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    av_image_fill_arrays(
+            pFrameRet->data,
+            pFrameRet->linesize,
+            buffer,
+            dstFormat,
+            pCodecCtx->width,
+            pCodecCtx->height,
+            32
+    );
+
+    struct SwsContext *swsCtx = sws_getContext(
+            pCodecCtx->width,
+            pCodecCtx->height,
+            pCodecCtx->pix_fmt,
+            pCodecCtx->width,
+            pCodecCtx->height,
+            dstFormat,
+            SWS_BILINEAR,
+            nullptr,
+            nullptr,
+            nullptr
+    );
+    sws_scale(
+            swsCtx,
+            (uint8_t const *const *) pFrame->data,
+            pFrame->linesize,
+            0,
+            pCodecCtx->height,
+            pFrameRet->data,
+            pFrameRet->linesize
+    );
+
+    // save file to disk
+    saveFrame(pFrameRet, pCodecCtx->width, pCodecCtx->height);
+
+    av_free(buffer);
+    av_frame_free(&pFrameRet);
+    sws_freeContext(swsCtx);
+
+    return 0;
+}
+
+int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int64_t timestamp) {
     AVPacket packet;
     int ret = 0;
 
@@ -116,71 +186,18 @@ int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
     }
 
     AVFrame *pFrame = av_frame_alloc();
-    ret = getFrameWithTimestamp(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, timestamp);
-    if (ret < 0) {
-        std::cout << "getFrameWithTimestamp failed" << std::endl;
-        return -1;
-    }
+    getFrameWithTimestamp(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, timestamp);
 
     std::cout << "Frame Width: " << std::to_string(pFrame->width) << std::endl;
     std::cout << "Frame Height: " << std::to_string(pFrame->height) << std::endl;
+
+    saveFrameAsPicture(pCodecCtx, pFrame, AV_PIX_FMT_RGB24);
 
     av_frame_free(&pFrame);
     avcodec_free_context(&pCodecCtx);
     avformat_close_input(&pFormatCtx);
     return 0;
 }
-
-int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame) {
-    // initialize sws
-    AVFrame *pFrameRet = av_frame_alloc();
-
-    struct SwsContext *swsCtx = sws_getContext(
-            pCodecCtx->width,
-            pCodecCtx->height,
-            pCodecCtx->pix_fmt,
-            pCodecCtx->width,
-            pCodecCtx->height,
-            AV_PIX_FMT_RGB24,
-            SWS_BILINEAR,
-            nullptr,
-            nullptr,
-            nullptr
-    );
-
-
-
-
-    // save file to disk
-
-
-    return 0;
-}
-
-void saveFrame(AVFrame *avFrame, int width, int height, int frameIndex) {
-    FILE *pFile;
-    char szFilename[32];
-    int y;
-
-    // Open file
-    sprintf(szFilename, "frame%d.ppm", frameIndex);
-    pFile = fopen(szFilename, "wb");
-    if (pFile == NULL) {
-        return;
-    }
-
-    // Write header
-    fprintf(pFile, "P6\n%d %d\n255\n", width, height);
-
-    // Write pixel data
-    for (y = 0; y < height; y++) {
-        fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
-    }
-
-    // Close file
-    fclose(pFile);
-}
-
 
 int initializeFFmpegWrapper(const std::string &filename, const std::string &callbackFuncName) {
     AVFormatContext *pFormatCtx = nullptr;

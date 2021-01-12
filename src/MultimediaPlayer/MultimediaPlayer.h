@@ -101,7 +101,6 @@ private:
     QLabel *m_labelDuration = nullptr;
     QPushButton *m_openBtn = nullptr;
     QPushButton *m_clearBtn = nullptr;
-    QPushButton *m_screenShotBtn = nullptr;
     QPushButton *m_fullScreenBtn = nullptr;
     QPushButton *m_colorBtn = nullptr;
     QDialog *m_colorDialog = nullptr;

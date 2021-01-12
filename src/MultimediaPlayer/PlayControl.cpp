@@ -9,7 +9,6 @@
 #include <QToolButton>
 #include <QComboBox>
 #include <QAudio>
-#include <QFile>
 
 PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     playBtn = new QToolButton(this);

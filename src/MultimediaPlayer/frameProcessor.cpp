@@ -40,13 +40,6 @@ void saveFrame(AVFrame *avFrame, int width, int height) {
     fclose(pFile);
 }
 
-int getInfoAboutFile(AVFormatContext *pFormatCtx, std::map<std::string, std::string> *fileInfo) {
-    fileInfo->insert(std::make_pair("duration", std::to_string(pFormatCtx->duration)));
-    fileInfo->insert(std::make_pair("bit_rate", std::to_string(pFormatCtx->bit_rate)));
-
-    return 0;
-}
-
 int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat) {
     AVFrame *pFrameRet = av_frame_alloc();
     int numBytes = av_image_get_buffer_size(dstFormat, pCodecCtx->width, pCodecCtx->height, 32);
@@ -93,7 +86,8 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
     return 0;
 }
 
-int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int64_t timestamp) {
+int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
+                          int64_t timestamp) {
     AVPacket packet;
     int ret = 0;
 
@@ -199,7 +193,7 @@ int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
     return 0;
 }
 
-int initializeFFmpegWrapper(const std::string &filename, const std::string &callbackFuncName) {
+int initializeFFmpeg(const std::string &filename) {
     AVFormatContext *pFormatCtx = nullptr;
     int ret = 1;
 
@@ -219,5 +213,10 @@ int initializeFFmpegWrapper(const std::string &filename, const std::string &call
     // todo
 
     avformat_close_input(&pFormatCtx);
+    return 0;
+}
+
+int freeFFmpeg(void *arg[]) {
+    // todo free all ffmpeg structs
     return 0;
 }

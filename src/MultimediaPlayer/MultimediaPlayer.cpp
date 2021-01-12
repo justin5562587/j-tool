@@ -3,6 +3,7 @@
 //
 #include "MultimediaPlayer.h"
 #include "PlayControl.h"
+#include "AdvancedControl.h"
 #include "PlaylistModel.h"
 #include "HistogramWidget.h"
 #include "VideoWidget.h"
@@ -29,10 +30,6 @@
 #include "./frameProcessor.h"
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
-//    test_ffmpeg();
-    setFixedWidth(1000);
-    setFixedHeight(800);
-
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
 
@@ -115,10 +112,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_clearBtn->setEnabled(false);
     connect(m_clearBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::clear);
 
-    m_screenShotBtn = new QPushButton("Screen Shot", this);
-    m_screenShotBtn->setEnabled(false);
-    connect(m_screenShotBtn, &QAbstractButton::clicked, this, &MultimediaPlayer::screenShot);
-
     m_fullScreenBtn = new QPushButton("Full Screen", this);
     m_fullScreenBtn->setCheckable(true);
 
@@ -134,10 +127,11 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->addWidget(m_openBtn);
     controlLayout->addWidget(m_clearBtn);
-    controlLayout->addWidget(m_screenShotBtn);
     controlLayout->addWidget(m_fullScreenBtn);
     controlLayout->addWidget(m_colorBtn);
     controlLayout->addWidget(playControl);
+
+    AdvancedControl *advancedControl= new AdvancedControl(this);
 
     QHBoxLayout *sliderDurationLayout = new QHBoxLayout;
     sliderDurationLayout->addWidget(m_slider);
@@ -147,6 +141,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     mainLayout->addLayout(displayLayout);
     mainLayout->addLayout(sliderDurationLayout);
     mainLayout->addLayout(controlLayout);
+    mainLayout->addWidget(advancedControl);
     mainLayout->addLayout(histogramLayout);
 
     setLayout(mainLayout);
@@ -161,7 +156,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
         m_openBtn->setEnabled(false);
         m_clearBtn->setEnabled(false);
         m_colorBtn->setEnabled(false);
-        m_screenShotBtn->setEnabled(false);
         m_fullScreenBtn->setEnabled(false);
     }
 
@@ -181,7 +175,6 @@ bool MultimediaPlayer::isPlayerAvailable() const {
 }
 
 void MultimediaPlayer::play() {
-    m_screenShotBtn->setEnabled(true);
     m_player->play();
 
     const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
@@ -217,8 +210,9 @@ void MultimediaPlayer::clear() {
     m_clearBtn->setEnabled(false);
 }
 
-// todo
 void MultimediaPlayer::screenShot() {
+    // todo render current frame of playing video
+
     QRect contentRect = m_videoWidget->contentsRect();
     QPixmap screenContent(contentRect.size());
     m_videoWidget->render(&screenContent, QPoint(), QRegion(contentRect));

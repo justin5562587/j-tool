@@ -126,6 +126,8 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
 }
 
 int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
+    std::cout << filename << std::endl;
+
     AVFormatContext *pFormatCtx = nullptr;
     int ret = 0;
 

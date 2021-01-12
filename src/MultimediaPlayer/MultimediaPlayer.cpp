@@ -176,7 +176,6 @@ bool MultimediaPlayer::isPlayerAvailable() const {
 void MultimediaPlayer::play() {
     m_player->play();
 
-    // todo active advanced control
     emit activeAdvancedControl(m_playlist);
 
     // todo show information of current playing media
@@ -209,8 +208,6 @@ void MultimediaPlayer::clear() {
 
 void MultimediaPlayer::screenShot() {
     // todo render current frame of playing video
-
-
 
     QRect contentRect = m_videoWidget->contentsRect();
     QPixmap screenContent(contentRect.size());

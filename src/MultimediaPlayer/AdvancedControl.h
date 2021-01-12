@@ -19,7 +19,7 @@ public slots:
 
     void active(QMediaPlaylist *mediaPlaylist);
 
-    void inactiveAndFree();
+    void inactive();
 
     void screenshot();
 

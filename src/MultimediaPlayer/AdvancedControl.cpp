@@ -17,6 +17,8 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_audioCodecBtn = new QPushButton("Log Audio Codec", this);
     connect(m_audioCodecBtn, &QAbstractButton::clicked, this, &AdvancedControl::logAudioCodec);
 
+    inactive();
+
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget(m_screenshotBtn);
     layout->addWidget(m_videoCodecBtn);
@@ -31,7 +33,7 @@ void AdvancedControl::active(QMediaPlaylist *mediaPlaylist) {
     m_audioCodecBtn->setEnabled(true);
 }
 
-void AdvancedControl::inactiveAndFree() {
+void AdvancedControl::inactive() {
     m_mediaPlaylist = nullptr;
     m_screenshotBtn->setEnabled(false);
     m_videoCodecBtn->setEnabled(false);
@@ -39,12 +41,15 @@ void AdvancedControl::inactiveAndFree() {
 }
 
 void AdvancedControl::screenshot() {
-    const std::string filename = "/Users/justin/Downloads/example_files/example.mp4";
-    getPixmapWithTimestamp(filename, 10);
+    QMediaContent mediaContent = m_mediaPlaylist->currentMedia();
+    std::string urlString = mediaContent.request().url().toString().toStdString();
+    getPixmapWithTimestamp(urlString.substr(7), 10);
 }
 
 void AdvancedControl::logVideoCodec() {
-    qInfo() << "log video codec info";
+    QMediaContent mediaContent = m_mediaPlaylist->currentMedia();
+    QUrl url = mediaContent.request().url();
+    qInfo() << url.toString();
 }
 
 void AdvancedControl::logAudioCodec() {

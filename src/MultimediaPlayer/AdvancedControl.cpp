@@ -43,7 +43,7 @@ void AdvancedControl::inactive() {
 void AdvancedControl::screenshot() {
     QMediaContent mediaContent = m_mediaPlaylist->currentMedia();
     std::string urlString = mediaContent.request().url().toString().toStdString();
-    getPixmapWithTimestamp(urlString.substr(7), 10);
+    getPixmapWithTimestamp(urlString.substr(7), 5);
 }
 
 void AdvancedControl::logVideoCodec() {

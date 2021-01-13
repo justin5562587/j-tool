@@ -87,32 +87,40 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
 }
 
 int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
-                          int64_t timestamp) {
+                          int targetSeconds) {
     AVPacket packet;
     int ret = 0;
 
-    if (av_seek_frame(pFormatCtx, videoStreamIndex, timestamp * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD) < 0) {
+    double streamTimeBase = av_q2d(pFormatCtx->streams[videoStreamIndex]->time_base);
+
+    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds * streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
         std::cout << "seek frame failed" << std::endl;
         return -1;
     }
 
     bool done = false;
+    int read_frame_times = 0;
     while (!done && av_read_frame(pFormatCtx, &packet) >= 0) {
+
         if (packet.stream_index == videoStreamIndex) {
+            std::cout << "read_frame_times: " << ++read_frame_times << std::endl;
             ret = avcodec_send_packet(pCodecCtx, &packet);
             if (ret < 0) {
                 std::cout << "send packet failed" << std::endl;
                 return -1;
             } else {
                 ret = avcodec_receive_frame(pCodecCtx, pFrame);
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret < 0) {
-//                    char err[1024] = { 0 };
-//                    av_strerror(ret, err, 1024);
-                    std::cout << "receive frame failed" << std::endl;
-                    return -1;
-                }
+//                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+//                    char errBuffer[128];
+//                    av_make_error_string(errBuffer, sizeof(errBuffer), ret);
+//                    std::cout << "receive frame failed: " << errBuffer << std::endl;
+//                    return -1;
+//                }
 
-                if (pFrame->width != 0) {
+                double packetSeconds = packet.pts * mediaTimeBase;
+                std::cout << "packetSeconds: " << packetSeconds << std::endl;
+
+                if (pFrame->width > 0) {
                     done = true;
                 }
             }
@@ -126,7 +134,7 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
 }
 
 int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
-    std::cout << filename << std::endl;
+    std::cout << "Current MediaFile: " << filename << std::endl;
 
     AVFormatContext *pFormatCtx = nullptr;
     int ret = 0;
@@ -153,12 +161,14 @@ int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
             break;
         }
     }
-
-    // video stream is required
     if (videoStreamIndex == -1) {
         std::cout << "cannot find video stream" << std::endl;
         return -1;
     }
+
+    // todo show total seconds of video
+//    double totalSeconds = pFormatCtx->duration * av_q2d(AV_TIME_BASE_Q);
+//    std::cout << "totalSeconds: " << totalSeconds << std::endl;
 
     AVCodecContext *pCodecCtx = nullptr;
     AVCodec *pCodec = nullptr;

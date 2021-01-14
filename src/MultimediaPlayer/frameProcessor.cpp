@@ -109,7 +109,7 @@ int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
 //    ofs.close();
 //}
 
-void saveFrame(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
+void writeFrameToDiskFile(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
     FILE *pFile;
     char szFilename[32];
     int y;
@@ -169,7 +169,7 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
     );
 
     // save file to disk
-    saveFrame(pFrameRet, pCodecCtx->width, pCodecCtx->height, diskPath);
+    writeFrameToDiskFile(pFrameRet, pCodecCtx->width, pCodecCtx->height, diskPath);
 
     av_free(buffer);
     av_frame_free(&pFrameRet);
@@ -192,7 +192,7 @@ getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
         return -1;
     }
 
-    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_ANY) < 0) {
+    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
         std::cout << "seek frame failed" << std::endl;
         return -1;
     }

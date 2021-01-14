@@ -12,6 +12,9 @@ extern "C" {
 #include <libavutil/imgutils.h>
 }
 
+/**
+ * custom struct wrapping some useful fields taken from ffmpeg
+ */
 struct FFmpegBasicInfo {
     int videoStreamIndex = -1;
     int audioStreamIndex = -1;
@@ -32,10 +35,14 @@ int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FF
  */
 int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx);
 
-int savePixelToDisk(AVFrame *pFrame);
+/**
+ * write scaled format frame data to disk file
+ */
+void writeFrameToDiskFile(AVFrame *avFrame, int width, int height, const std::string &diskPath);
 
-int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat);
-
+/**
+ * get frame data using avformat_seek_frame
+ */
 int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, double targetSeconds);
 
 /**
@@ -43,6 +50,5 @@ int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCo
  */
 int getPixmapInSpecificSeconds(const std::string &filepath, double targetSeconds, const std::string &diskPath);
 
-
-
+// todo
 int getVideoOverviewPicture(const std::string &filepath);

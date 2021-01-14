@@ -92,8 +92,9 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
     int ret = 0;
 
     double streamTimeBase = av_q2d(pFormatCtx->streams[videoStreamIndex]->time_base);
+    std::cout << "AVStream->time_base: " << streamTimeBase << std::endl;
 
-    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds * streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
+    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
         std::cout << "seek frame failed" << std::endl;
         return -1;
     }
@@ -117,7 +118,7 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
 //                    return -1;
 //                }
 
-                double packetSeconds = packet.pts * mediaTimeBase;
+                double packetSeconds = packet.pts * streamTimeBase;
                 std::cout << "packetSeconds: " << packetSeconds << std::endl;
 
                 if (pFrame->width > 0) {
@@ -133,7 +134,7 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
     return 0;
 }
 
-int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
+int getPixmapWithTimestamp(const std::string &filename, int targetSeconds) {
     std::cout << "Current MediaFile: " << filename << std::endl;
 
     AVFormatContext *pFormatCtx = nullptr;
@@ -166,10 +167,6 @@ int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
         return -1;
     }
 
-    // todo show total seconds of video
-//    double totalSeconds = pFormatCtx->duration * av_q2d(AV_TIME_BASE_Q);
-//    std::cout << "totalSeconds: " << totalSeconds << std::endl;
-
     AVCodecContext *pCodecCtx = nullptr;
     AVCodec *pCodec = nullptr;
     pCodec = avcodec_find_decoder(pFormatCtx->streams[videoStreamIndex]->codecpar->codec_id);
@@ -194,7 +191,7 @@ int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp) {
     }
 
     AVFrame *pFrame = av_frame_alloc();
-    getFrameWithTimestamp(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, timestamp);
+    getFrameWithTimestamp(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, targetSeconds);
 
     std::cout << "Frame Width: " << std::to_string(pFrame->width) << std::endl;
     std::cout << "Frame Height: " << std::to_string(pFrame->height) << std::endl;

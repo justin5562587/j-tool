@@ -22,9 +22,9 @@ int savePixelToDisk(AVFrame *pFrame);
 
 int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat);
 
-int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int64_t timestamp);
+int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int targetSeconds);
 
-int getPixmapWithTimestamp(const std::string &filename, int64_t timestamp);
+int getPixmapWithTimestamp(const std::string &filename, int targetSeconds);
 
 int initializeFFmpeg(const std::string &filename);
 

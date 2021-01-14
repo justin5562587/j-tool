@@ -4,6 +4,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 
 #include "./frameProcessor.h"
@@ -48,12 +49,6 @@ int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicIn
     return 0;
 }
 
-int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
-    avcodec_free_context(&pCodecCtx);
-    avformat_close_input(&pFormatCtx);
-    return 0;
-}
-
 int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FFmpegBasicInfo *pFFmpegBasicInfo) {
     int videoStreamIndex = pFFmpegBasicInfo->videoStreamIndex;
     // find Codec
@@ -76,13 +71,51 @@ int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FF
     return 0;
 }
 
-void saveFrame(AVFrame *avFrame, int width, int height) {
+int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
+    avcodec_free_context(&pCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    return 0;
+}
+
+//std::ostream &operator<<(std::ostream &outputStream, const PPMObject &other) {
+//    outputStream << "P6" << "\n"
+//                 << other.width << " "
+//                 << other.height << "\n"
+//                 << other.maxColVal << "\n";
+//    size_t size = other.width * other.height * 3;
+//    outputStream.write(other.m_Ptr, size);
+//    return outputStream;
+//}
+
+//void writePPMFileWithFrame(AVFrame *pFrame, int width, int height, const std::string &filename,
+//                           const std::string &diskPath) {
+//    constexpr auto dimx = 800u, dimy = 800u;
+//
+//    const std::string fullFilename = diskPath + filename;
+//    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+//    // write header
+//    ofs << "P6" << "\n" << width << " " << height << "\n" << 255 << "\n";
+//    // Write pixel data
+//    for (int y = 0; y < height; y++) {
+////        ofs << pFrame->data[0] + y * pFrame->linesize[0], 1, width * 3,
+//        ofs.write(pFrame->data[0] + y * pFrame->linesize[0], width * 3);
+////        fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
+//    }
+//
+//    for (auto j = 0u; j < dimy; ++j)
+//        for (auto i = 0u; i < dimx; ++i)
+//            ofs << (char) (i % 256) << (char) (j % 256) << (char) ((i * j) % 256);       // red, green, blue
+//
+//    ofs.close();
+//}
+
+void saveFrame(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
     FILE *pFile;
     char szFilename[32];
     int y;
 
     // Open file
-    sprintf(szFilename, "frame%d.ppm");
+    sprintf(szFilename, (diskPath + "frame.ppm").c_str());
     pFile = fopen(szFilename, "wb");
     if (pFile == NULL) {
         return;
@@ -90,7 +123,6 @@ void saveFrame(AVFrame *avFrame, int width, int height) {
 
     // Write header
     fprintf(pFile, "P6\n%d %d\n255\n", width, height);
-
     // Write pixel data
     for (y = 0; y < height; y++) {
         fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
@@ -100,7 +132,7 @@ void saveFrame(AVFrame *avFrame, int width, int height) {
     fclose(pFile);
 }
 
-int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat) {
+int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat, const std::string &diskPath) {
     AVFrame *pFrameRet = av_frame_alloc();
     int numBytes = av_image_get_buffer_size(dstFormat, pCodecCtx->width, pCodecCtx->height, 32);
     uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
@@ -137,7 +169,7 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
     );
 
     // save file to disk
-    saveFrame(pFrameRet, pCodecCtx->width, pCodecCtx->height);
+    saveFrame(pFrameRet, pCodecCtx->width, pCodecCtx->height, diskPath);
 
     av_free(buffer);
     av_frame_free(&pFrameRet);
@@ -146,8 +178,9 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
     return 0;
 }
 
-int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
-                          int targetSeconds) {
+int
+getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
+                          double targetSeconds) {
     AVPacket packet;
     int ret = 0;
 
@@ -159,7 +192,7 @@ int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCo
         return -1;
     }
 
-    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
+    if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_ANY) < 0) {
         std::cout << "seek frame failed" << std::endl;
         return -1;
     }
@@ -199,7 +232,7 @@ int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCo
     return 0;
 }
 
-int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
+int getPixmapInSpecificSeconds(const std::string &filepath, double targetSeconds, const std::string &diskPath) {
     AVFormatContext *pFormatCtx = avformat_alloc_context();
     FFmpegBasicInfo ffmpegBasicInfo;
     initializeFFmpeg(pFormatCtx, &ffmpegBasicInfo, filepath);
@@ -210,12 +243,10 @@ int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
     int videoStreamIndex = ffmpegBasicInfo.videoStreamIndex;
 
     AVFrame *pFrame = av_frame_alloc();
+
     getFrameInSpecificSeconds(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, targetSeconds);
 
-    std::cout << "Frame Width: " << std::to_string(pFrame->width) << std::endl;
-    std::cout << "Frame Height: " << std::to_string(pFrame->height) << std::endl;
-
-    saveFrameAsPicture(pCodecCtx, pFrame, AV_PIX_FMT_RGB24);
+    saveFrameAsPicture(pCodecCtx, pFrame, AV_PIX_FMT_RGB24, diskPath);
 
     av_frame_free(&pFrame);
     avcodec_free_context(&pCodecCtx);
@@ -223,6 +254,7 @@ int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
     return 0;
 }
 
+// todo - video overview picture
 int getVideoOverviewPicture(const std::string &filepath) {
 
     return 0;

@@ -23,21 +23,26 @@ struct FFmpegBasicInfo {
 int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicInfo, const std::string &filepath);
 
 /**
- * deallocate ffmpeg relevant structs
- */
-int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx);
-
-/**
  * populate AVCodecContext and open Codec with given AVFormatContext and FFmpegBasicInfo
  */
 int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicInfo);
+
+/**
+ * deallocate ffmpeg relevant structs
+ */
+int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx);
 
 int savePixelToDisk(AVFrame *pFrame);
 
 int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat);
 
-int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int targetSeconds);
+int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, double targetSeconds);
 
-int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds);
+/**
+ * get a pixel picture according to video filepath and saved diskPath
+ */
+int getPixmapInSpecificSeconds(const std::string &filepath, double targetSeconds, const std::string &diskPath);
+
+
 
 int getVideoOverviewPicture(const std::string &filepath);

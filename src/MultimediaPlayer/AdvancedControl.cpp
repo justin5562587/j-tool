@@ -6,6 +6,7 @@
 #include "./frameProcessor.h"
 
 #include <QPushButton>
+#include <QStandardPaths>
 #include <QBoxLayout>
 #include <QDebug>
 
@@ -40,11 +41,17 @@ void AdvancedControl::inactive() {
     m_audioCodecBtn->setEnabled(false);
 }
 
-// todo
+// todo - optimize precision of screenshot
 void AdvancedControl::screenshot() {
     QMediaContent mediaContent = m_mediaPlayer->currentMedia();
     std::string urlString = mediaContent.request().url().toString().toStdString();
-    getPixmapInSpecificSeconds(urlString.substr(7), 10);
+
+    double currentSeconds = (double) m_mediaPlayer->position() / 1000;
+    qInfo() << currentSeconds;
+    QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
+    QString defaultDownloadDir = downloadDir + "/FFmpeg_Download/";
+
+    getPixmapInSpecificSeconds(urlString.substr(7), currentSeconds, defaultDownloadDir.toStdString());
 }
 
 void AdvancedControl::logVideoCodec() {

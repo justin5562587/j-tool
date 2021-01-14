@@ -193,6 +193,7 @@ void MultimediaPlayer::open() {
             QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).value(0, QDir::homePath())
 //            QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath())
     );
+
     if (fileDialog.exec() == QDialog::Accepted) {
         addToPlaylist(fileDialog.selectedUrls());
     }

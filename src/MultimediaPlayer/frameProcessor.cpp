@@ -19,14 +19,12 @@ int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicIn
     int ret = 0;
 
     const char *url = filepath.c_str();
-    ret = avformat_open_input(&pFormatCtx, url, nullptr, nullptr);
-    if (ret < 0) {
+    if (avformat_open_input(&pFormatCtx, url, nullptr, nullptr) < 0) {
         std::cout << "cannot open file" << std::endl;
         return -1;
     }
 
-    ret = avformat_find_stream_info(pFormatCtx, nullptr);
-    if (ret < 0) {
+    if (avformat_find_stream_info(pFormatCtx, nullptr) < 0) {
         std::cout << "cannot find stream info" << std::endl;
         return -1;
     }
@@ -50,9 +48,31 @@ int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicIn
     return 0;
 }
 
-int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, AVCodec *pCodec) {
+int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
     avcodec_free_context(&pCodecCtx);
     avformat_close_input(&pFormatCtx);
+    return 0;
+}
+
+int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FFmpegBasicInfo *pFFmpegBasicInfo) {
+    int videoStreamIndex = pFFmpegBasicInfo->videoStreamIndex;
+    // find Codec
+    AVCodec *pCodec = avcodec_find_decoder(pFormatCtx->streams[videoStreamIndex]->codecpar->codec_id);
+    if (pCodec == nullptr) {
+        std::cout << "cannot find decoder" << std::endl;
+        return -1;
+    }
+    // initialize CodecContext with found Codec
+    *ppCodecCtx = avcodec_alloc_context3(pCodec);
+    if (avcodec_parameters_to_context(*ppCodecCtx, pFormatCtx->streams[videoStreamIndex]->codecpar) < 0) {
+        std::cout << "cannot fill CodecContext with given Codec" << std::endl;
+        return -1;
+    }
+    if (avcodec_open2(*ppCodecCtx, pCodec, nullptr) < 0) {
+        std::cout << "cannot initialize CodecContext to use given Codec" << std::endl;
+        return -1;
+    }
+
     return 0;
 }
 
@@ -180,30 +200,14 @@ int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCo
 }
 
 int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
-    int ret = 0;
     AVFormatContext *pFormatCtx = avformat_alloc_context();
     FFmpegBasicInfo ffmpegBasicInfo;
     initializeFFmpeg(pFormatCtx, &ffmpegBasicInfo, filepath);
 
+    AVCodecContext *pCodecCtx = nullptr;
+    initializeCodec(&pCodecCtx, pFormatCtx, &ffmpegBasicInfo);
+
     int videoStreamIndex = ffmpegBasicInfo.videoStreamIndex;
-    // find Codec
-    AVCodec *pCodec = avcodec_find_decoder(pFormatCtx->streams[videoStreamIndex]->codecpar->codec_id);
-    if (pCodec == nullptr) {
-        std::cout << "cannot find decoder" << std::endl;
-        return -1;
-    }
-    // initialize CodecContext with found Codec
-    AVCodecContext *pCodecCtx = avcodec_alloc_context3(pCodec);
-    ret = avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoStreamIndex]->codecpar);
-    if (ret < 0) {
-        std::cout << "cannot fill CodecContext with given Codec" << std::endl;
-        return -1;
-    }
-    ret = avcodec_open2(pCodecCtx, pCodec, nullptr);
-    if (ret < 0) {
-        std::cout << "cannot initialize CodecContext to use given Codec" << std::endl;
-        return -1;
-    }
 
     AVFrame *pFrame = av_frame_alloc();
     getFrameInSpecificSeconds(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, targetSeconds);
@@ -214,6 +218,12 @@ int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
     saveFrameAsPicture(pCodecCtx, pFrame, AV_PIX_FMT_RGB24);
 
     av_frame_free(&pFrame);
-    deallocateFFmpeg(pFormatCtx, pCodecCtx, pCodec);
+    avcodec_free_context(&pCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    return 0;
+}
+
+int getVideoOverviewPicture(const std::string &filepath) {
+
     return 0;
 }

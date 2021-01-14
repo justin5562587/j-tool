@@ -26,15 +26,15 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-void AdvancedControl::active(QMediaPlaylist *mediaPlaylist) {
-    m_mediaPlaylist = mediaPlaylist;
+void AdvancedControl::active(QMediaPlayer *mediaPlayer) {
+    m_mediaPlayer = mediaPlayer;
     m_screenshotBtn->setEnabled(true);
     m_videoCodecBtn->setEnabled(true);
     m_audioCodecBtn->setEnabled(true);
 }
 
 void AdvancedControl::inactive() {
-    m_mediaPlaylist = nullptr;
+    m_mediaPlayer = nullptr;
     m_screenshotBtn->setEnabled(false);
     m_videoCodecBtn->setEnabled(false);
     m_audioCodecBtn->setEnabled(false);
@@ -42,13 +42,13 @@ void AdvancedControl::inactive() {
 
 // todo
 void AdvancedControl::screenshot() {
-    QMediaContent mediaContent = m_mediaPlaylist->currentMedia();
+    QMediaContent mediaContent = m_mediaPlayer->currentMedia();
     std::string urlString = mediaContent.request().url().toString().toStdString();
     getPixmapInSpecificSeconds(urlString.substr(7), 10);
 }
 
 void AdvancedControl::logVideoCodec() {
-    QMediaContent mediaContent = m_mediaPlaylist->currentMedia();
+    QMediaContent mediaContent = m_mediaPlayer->currentMedia();
     QUrl url = mediaContent.request().url();
     qInfo() << url.toString();
 }

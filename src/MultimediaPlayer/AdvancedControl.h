@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <QMediaPlaylist>
+#include <QMediaPlayer>
 #include <QWidget>
 #include <QAbstractButton>
 
@@ -17,7 +17,7 @@ public:
 
 public slots:
 
-    void active(QMediaPlaylist *mediaPlaylist);
+    void active(QMediaPlayer *mediaPlayer);
 
     void inactive();
 
@@ -29,7 +29,7 @@ public slots:
 
 private:
 
-    QMediaPlaylist *m_mediaPlaylist = nullptr;
+    QMediaPlayer *m_mediaPlayer = nullptr;
 
     QAbstractButton *m_screenshotBtn = nullptr;
     QAbstractButton *m_videoCodecBtn = nullptr;

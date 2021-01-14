@@ -17,9 +17,20 @@ struct FFmpegBasicInfo {
     int audioStreamIndex = -1;
 };
 
+/**
+ * populate AVFormatContext and FFmpegBasicInfo with given filepath
+ */
 int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicInfo, const std::string &filepath);
 
-int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, AVCodec *pCodec);
+/**
+ * deallocate ffmpeg relevant structs
+ */
+int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx);
+
+/**
+ * populate AVCodecContext and open Codec with given AVFormatContext and FFmpegBasicInfo
+ */
+int initializeCodec(AVCodecContext **ppCodecCtx, AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicInfo);
 
 int savePixelToDisk(AVFrame *pFrame);
 
@@ -28,3 +39,5 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
 int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex, int targetSeconds);
 
 int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds);
+
+int getVideoOverviewPicture(const std::string &filepath);

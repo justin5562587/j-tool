@@ -57,7 +57,7 @@ public:
 
 signals:
 
-    void activeAdvancedControl(QMediaPlaylist *mediaPlaylist);
+    void activeAdvancedControl(QMediaPlayer *mediaPlayer);
 
     void fullScreenChanged(bool fullScreen);
 

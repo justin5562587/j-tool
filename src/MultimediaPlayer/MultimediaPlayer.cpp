@@ -176,9 +176,7 @@ bool MultimediaPlayer::isPlayerAvailable() const {
 void MultimediaPlayer::play() {
     m_player->play();
 
-    emit activeAdvancedControl(m_playlist);
-
-    // todo show information of current playing media
+    emit activeAdvancedControl(m_player);
 }
 
 void MultimediaPlayer::open() {

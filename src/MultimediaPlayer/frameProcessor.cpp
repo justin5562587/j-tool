@@ -5,8 +5,6 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
-#include <any>
-#include <functional>
 
 #include "./frameProcessor.h"
 
@@ -14,6 +12,48 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+}
+
+int initializeFFmpeg(AVFormatContext *pFormatCtx, FFmpegBasicInfo *ffmpegBasicInfo, const std::string &filepath) {
+    std::cout << "Current MediaFile: " << filepath << std::endl;
+    int ret = 0;
+
+    const char *url = filepath.c_str();
+    ret = avformat_open_input(&pFormatCtx, url, nullptr, nullptr);
+    if (ret < 0) {
+        std::cout << "cannot open file" << std::endl;
+        return -1;
+    }
+
+    ret = avformat_find_stream_info(pFormatCtx, nullptr);
+    if (ret < 0) {
+        std::cout << "cannot find stream info" << std::endl;
+        return -1;
+    }
+
+    for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
+        AVCodecParameters *codecParameters = pFormatCtx->streams[i]->codecpar;
+        if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
+            ffmpegBasicInfo->videoStreamIndex = i;
+        }
+        if (codecParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
+            ffmpegBasicInfo->audioStreamIndex = i;
+        }
+    }
+
+    int videoStreamIndex = ffmpegBasicInfo->videoStreamIndex;
+    if (videoStreamIndex == -1) {
+        std::cout << "cannot find video stream" << std::endl;
+        return -1;
+    }
+
+    return 0;
+}
+
+int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, AVCodec *pCodec) {
+    avcodec_free_context(&pCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    return 0;
 }
 
 void saveFrame(AVFrame *avFrame, int width, int height) {
@@ -86,13 +126,18 @@ int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat
     return 0;
 }
 
-int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
+int getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx, int videoStreamIndex,
                           int targetSeconds) {
     AVPacket packet;
     int ret = 0;
 
+    int64_t streamDuration = pFormatCtx->streams[videoStreamIndex]->duration;
     double streamTimeBase = av_q2d(pFormatCtx->streams[videoStreamIndex]->time_base);
-    std::cout << "AVStream->time_base: " << streamTimeBase << std::endl;
+
+    if (targetSeconds >= streamDuration * streamTimeBase) {
+        std::cout << "target seconds cannot greater than total seconds of video stream " << std::endl;
+        return -1;
+    }
 
     if (av_seek_frame(pFormatCtx, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
         std::cout << "seek frame failed" << std::endl;
@@ -134,64 +179,34 @@ int getFrameWithTimestamp(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
     return 0;
 }
 
-int getPixmapWithTimestamp(const std::string &filename, int targetSeconds) {
-    std::cout << "Current MediaFile: " << filename << std::endl;
-
-    AVFormatContext *pFormatCtx = nullptr;
+int getPixmapInSpecificSeconds(const std::string &filepath, int targetSeconds) {
     int ret = 0;
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
+    FFmpegBasicInfo ffmpegBasicInfo;
+    initializeFFmpeg(pFormatCtx, &ffmpegBasicInfo, filepath);
 
-    const char *url = filename.c_str();
-    ret = avformat_open_input(&pFormatCtx, url, nullptr, nullptr);
-    if (ret < 0) {
-        std::cout << "cannot open file" << std::endl;
-        return -1;
-    }
-
-    ret = avformat_find_stream_info(pFormatCtx, nullptr);
-    if (ret < 0) {
-        std::cout << "cannot find stream info" << std::endl;
-        return -1;
-    }
-
-    // find index of video stream
-    int videoStreamIndex = -1;
-    for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
-        AVCodecParameters *codecParameters = pFormatCtx->streams[i]->codecpar;
-        if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIndex = i;
-            break;
-        }
-    }
-    if (videoStreamIndex == -1) {
-        std::cout << "cannot find video stream" << std::endl;
-        return -1;
-    }
-
-    AVCodecContext *pCodecCtx = nullptr;
-    AVCodec *pCodec = nullptr;
-    pCodec = avcodec_find_decoder(pFormatCtx->streams[videoStreamIndex]->codecpar->codec_id);
+    int videoStreamIndex = ffmpegBasicInfo.videoStreamIndex;
+    // find Codec
+    AVCodec *pCodec = avcodec_find_decoder(pFormatCtx->streams[videoStreamIndex]->codecpar->codec_id);
     if (pCodec == nullptr) {
         std::cout << "cannot find decoder" << std::endl;
         return -1;
     }
-
-    // copy context
-    pCodecCtx = avcodec_alloc_context3(pCodec);
+    // initialize CodecContext with found Codec
+    AVCodecContext *pCodecCtx = avcodec_alloc_context3(pCodec);
     ret = avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoStreamIndex]->codecpar);
     if (ret < 0) {
-        std::cout << "cannot fill codec context" << std::endl;
+        std::cout << "cannot fill CodecContext with given Codec" << std::endl;
         return -1;
     }
-
-    // initialize codec context to use given codec
     ret = avcodec_open2(pCodecCtx, pCodec, nullptr);
     if (ret < 0) {
-        std::cout << "cannot initialize codec context to use given codec" << std::endl;
+        std::cout << "cannot initialize CodecContext to use given Codec" << std::endl;
         return -1;
     }
 
     AVFrame *pFrame = av_frame_alloc();
-    getFrameWithTimestamp(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, targetSeconds);
+    getFrameInSpecificSeconds(pFrame, pFormatCtx, pCodecCtx, videoStreamIndex, targetSeconds);
 
     std::cout << "Frame Width: " << std::to_string(pFrame->width) << std::endl;
     std::cout << "Frame Height: " << std::to_string(pFrame->height) << std::endl;
@@ -199,35 +214,6 @@ int getPixmapWithTimestamp(const std::string &filename, int targetSeconds) {
     saveFrameAsPicture(pCodecCtx, pFrame, AV_PIX_FMT_RGB24);
 
     av_frame_free(&pFrame);
-    avcodec_free_context(&pCodecCtx);
-    avformat_close_input(&pFormatCtx);
-    return 0;
-}
-
-int initializeFFmpeg(const std::string &filename) {
-    AVFormatContext *pFormatCtx = nullptr;
-    int ret = 1;
-
-    const char *url = filename.c_str();
-    ret = avformat_open_input(&pFormatCtx, url, nullptr, nullptr);
-    if (ret < 0) {
-        std::cout << "cannot open file" << std::endl;
-        return -1;
-    }
-
-    ret = avformat_find_stream_info(pFormatCtx, nullptr);
-    if (ret < 0) {
-        std::cout << "cannot find stream info" << std::endl;
-        return -1;
-    }
-
-    // todo
-
-    avformat_close_input(&pFormatCtx);
-    return 0;
-}
-
-int freeFFmpeg(void *arg[]) {
-    // todo free all ffmpeg structs
+    deallocateFFmpeg(pFormatCtx, pCodecCtx, pCodec);
     return 0;
 }

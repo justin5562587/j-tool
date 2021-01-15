@@ -47,11 +47,9 @@ void AdvancedControl::screenshot() {
     std::string urlString = mediaContent.request().url().toString().toStdString();
 
     double currentSeconds = (double) m_mediaPlayer->position() / 1000;
-    qInfo() << currentSeconds;
     QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
-    QString defaultDownloadDir = downloadDir + "/FFmpeg_Download/";
 
-    getPixmapInSpecificSeconds(urlString.substr(7), currentSeconds, defaultDownloadDir.toStdString());
+    getPixmapInSpecificSeconds(urlString.substr(7), currentSeconds, downloadDir.toStdString());
 }
 
 void AdvancedControl::logVideoCodec() {

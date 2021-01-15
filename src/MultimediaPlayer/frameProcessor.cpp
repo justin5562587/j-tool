@@ -6,6 +6,12 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <chrono>
+#include <string>
+
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #include "./frameProcessor.h"
 
@@ -110,14 +116,17 @@ int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
 //}
 
 void writeFrameToDiskFile(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
-    FILE *pFile;
-    char szFilename[32];
+    char szFilename[64];
     int y;
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+    // std::to_string(ms.count())
 
     // Open file
-    sprintf(szFilename, (diskPath + "frame.ppm").c_str());
-    pFile = fopen(szFilename, "wb");
-    if (pFile == NULL) {
+    sprintf(szFilename, "%s_screenshot.ppm", diskPath.c_str());
+    FILE *pFile = fopen(szFilename, "wb");
+    if (pFile == nullptr) {
         return;
     }
 
@@ -132,7 +141,8 @@ void writeFrameToDiskFile(AVFrame *avFrame, int width, int height, const std::st
     fclose(pFile);
 }
 
-int saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat, const std::string &diskPath) {
+int
+saveFrameAsPicture(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPixelFormat dstFormat, const std::string &diskPath) {
     AVFrame *pFrameRet = av_frame_alloc();
     int numBytes = av_image_get_buffer_size(dstFormat, pCodecCtx->width, pCodecCtx->height, 32);
     uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
@@ -198,14 +208,14 @@ getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
     }
 
     bool done = false;
-    int read_frame_times = 0;
+    int send_packet_times = 0;
     while (!done && av_read_frame(pFormatCtx, &packet) >= 0) {
 
         if (packet.stream_index == videoStreamIndex) {
-            std::cout << "read_frame_times: " << ++read_frame_times << std::endl;
             ret = avcodec_send_packet(pCodecCtx, &packet);
+            std::cout << "avcodec_send_packet_times: " << ++send_packet_times << std::endl;
             if (ret < 0) {
-                std::cout << "send packet failed" << std::endl;
+                std::cout << "send packet failed\n";
                 return -1;
             } else {
                 ret = avcodec_receive_frame(pCodecCtx, pFrame);

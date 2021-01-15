@@ -83,57 +83,32 @@ int deallocateFFmpeg(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx) {
     return 0;
 }
 
-//std::ostream &operator<<(std::ostream &outputStream, const PPMObject &other) {
-//    outputStream << "P6" << "\n"
-//                 << other.width << " "
-//                 << other.height << "\n"
-//                 << other.maxColVal << "\n";
-//    size_t size = other.width * other.height * 3;
-//    outputStream.write(other.m_Ptr, size);
-//    return outputStream;
-//}
-
-//void writePPMFileWithFrame(AVFrame *pFrame, int width, int height, const std::string &filename,
-//                           const std::string &diskPath) {
-//    constexpr auto dimx = 800u, dimy = 800u;
-//
-//    const std::string fullFilename = diskPath + filename;
-//    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
-//    // write header
-//    ofs << "P6" << "\n" << width << " " << height << "\n" << 255 << "\n";
-//    // Write pixel data
-//    for (int y = 0; y < height; y++) {
-////        ofs << pFrame->data[0] + y * pFrame->linesize[0], 1, width * 3,
-//        ofs.write(pFrame->data[0] + y * pFrame->linesize[0], width * 3);
-////        fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
-//    }
-//
-//    for (auto j = 0u; j < dimy; ++j)
-//        for (auto i = 0u; i < dimx; ++i)
-//            ofs << (char) (i % 256) << (char) (j % 256) << (char) ((i * j) % 256);       // red, green, blue
-//
-//    ofs.close();
-//}
-
-void writeFrameToDiskFile(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
-    char szFilename[64];
-    int y;
+void writeFrameToDiskFile(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
-    // std::to_string(ms.count())
+    const std::string fullFilename = diskPath + "_screenshot_" + std::to_string(ms.count()) + ".ppm";
+    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    // write header
+    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
+    // Write pixel data
+    for (int y = 0; y < height; y++) {
+        ofs.write((const char*) pFrame->data[0] + y * pFrame->linesize[0], width * 3);
+    }
 
+    ofs.close();
+}
+
+void writeFrameToDiskFileC(AVFrame *avFrame, int width, int height, const std::string &diskPath) {
+    char szFilename[64];
     // Open file
     sprintf(szFilename, "%s_screenshot.ppm", diskPath.c_str());
     FILE *pFile = fopen(szFilename, "wb");
-    if (pFile == nullptr) {
-        return;
-    }
 
     // Write header
     fprintf(pFile, "P6\n%d %d\n255\n", width, height);
     // Write pixel data
-    for (y = 0; y < height; y++) {
+    for (int y = 0; y < height; y++) {
         fwrite(avFrame->data[0] + y * avFrame->linesize[0], 1, width * 3, pFile);
     }
 

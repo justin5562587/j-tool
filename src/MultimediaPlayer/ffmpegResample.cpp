@@ -11,13 +11,12 @@ int recordAudioWithFFmpeg() {
     char errorMessage[1024];
     AVFormatContext *pFormatCtx = nullptr;
     char *deviceName = ":0";
-    AVDictionary *options = nullptr;
 
     char *diskPath = "/User/justin/Downloads/";
 
     // get format
     AVInputFormat *pInputFormat = av_find_input_format("avfoundation");
-    ret = avformat_open_input(&pFormatCtx, deviceName, pInputFormat, &options);
+    ret = avformat_open_input(&pFormatCtx, deviceName, pInputFormat, nullptr);
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         std::cout << "avformat_open_input: " << errorMessage << std::endl;
@@ -26,7 +25,7 @@ int recordAudioWithFFmpeg() {
     int count = 0;
     AVPacket packet;
     av_init_packet(&packet);
-    while ((ret = av_read_frame(pFormatCtx, &packet)) == 0 && count < 50) {
+    while ((ret = av_read_frame(pFormatCtx, &packet)) == 0 && count < 500) {
         std::cout << "packet.size: " << packet.size << std::endl;
         writeDataToDisk(diskPath, &packet);
         av_packet_unref(&packet);

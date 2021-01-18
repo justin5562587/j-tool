@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "./frameProcessor.h"
+#include "./ffmpegFrame.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -184,7 +184,7 @@ getFrameInSpecificSeconds(AVFrame *pFrame, AVFormatContext *pFormatCtx, AVCodecC
 
     bool done = false;
     int send_packet_times = 0;
-    while (!done && av_read_frame(pFormatCtx, &packet) >= 0) {
+    while (!done && av_read_frame(pFormatCtx, &packet) == 0) {
 
         if (packet.stream_index == videoStreamIndex) {
             ret = avcodec_send_packet(pCodecCtx, &packet);

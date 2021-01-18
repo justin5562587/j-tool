@@ -3,12 +3,12 @@
 //
 
 #include "AdvancedControl.h"
-#include "./frameProcessor.h"
+#include "./ffmpegFrame.h"
+#include "./ffmpegResample.h"
 
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QBoxLayout>
-#include <QDebug>
 
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_screenshotBtn = new QPushButton("ScreenShot", this);
@@ -17,6 +17,10 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     connect(m_videoCodecBtn, &QAbstractButton::clicked, this, &AdvancedControl::logVideoCodec);
     m_audioCodecBtn = new QPushButton("Log Audio Codec", this);
     connect(m_audioCodecBtn, &QAbstractButton::clicked, this, &AdvancedControl::logAudioCodec);
+    m_videoRecordBtn = new QPushButton("Record Video", this);
+    connect(m_videoRecordBtn, &QAbstractButton::clicked, this, &AdvancedControl::recordVideo);
+    m_audioRecordBtn = new QPushButton("Record Audio", this);
+    connect(m_audioRecordBtn, &QAbstractButton::clicked, this, &AdvancedControl::recordAudio);
 
     inactive();
 
@@ -24,6 +28,8 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     layout->addWidget(m_screenshotBtn);
     layout->addWidget(m_videoCodecBtn);
     layout->addWidget(m_audioCodecBtn);
+    layout->addWidget(m_videoRecordBtn);
+    layout->addWidget(m_audioRecordBtn);
     setLayout(layout);
 }
 
@@ -62,4 +68,11 @@ void AdvancedControl::logAudioCodec() {
     qInfo() << "log audio codec info";
 }
 
+void AdvancedControl::recordVideo() {
+
+}
+
+void AdvancedControl::recordAudio() {
+    recordAudioWithFFmpeg();
+}
 

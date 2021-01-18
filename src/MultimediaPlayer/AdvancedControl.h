@@ -27,6 +27,10 @@ public slots:
 
     void logAudioCodec();
 
+    void recordVideo();
+
+    void recordAudio();
+
 private:
 
     QMediaPlayer *m_mediaPlayer = nullptr;
@@ -34,5 +38,7 @@ private:
     QAbstractButton *m_screenshotBtn = nullptr;
     QAbstractButton *m_videoCodecBtn = nullptr;
     QAbstractButton *m_audioCodecBtn = nullptr;
+    QAbstractButton *m_videoRecordBtn = nullptr;
+    QAbstractButton *m_audioRecordBtn = nullptr;
 
 };

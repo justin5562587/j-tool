@@ -4,7 +4,7 @@
 
 #include "ffmpegResample.h"
 
-int recordAudioWithFFmpeg() {
+int recordAudioWithFFmpeg(AdvancedControl *advancedControl) {
     avdevice_register_all();
 
     int ret;
@@ -16,15 +16,23 @@ int recordAudioWithFFmpeg() {
 
     // get format
     AVInputFormat *pInputFormat = av_find_input_format("avfoundation");
+    if (pInputFormat == nullptr) {
+        av_strerror(ret, errorMessage, sizeof(errorMessage));
+        std::cout << "avformat_open_input: " << errorMessage << std::endl;
+        return -1;
+    }
+
     ret = avformat_open_input(&pFormatCtx, deviceName, pInputFormat, nullptr);
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         std::cout << "avformat_open_input: " << errorMessage << std::endl;
+        return -1;
     }
 
     int count = 0;
     AVPacket packet;
     av_init_packet(&packet);
+
     while ((ret = av_read_frame(pFormatCtx, &packet)) == 0 && count < 500) {
         std::cout << "packet.size: " << packet.size << std::endl;
         writeDataToDisk(diskPath, &packet);
@@ -34,10 +42,14 @@ int recordAudioWithFFmpeg() {
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         std::cout << "av_read_frame: " << errorMessage << std::endl;
+        return -1;
     }
 
     avformat_close_input(&pFormatCtx);
     av_log(nullptr, AV_LOG_DEBUG, "Record Audio Finished.\n");
+
+    // todo callback - need optimize
+    advancedControl->setBtnStatus(AUDIO_RECORD, true);
 
     return 0;
 }

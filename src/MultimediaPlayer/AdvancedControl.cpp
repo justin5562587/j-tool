@@ -47,6 +47,24 @@ void AdvancedControl::inactive() {
     m_audioCodecBtn->setEnabled(false);
 }
 
+void AdvancedControl::setBtnStatus(AdvancedControlBtnTypes advancedControlBtnTypes, bool isEnabled) {
+    switch (advancedControlBtnTypes) {
+        case VIDEO_RECORD:
+            m_videoRecordBtn->setEnabled(isEnabled);
+            m_audioRecordBtn->setText(isEnabled ? "Record Video" : "Recording Video...");
+            break;
+        case AUDIO_RECORD:
+            m_audioRecordBtn->setEnabled(isEnabled);
+            m_audioRecordBtn->setText(isEnabled ? "Record Audio" : "Recording Audio...");
+            break;
+        case SCREEN_SHOT:
+        case LOG_VIDEO_CODEC:
+        case LOG_AUDIO_CODEC:
+        default:
+            break;
+    }
+}
+
 // todo - optimize precision of screenshot
 void AdvancedControl::screenshot() {
     QMediaContent mediaContent = m_mediaPlayer->currentMedia();
@@ -73,6 +91,6 @@ void AdvancedControl::recordVideo() {
 }
 
 void AdvancedControl::recordAudio() {
-    recordAudioWithFFmpeg();
+    setBtnStatus(AUDIO_RECORD, false);
+    recordAudioWithFFmpeg(this);
 }
-

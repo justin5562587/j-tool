@@ -16,11 +16,10 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-void set_status(int status);
-void rec_audio(void);
+#include "./AdvancedControl.h"
 
 int initializeFFmpeg(const std::string &filepath);
 
-int recordAudioWithFFmpeg();
+int recordAudioWithFFmpeg(AdvancedControl *advancedControl);
 
 void writeDataToDisk(const std::string &diskPath, AVPacket *packet);

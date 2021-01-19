@@ -8,6 +8,14 @@
 #include <QWidget>
 #include <QAbstractButton>
 
+enum AdvancedControlBtnTypes {
+    VIDEO_RECORD,
+    AUDIO_RECORD,
+    SCREEN_SHOT,
+    LOG_VIDEO_CODEC,
+    LOG_AUDIO_CODEC
+};
+
 class AdvancedControl : public QWidget {
 Q_OBJECT
 
@@ -20,6 +28,8 @@ public slots:
     void active(QMediaPlayer *mediaPlayer);
 
     void inactive();
+
+    void setBtnStatus(AdvancedControlBtnTypes advancedControlBtnTypes, bool isEnabled);
 
     void screenshot();
 

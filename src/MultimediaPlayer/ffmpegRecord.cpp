@@ -4,24 +4,23 @@
 
 #include "ffmpegRecord.h"
 
-
 int recordVideoWithFFmpeg(AdvancedControl *advancedControl, const std::string &diskPath) {
     avdevice_register_all();
 
     int ret;
     char errorMessage[1024];
+    // 0->使用摄像头录制 1->录制桌面
     char *deviceName = "0";
-    AVFormatContext *pFormatCtx = nullptr;
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
     AVDictionary *options = nullptr;
 
     av_dict_set(&options, "video_size", "640*480", 0);
     av_dict_set(&options, "framerate", "30", 0);
+    av_dict_set(&options, "pixel_format", "uyvy422", 0);
 
-    // get format
     AVInputFormat *pInputFormat = av_find_input_format("avfoundation");
     if (pInputFormat == nullptr) {
-        av_strerror(ret, errorMessage, sizeof(errorMessage));
-        std::cout << "avformat_open_input: " << errorMessage << std::endl;
+        std::cout << "av_find_input_format error\n";
         return -1;
     }
 
@@ -29,23 +28,23 @@ int recordVideoWithFFmpeg(AdvancedControl *advancedControl, const std::string &d
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         std::cout << "avformat_open_input: " << errorMessage << std::endl;
-        return -1;
+        return ret;
     }
 
     int count = 0;
-    AVPacket packet;
-    av_init_packet(&packet);
+    AVPacket *pPacket = (AVPacket *)av_malloc(sizeof(AVPacket));
+    av_init_packet(pPacket);
 
-    while ((ret = av_read_frame(pFormatCtx, &packet)) == 0 && count < 500) {
-        std::cout << "packet.size: " << packet.size << std::endl;
-        writeVideoDataToDisk(diskPath, &packet);
-        av_packet_unref(&packet);
+    while ((ret = av_read_frame(pFormatCtx, pPacket)) == 0 && count < 500) {
+        std::cout << "packet.size: " << pPacket->size << std::endl;
+        writeVideoDataToDisk(diskPath, pPacket);
+        av_packet_unref(pPacket);
         ++count;
     }
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         std::cout << "av_read_frame: " << errorMessage << std::endl;
-        return -1;
+        return ret;
     }
 
     avformat_close_input(&pFormatCtx);
@@ -66,7 +65,7 @@ void writeVideoDataToDisk(const std::string &diskPath, AVPacket *packet) {
     std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
 
     // Write PCM data
-    ofs.write((const char*) packet->data, packet->size);
+    ofs.write((const char *) packet->data, packet->size);
 
     ofs.close();
 }
@@ -127,7 +126,7 @@ void writeAudioDataToDisk(const std::string &diskPath, AVPacket *packet) {
     std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
 
     // Write PCM data
-    ofs.write((const char*) packet->data, packet->size);
+    ofs.write((const char *) packet->data, packet->size);
 
     ofs.close();
 }

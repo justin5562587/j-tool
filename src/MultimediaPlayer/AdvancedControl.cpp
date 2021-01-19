@@ -51,7 +51,7 @@ void AdvancedControl::setBtnStatus(AdvancedControlBtnTypes advancedControlBtnTyp
     switch (advancedControlBtnTypes) {
         case VIDEO_RECORD:
             m_videoRecordBtn->setEnabled(isEnabled);
-            m_audioRecordBtn->setText(isEnabled ? "Record Video" : "Recording Video...");
+            m_videoRecordBtn->setText(isEnabled ? "Record Video" : "Recording Video...");
             break;
         case AUDIO_RECORD:
             m_audioRecordBtn->setEnabled(isEnabled);

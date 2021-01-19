@@ -4,7 +4,7 @@
 
 #include "AdvancedControl.h"
 #include "./ffmpegFrame.h"
-#include "./ffmpegResample.h"
+#include "./ffmpegRecord.h"
 
 #include <QPushButton>
 #include <QStandardPaths>
@@ -87,10 +87,11 @@ void AdvancedControl::logAudioCodec() {
 }
 
 void AdvancedControl::recordVideo() {
-
+    this->setBtnStatus(VIDEO_RECORD, false);
+    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
 }
 
 void AdvancedControl::recordAudio() {
-    setBtnStatus(AUDIO_RECORD, false);
-    recordAudioWithFFmpeg(this);
+    this->setBtnStatus(AUDIO_RECORD, false);
+    recordAudioWithFFmpeg(this, "/User/justin/Downloads/");
 }

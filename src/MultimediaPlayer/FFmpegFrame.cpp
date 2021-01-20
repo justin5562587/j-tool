@@ -168,6 +168,3 @@ int FFmpegFrame::scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string 
 
     return 0;
 }
-
-
-

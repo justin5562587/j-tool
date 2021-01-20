@@ -16,7 +16,7 @@ extern "C" {
 class FFmpegFrame {
 public:
 
-    FFmpegFrame();
+    explicit FFmpegFrame();
 
     ~FFmpegFrame();
 

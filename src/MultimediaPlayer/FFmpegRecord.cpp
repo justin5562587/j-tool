@@ -1,0 +1,144 @@
+//
+// Created by justin on 2021/01/19.
+//
+
+#include "FFmpegRecord.h"
+
+FFmpegRecord::FFmpegRecord() {
+    avdevice_register_all();
+}
+
+FFmpegRecord::~FFmpegRecord() {
+    avformat_close_input(&pAVFormatContext);
+    avformat_free_context(pAVFormatContext);
+}
+
+int FFmpegRecord::openCamera() {
+    value = 0;
+    options = nullptr;
+    pAVFormatContext = avformat_alloc_context();
+
+    // use avfoundation here
+    pAVInputFormat = av_find_input_format("avfoundation");
+    value = avformat_open_input(&pAVFormatContext, "0:0", pAVInputFormat, nullptr);
+
+    av_dict_set(&options, "framerate", "30", 0);
+
+    videoStreamIndex = -1;
+    for (int i = 0; i < pAVFormatContext->nb_streams; ++i) {
+        if (pAVFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoStreamIndex = i;
+            break;
+        }
+    }
+
+    pAVCodec = avcodec_find_decoder(pAVFormatContext->streams[videoStreamIndex]->codecpar->codec_id);
+    pAVCodecContext = avcodec_alloc_context3(pAVCodec);
+    avcodec_parameters_to_context(pAVCodecContext, pAVFormatContext->streams[videoStreamIndex]->codecpar);
+    avcodec_open2(pAVCodecContext, pAVCodec, nullptr);
+
+    return 0;
+}
+
+// initialize output video file
+int FFmpegRecord::initializeOutputFile() {
+    outAVFormatContext = nullptr;
+    value = 0;
+    outputFile = "../media/output.mp4";
+
+    avformat_alloc_output_context2(&outAVFormatContext, nullptr, nullptr, outputFile);
+
+    // return output format in the registered format list which best match the parameters
+    output_format = av_guess_format(nullptr, outputFile, nullptr);
+
+    video_st = avformat_new_stream(outAVFormatContext, nullptr);
+
+    outAVCodecContext = avcodec_alloc_context3(outAVCodec);
+
+    // set properties of output video file
+    avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar); // outAVCodecContext = video_st->codec;
+    outAVCodecContext->codec_id = AV_CODEC_ID_MPEG4;
+    outAVCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
+    outAVCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
+    outAVCodecContext->bit_rate = 400000;
+    outAVCodecContext->width = 1920;
+    outAVCodecContext->height = 1080;
+    outAVCodecContext->gop_size = 3;
+    outAVCodecContext->max_b_frames = 2;
+    outAVCodecContext->time_base.num = 1;
+    outAVCodecContext->time_base.den = 30;
+
+    if (codecId == AV_CODEC_ID_H264) {
+        av_opt_set(outAVCodecContext->priv_data, "present", "slow", 0);
+    }
+
+    outAVCodec = avcodec_find_decoder(AV_CODEC_ID_MPEG4);
+
+    // some containers require global header (like mp4) to be present
+    // Mart the decoder so that it behaves accordingly
+    if (outAVFormatContext->oformat->flags & AVFMT_GLOBALHEADER) {
+        outAVCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    }
+
+    avcodec_open2(outAVCodecContext, outAVCodec, nullptr);
+
+    // create empty video file
+    if ( !(outAVFormatContext->flags & AVFMT_NOFILE) ) {
+        if (avio_open2(&outAVFormatContext->pb, outputFile, AVIO_FLAG_WRITE, nullptr, nullptr)< 0) {
+            std::cout << "\nerror in create new file";
+            return -1;
+        }
+    }
+
+    if (!outAVFormatContext->nb_streams) {
+        std::cout << "\noutput file include no streams";
+        return -1;
+    }
+
+    value = avformat_write_header(outAVFormatContext, &options);
+    if (value < 0) {
+        std::cout << "\nerror in write header";
+        return -1;
+    }
+
+    // dump information about output file
+    std::cout << "\n\noutput file information:\n\n";
+    av_dump_format(outAVFormatContext, 0, outputFile, 1);
+
+
+    return 0;
+}
+
+int FFmpegRecord::captureVideoFrames() {
+    int flag;
+    int frameIndex = 0;
+    value = 0;
+
+    pAVPacket = (AVPacket *) av_malloc(sizeof(AVPacket));
+    av_init_packet(pAVPacket);
+
+    pAVFrame = av_frame_alloc();
+    outFrame = av_frame_alloc();
+
+    int video_outbuf_size;
+    int nbytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width,
+                                          outAVCodecContext->height, 32);
+    uint8_t *video_outbuf = (uint8_t *) av_malloc(nbytes);
+
+    value = av_image_fill_arrays(
+            outFrame->data,
+            outFrame->linesize,
+            video_outbuf,
+            AV_PIX_FMT_YUV420P,
+            outAVCodecContext->width,
+            outAVCodecContext->height,
+            1
+    );
+
+    SwsContext *swsCtx = nullptr;
+    swsCtx = sws_getContext(
+    );
+
+
+    return 0;
+}

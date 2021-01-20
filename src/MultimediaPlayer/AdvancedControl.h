@@ -8,6 +8,8 @@
 #include <QWidget>
 #include <QAbstractButton>
 
+#include "./FFmpegFrame.h"
+
 enum AdvancedControlBtnTypes {
     VIDEO_RECORD,
     AUDIO_RECORD,
@@ -50,5 +52,7 @@ private:
     QAbstractButton *m_audioCodecBtn = nullptr;
     QAbstractButton *m_videoRecordBtn = nullptr;
     QAbstractButton *m_audioRecordBtn = nullptr;
+
+    FFmpegFrame m_ffmpegFrame;
 
 };

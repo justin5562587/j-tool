@@ -31,11 +31,6 @@ public:
     void deallocateFFmpeg();
 
     /**
-     * write frame data into file
-     */
-    void writeFrameToFile(AVFrame *pFrame, int width, int height, const std::string &diskPath);
-
-    /**
      * decode video stream and save data into frame in specific seconds
      */
     int getFrameInTargetSeconds(double targetSeconds);
@@ -43,14 +38,14 @@ public:
     /**
      * save frame as picture
      */
-    int scaleImage(AVPixelFormat dstFormat);
+    int scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll);
 
 private:
 
-    AVFormatContext *pAVFormatContext;
-    AVCodec *pAVCodec;
-    AVCodecContext *pAVCodecContext;
-    AVFrame *pAVFrame;
+    AVFormatContext *pAVFormatContext = nullptr;
+    AVCodec *pAVCodec = nullptr;
+    AVCodecContext *pAVCodecContext = nullptr;
+    AVFrame *pAVFrame = nullptr;
 
     int videoStreamIndex;
     int audioStreamIndex;

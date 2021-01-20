@@ -8,6 +8,22 @@
 #include <chrono>
 #include <fstream>
 
+void writeFrameToFile(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+    const std::string fullFilename = diskPath + "_screenshot_" + std::to_string(ms.count()) + ".ppm";
+    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    // write header
+    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
+    // Write pixel data
+    for (int y = 0; y < height; y++) {
+        ofs.write((const char*) pFrame->data[0] + y * pFrame->linesize[0], width * 3);
+    }
+
+    ofs.close();
+}
+
 FFmpegFrame::FFmpegFrame() {
 }
 
@@ -103,7 +119,7 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
     return 0;
 }
 
-int FFmpegFrame::scaleImage(AVPixelFormat dstFormat) {
+int FFmpegFrame::scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll) {
     AVFrame *pFrameRet = av_frame_alloc();
     int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
     uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
@@ -140,29 +156,18 @@ int FFmpegFrame::scaleImage(AVPixelFormat dstFormat) {
     );
 
     // save file to disk
-    writeFrameToFile(pFrameRet, pAVCodecContext->width, pAVCodecContext->height, "diskPath");
+    writeFrameToFile(pFrameRet, pAVCodecContext->width, pAVCodecContext->height, diskPath);
 
     av_free(buffer);
     av_frame_free(&pFrameRet);
     sws_freeContext(swsCtx);
 
+    if (cleanAll) {
+        this->deallocateFFmpeg();
+    }
+
     return 0;
 }
 
-void FFmpegFrame::writeFrameToFile(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
-    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-    );
-    const std::string fullFilename = diskPath + "_screenshot_" + std::to_string(ms.count()) + ".ppm";
-    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
-    // write header
-    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
-    // Write pixel data
-    for (int y = 0; y < height; y++) {
-        ofs.write((const char*) pFrame->data[0] + y * pFrame->linesize[0], width * 3);
-    }
-
-    ofs.close();
-}
 
 

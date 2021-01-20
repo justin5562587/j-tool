@@ -3,14 +3,16 @@
 //
 
 #include "AdvancedControl.h"
-#include "./ffmpegFrame.h"
-#include "./ffmpegRecord.h"
+#include "./FFmpegFrame.h"
+//#include "./ffmpegRecord.h"
 
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QBoxLayout>
 
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
+    m_ffmpegFrame = FFmpegFrame();
+
     m_screenshotBtn = new QPushButton("ScreenShot", this);
     connect(m_screenshotBtn, &QAbstractButton::clicked, this, &AdvancedControl::screenshot);
     m_videoCodecBtn = new QPushButton("Log Video Codec", this);
@@ -73,7 +75,9 @@ void AdvancedControl::screenshot() {
     double currentSeconds = (double) m_mediaPlayer->position() / 1000;
     QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
 
-    getPixmapInSpecificSeconds(urlString.substr(7), currentSeconds, downloadDir.toStdString());
+    m_ffmpegFrame.initializeFFmpeg(urlString.substr(7));
+    m_ffmpegFrame.getFrameInTargetSeconds(currentSeconds);
+    m_ffmpegFrame.scaleAndSaveToImage(AV_PIX_FMT_RGB24, downloadDir.toStdString(), true);
 }
 
 void AdvancedControl::logVideoCodec() {
@@ -83,15 +87,17 @@ void AdvancedControl::logVideoCodec() {
 }
 
 void AdvancedControl::logAudioCodec() {
-    qInfo() << "log audio codec info";
+    qInfo() << "\nlog audio codec info";
 }
 
 void AdvancedControl::recordVideo() {
-    this->setBtnStatus(VIDEO_RECORD, false);
-    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
+    qInfo() << "\ntodo";
+//    this->setBtnStatus(VIDEO_RECORD, false);
+//    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
 }
 
 void AdvancedControl::recordAudio() {
-    this->setBtnStatus(AUDIO_RECORD, false);
-    recordAudioWithFFmpeg(this, "/User/justin/Downloads/");
+    qInfo() << "\ntodo";
+//    this->setBtnStatus(AUDIO_RECORD, false);
+//    recordAudioWithFFmpeg(this, "/User/justin/Downloads/");
 }

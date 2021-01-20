@@ -83,8 +83,8 @@ int FFmpegRecord::initializeOutputFile() {
     avcodec_open2(outAVCodecContext, outAVCodec, nullptr);
 
     // create empty video file
-    if ( !(outAVFormatContext->flags & AVFMT_NOFILE) ) {
-        if (avio_open2(&outAVFormatContext->pb, outputFile, AVIO_FLAG_WRITE, nullptr, nullptr)< 0) {
+    if (!(outAVFormatContext->flags & AVFMT_NOFILE)) {
+        if (avio_open2(&outAVFormatContext->pb, outputFile, AVIO_FLAG_WRITE, nullptr, nullptr) < 0) {
             std::cout << "\nerror in create new file";
             return -1;
         }
@@ -137,8 +137,51 @@ int FFmpegRecord::captureVideoFrames() {
 
     SwsContext *swsCtx = nullptr;
     swsCtx = sws_getContext(
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            pAVCodecContext->pix_fmt,
+            outAVCodecContext->width,
+            outAVCodecContext->height,
+            outAVCodecContext->pix_fmt,
+            SWS_BICUBIC,
+            nullptr, nullptr, nullptr
     );
 
+    int ii = 0;
+    int nb_frames = 100; // numbers of frames to capture
+
+    AVPacket outPacket;
+    int j = 0;
+
+    while (av_read_frame(pAVFormatContext, pAVPacket) > 0) {
+        if (++ii == nb_frames) break;
+        if (pAVPacket->stream_index == videoStreamIndex) {
+            avcodec_send_packet(pAVCodecContext, pAVPacket);
+            avcodec_receive_frame(pAVCodecContext, pAVFrame);
+            sws_scale(
+                    swsCtx,
+                    pAVFrame->data,
+                    pAVFrame->linesize,
+                    0,
+                    pAVCodecContext->height,
+                    outFrame->data,
+                    outFrame->linesize
+            );
+            av_init_packet(&outPacket);
+            outPacket.data = nullptr;
+            outPacket.size = 0;
+
+            avcodec_send_frame(outAVCodecContext, outFrame);
+            avcodec_receive_packet(outAVCodecContext, &outPacket);
+
+            av_packet_unref(&outPacket);
+        }
+        av_packet_unref(&outPacket);
+    }
+
+    av_write_trailer(outAVFormatContext);
+
+    av_free(video_outbuf);
 
     return 0;
 }

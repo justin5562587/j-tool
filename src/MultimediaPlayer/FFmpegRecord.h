@@ -23,15 +23,17 @@ public:
 
     ~FFmpegRecord();
 
-    int openCamera();
+    int initializeRecordDevice();
 
-    int initializeOutputFile();
+    int initializeOutputFile(AVCodecID avCodecId, const std::string &outputFilePath);
 
     int captureVideoFrames();
 
     int cleanAll();
 
 private:
+
+    char errorMessage[1024];
 
     AVInputFormat *pAVInputFormat;
     AVFormatContext *pAVFormatContext;

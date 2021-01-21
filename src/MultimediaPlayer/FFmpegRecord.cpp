@@ -12,15 +12,17 @@ FFmpegRecord::~FFmpegRecord() {
 
 }
 
-int FFmpegRecord::openCamera() {
+int FFmpegRecord::initializeRecordDevice() {
     options = nullptr;
     pAVFormatContext = avformat_alloc_context();
 
     av_dict_set(&options, "framerate", "30", 0);
+    av_dict_set(&options, "pixel_format", "uyvy422", 0);
+    av_dict_set(&options, "video_size", "1280x720", 0);
 
     // use avfoundation here
     pAVInputFormat = av_find_input_format("avfoundation");
-    avformat_open_input(&pAVFormatContext, "0:0", pAVInputFormat, &options);
+    avformat_open_input(&pAVFormatContext, "0", pAVInputFormat, &options);
 
     videoStreamIndex = -1;
     for (int i = 0; i < pAVFormatContext->nb_streams; ++i) {
@@ -39,22 +41,24 @@ int FFmpegRecord::openCamera() {
 }
 
 // initialize output video file
-int FFmpegRecord::initializeOutputFile() {
-    outAVFormatContext = nullptr;
+// use AV_CODEC_ID_H264 for test
+int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &outputFilePath) {
     value = 0;
-    outputFile = "../media/output.mp4";
+    outputFile = outputFilePath.c_str();
 
+    outAVFormatContext = avformat_alloc_context();
     avformat_alloc_output_context2(&outAVFormatContext, nullptr, nullptr, outputFile);
 
     // return output format in the registered format list which best match the parameters
     outAVOutputFormat = av_guess_format(nullptr, outputFile, nullptr);
 
-    video_st = avformat_new_stream(outAVFormatContext, nullptr);
+    outAVCodec = avcodec_find_decoder(avCodecId);
 
+    video_st = avformat_new_stream(outAVFormatContext, outAVCodec);
+
+    // allocate outAVCodecContext and set properties of output video file
     outAVCodecContext = avcodec_alloc_context3(outAVCodec);
-
-    // set properties of output video file
-    avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar); // outAVCodecContext = video_st->codec;
+    avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar);
     outAVCodecContext->codec_id = AV_CODEC_ID_MPEG4;
     outAVCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
     outAVCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
@@ -63,14 +67,12 @@ int FFmpegRecord::initializeOutputFile() {
     outAVCodecContext->height = 1080;
     outAVCodecContext->gop_size = 3;
     outAVCodecContext->max_b_frames = 2;
-    outAVCodecContext->time_base.num = 1;
-    outAVCodecContext->time_base.den = 30;
+    outAVCodecContext->framerate = (AVRational) {30, 1};
+    outAVCodecContext->time_base = (AVRational) {1, 30};
 
-    if (codecId == AV_CODEC_ID_H264) {
+    if (avCodecId == AV_CODEC_ID_H264) {
         av_opt_set(outAVCodecContext->priv_data, "present", "slow", 0);
     }
-
-    outAVCodec = avcodec_find_decoder(AV_CODEC_ID_MPEG4);
 
     // some containers require global header (like mp4) to be present
     // Mart the decoder so that it behaves accordingly
@@ -82,8 +84,10 @@ int FFmpegRecord::initializeOutputFile() {
 
     // create empty video file
     if (!(outAVFormatContext->flags & AVFMT_NOFILE)) {
-        if (avio_open2(&outAVFormatContext->pb, outputFile, AVIO_FLAG_WRITE, nullptr, nullptr) < 0) {
-            std::cout << "\nerror in create new file";
+        value = avio_open2(&outAVFormatContext->pb, outputFile, AVIO_FLAG_WRITE, nullptr, nullptr);
+        if (value < 0) {
+            av_strerror(value, errorMessage, 1024);
+            std::cout << "\navio_open2: " << errorMessage;
             return -1;
         }
     }
@@ -95,14 +99,14 @@ int FFmpegRecord::initializeOutputFile() {
 
     value = avformat_write_header(outAVFormatContext, &options);
     if (value < 0) {
-        std::cout << "\nerror in write header";
+        av_strerror(value, errorMessage, 1024);
+        std::cout << "\navformat_write_header: " << errorMessage;
         return -1;
     }
 
     // dump information about output file
     std::cout << "\n\noutput file information:\n\n";
     av_dump_format(outAVFormatContext, 0, outputFile, 1);
-
 
     return 0;
 }
@@ -141,13 +145,11 @@ int FFmpegRecord::captureVideoFrames() {
     );
 
     int ii = 0;
-    int nb_frames = 100; // numbers of frames to capture
+    int readFrameTimes = 100; // call times of av_read_frame
 
     AVPacket outPacket;
-    int j = 0;
-
     while (av_read_frame(pAVFormatContext, pAVPacket) > 0) {
-        if (++ii == nb_frames) break;
+        if (++ii == readFrameTimes) break;
         if (pAVPacket->stream_index == videoStreamIndex) {
             avcodec_send_packet(pAVCodecContext, pAVPacket);
             avcodec_receive_frame(pAVCodecContext, pAVFrame);
@@ -170,8 +172,9 @@ int FFmpegRecord::captureVideoFrames() {
 
             av_packet_unref(&outPacket);
         }
-        av_packet_unref(&outPacket);
     }
+
+    std::cout << "\niterate times: " << ii;
 
     av_write_trailer(outAVFormatContext);
 

@@ -94,10 +94,13 @@ void AdvancedControl::recordVideo() {
 //    this->setBtnStatus(VIDEO_RECORD, false);
 //    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
 
-    m_ffmpegRecord.openCamera();
-    m_ffmpegRecord.initializeOutputFile();
-    m_ffmpegRecord.captureVideoFrames();
-    m_ffmpegRecord.cleanAll();
+    if (m_ffmpegRecord.initializeRecordDevice() == 0) {
+        if (m_ffmpegRecord.initializeOutputFile(AV_CODEC_ID_H264, "FFmpegRecord_output.mp4") == 0) {
+            if (m_ffmpegRecord.captureVideoFrames() == 0) {
+                m_ffmpegRecord.cleanAll();
+            }
+        }
+    }
 }
 
 void AdvancedControl::recordAudio() {

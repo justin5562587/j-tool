@@ -74,12 +74,12 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
     double streamTimeBase = av_q2d(pAVFormatContext->streams[videoStreamIndex]->time_base);
 
     if (targetSeconds >= streamDuration * streamTimeBase) {
-        std::cout << "target seconds cannot greater than total seconds of video stream " << std::endl;
+        std::cout << "\ntarget seconds cannot greater than total seconds of video stream";
         return -1;
     }
 
     if (av_seek_frame(pAVFormatContext, videoStreamIndex, targetSeconds / streamTimeBase, AVSEEK_FLAG_BACKWARD) < 0) {
-        std::cout << "seek frame failed" << std::endl;
+        std::cout << "\nseek frame failed";
         return -1;
     }
 
@@ -89,11 +89,9 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
 
         if (packet.stream_index == videoStreamIndex) {
             ret = avcodec_send_packet(pAVCodecContext, &packet);
-            std::cout << "avcodec_send_packet_times: " << ++send_packet_times << std::endl;
-            if (ret < 0) {
-                std::cout << "send packet failed\n";
-                return -1;
-            } else {
+            std::cout << "\navcodec_send_packet_times: " << ++send_packet_times;
+
+            if (ret > 0) {
                 ret = avcodec_receive_frame(pAVCodecContext, pAVFrame);
 //                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
 //                    char errBuffer[128];
@@ -103,14 +101,14 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
 //                }
 
                 double packetSeconds = packet.pts * streamTimeBase;
-                std::cout << "packetSeconds: " << packetSeconds << std::endl;
+                std::cout << "\npacketSeconds: " << packetSeconds;
 
                 if (pAVFrame->width > 0) {
                     done = true;
                 }
             }
+            av_packet_unref(&packet);
         }
-        av_packet_unref(&packet);
     }
 
 //    av_seek_frame(pAVFormatContext, videoStreamIndex, 0, AVSEEK_FLAG_BYTE);

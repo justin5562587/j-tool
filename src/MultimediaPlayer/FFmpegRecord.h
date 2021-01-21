@@ -29,20 +29,15 @@ public:
 
     int captureVideoFrames();
 
+    int cleanAll();
+
 private:
 
     AVInputFormat *pAVInputFormat;
-    AVOutputFormat *output_format;
-
-    AVCodecContext *pAVCodecContext;
-
     AVFormatContext *pAVFormatContext;
-
+    AVCodecContext *pAVCodecContext;
     AVFrame *pAVFrame;
-    AVFrame *outFrame;
-
     AVCodec *pAVCodec;
-    AVCodec *outAVCodec;
 
     AVPacket *pAVPacket;
 
@@ -51,6 +46,8 @@ private:
     AVOutputFormat *outAVOutputFormat;
     AVFormatContext *outAVFormatContext;
     AVCodecContext *outAVCodecContext;
+    AVFrame *outFrame;
+    AVCodec *outAVCodec;
 
     AVStream *video_st;
     AVFrame *outAVFrame;

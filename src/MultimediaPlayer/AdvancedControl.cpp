@@ -3,8 +3,6 @@
 //
 
 #include "AdvancedControl.h"
-#include "./FFmpegFrame.h"
-//#include "./ffmpegRecord.h"
 
 #include <QPushButton>
 #include <QStandardPaths>
@@ -12,6 +10,7 @@
 
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_ffmpegFrame = FFmpegFrame();
+    m_ffmpegRecord = FFmpegRecord();
 
     m_screenshotBtn = new QPushButton("ScreenShot", this);
     connect(m_screenshotBtn, &QAbstractButton::clicked, this, &AdvancedControl::screenshot);
@@ -94,6 +93,11 @@ void AdvancedControl::recordVideo() {
     qInfo() << "\ntodo";
 //    this->setBtnStatus(VIDEO_RECORD, false);
 //    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
+
+    m_ffmpegRecord.openCamera();
+    m_ffmpegRecord.initializeOutputFile();
+    m_ffmpegRecord.captureVideoFrames();
+    m_ffmpegRecord.cleanAll();
 }
 
 void AdvancedControl::recordAudio() {

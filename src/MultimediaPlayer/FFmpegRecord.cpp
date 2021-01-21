@@ -9,20 +9,18 @@ FFmpegRecord::FFmpegRecord() {
 }
 
 FFmpegRecord::~FFmpegRecord() {
-    avformat_close_input(&pAVFormatContext);
-    avformat_free_context(pAVFormatContext);
+
 }
 
 int FFmpegRecord::openCamera() {
-    value = 0;
     options = nullptr;
     pAVFormatContext = avformat_alloc_context();
 
+    av_dict_set(&options, "framerate", "30", 0);
+
     // use avfoundation here
     pAVInputFormat = av_find_input_format("avfoundation");
-    value = avformat_open_input(&pAVFormatContext, "0:0", pAVInputFormat, nullptr);
-
-    av_dict_set(&options, "framerate", "30", 0);
+    avformat_open_input(&pAVFormatContext, "0:0", pAVInputFormat, &options);
 
     videoStreamIndex = -1;
     for (int i = 0; i < pAVFormatContext->nb_streams; ++i) {
@@ -49,7 +47,7 @@ int FFmpegRecord::initializeOutputFile() {
     avformat_alloc_output_context2(&outAVFormatContext, nullptr, nullptr, outputFile);
 
     // return output format in the registered format list which best match the parameters
-    output_format = av_guess_format(nullptr, outputFile, nullptr);
+    outAVOutputFormat = av_guess_format(nullptr, outputFile, nullptr);
 
     video_st = avformat_new_stream(outAVFormatContext, nullptr);
 
@@ -110,8 +108,6 @@ int FFmpegRecord::initializeOutputFile() {
 }
 
 int FFmpegRecord::captureVideoFrames() {
-    int flag;
-    int frameIndex = 0;
     value = 0;
 
     pAVPacket = (AVPacket *) av_malloc(sizeof(AVPacket));
@@ -120,23 +116,20 @@ int FFmpegRecord::captureVideoFrames() {
     pAVFrame = av_frame_alloc();
     outFrame = av_frame_alloc();
 
-    int video_outbuf_size;
-    int nbytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width,
-                                          outAVCodecContext->height, 32);
-    uint8_t *video_outbuf = (uint8_t *) av_malloc(nbytes);
+    int nbytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width, outAVCodecContext->height, 32);
+    uint8_t *video_out_buffer = (uint8_t *) av_malloc(nbytes);
 
-    value = av_image_fill_arrays(
+    av_image_fill_arrays(
             outFrame->data,
             outFrame->linesize,
-            video_outbuf,
+            video_out_buffer,
             AV_PIX_FMT_YUV420P,
             outAVCodecContext->width,
             outAVCodecContext->height,
             1
     );
 
-    SwsContext *swsCtx = nullptr;
-    swsCtx = sws_getContext(
+    SwsContext *swsCtx = sws_getContext(
             pAVCodecContext->width,
             pAVCodecContext->height,
             pAVCodecContext->pix_fmt,
@@ -158,6 +151,7 @@ int FFmpegRecord::captureVideoFrames() {
         if (pAVPacket->stream_index == videoStreamIndex) {
             avcodec_send_packet(pAVCodecContext, pAVPacket);
             avcodec_receive_frame(pAVCodecContext, pAVFrame);
+
             sws_scale(
                     swsCtx,
                     pAVFrame->data,
@@ -181,7 +175,16 @@ int FFmpegRecord::captureVideoFrames() {
 
     av_write_trailer(outAVFormatContext);
 
-    av_free(video_outbuf);
+    av_free(video_out_buffer);
 
+    return 0;
+}
+
+int FFmpegRecord::cleanAll() {
+    avformat_close_input(&pAVFormatContext);
+    avformat_close_input(&outAVFormatContext);
+
+    avformat_free_context(pAVFormatContext);
+    avformat_free_context(outAVFormatContext);
     return 0;
 }

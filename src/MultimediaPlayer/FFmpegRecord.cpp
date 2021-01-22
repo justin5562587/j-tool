@@ -59,7 +59,7 @@ int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &o
     // allocate outAVCodecContext and set properties of output video file
     outAVCodecContext = avcodec_alloc_context3(outAVCodec);
     avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar);
-    outAVCodecContext->codec_id = AV_CODEC_ID_MPEG4;
+    outAVCodecContext->codec_id = avCodecId;
     outAVCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
     outAVCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     outAVCodecContext->bit_rate = 400000;
@@ -97,6 +97,7 @@ int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &o
         return -1;
     }
 
+    // todo handle this error
     value = avformat_write_header(outAVFormatContext, &options);
     if (value < 0) {
         av_strerror(value, errorMessage, 1024);
@@ -119,6 +120,8 @@ int FFmpegRecord::captureVideoFrames() {
 
     pAVFrame = av_frame_alloc();
     outFrame = av_frame_alloc();
+
+    outAVFormatContext->
 
     int nbBytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width, outAVCodecContext->height, 32);
     uint8_t *video_out_buffer = (uint8_t *) av_malloc(nbBytes);

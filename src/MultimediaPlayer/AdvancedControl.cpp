@@ -78,9 +78,10 @@ void AdvancedControl::screenshot() {
 }
 
 void AdvancedControl::logVideoCodec() {
-    QMediaContent mediaContent = m_mediaPlayer->currentMedia();
-    QUrl url = mediaContent.request().url();
-    qInfo() << url.toString();
+    qInfo() << "\nAdvancedControl::logVideoCodec";
+//    QMediaContent mediaContent = m_mediaPlayer->currentMedia();
+//    QUrl url = mediaContent.request().url();
+//    qInfo() << url.toString();
 }
 
 void AdvancedControl::logAudioCodec() {

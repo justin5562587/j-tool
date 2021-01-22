@@ -44,6 +44,8 @@ public:
 
 private:
 
+    char errorMessage[1024];
+
     AVFormatContext *pAVFormatContext = nullptr;
     AVCodec *pAVCodec = nullptr;
     AVCodecContext *pAVCodecContext = nullptr;

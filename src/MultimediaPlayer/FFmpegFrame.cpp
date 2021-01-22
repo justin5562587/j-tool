@@ -84,25 +84,21 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
     }
 
     bool done = false;
-    int send_packet_times = 0;
     while (!done && av_read_frame(pAVFormatContext, &packet) == 0) {
 
         if (packet.stream_index == videoStreamIndex) {
             ret = avcodec_send_packet(pAVCodecContext, &packet);
-            std::cout << "\navcodec_send_packet_times: " << ++send_packet_times;
 
-            if (ret > 0) {
+            if (ret == 0) {
                 ret = avcodec_receive_frame(pAVCodecContext, pAVFrame);
 //                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-//                    char errBuffer[128];
-//                    av_make_error_string(errBuffer, sizeof(errBuffer), ret);
-//                    std::cout << "receive frame failed: " << errBuffer << std::endl;
-//                    return -1;
-//                }
+                if (ret == AVERROR_EOF) {
+                    av_strerror(ret, errorMessage, 1024);
+                    std::cout << "receive frame failed: " << errorMessage << std::endl;
+                    return -1;
+                }
 
-                double packetSeconds = packet.pts * streamTimeBase;
-                std::cout << "\npacketSeconds: " << packetSeconds;
-
+                std::cout << "\npacketSeconds: " << packet.pts * streamTimeBase;
                 if (pAVFrame->width > 0) {
                     done = true;
                 }
@@ -112,7 +108,7 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
     }
 
 //    av_seek_frame(pAVFormatContext, videoStreamIndex, 0, AVSEEK_FLAG_BYTE);
-//    avcodec_flush_buffers(pCodecCtx);
+//    avcodec_flush_buffers(pAVCodecContext);
 
     return 0;
 }

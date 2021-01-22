@@ -23,12 +23,24 @@ public:
 
     ~FFmpegRecord();
 
+    /**
+     * initialize record device
+     */
     int initializeRecordDevice();
 
+    /**
+     * initialize FFmpeg structs (eg. AVFormatContext, encoder) for outputFile
+     */
     int initializeOutputFile(AVCodecID avCodecId, const std::string &outputFilePath);
 
+    /**
+     * collect data from record device, scale data, then encode and write data to outputFile
+     */
     int captureVideoFrames();
 
+    /**
+     * clean all FFmpeg structs
+     */
     int cleanAll();
 
     int recordVideo(AVCodecID avCodecId, const std::string &outputFilePath);

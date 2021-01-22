@@ -120,8 +120,8 @@ int FFmpegRecord::captureVideoFrames() {
     pAVFrame = av_frame_alloc();
     outFrame = av_frame_alloc();
 
-    int nbytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width, outAVCodecContext->height, 32);
-    uint8_t *video_out_buffer = (uint8_t *) av_malloc(nbytes);
+    int nbBytes = av_image_get_buffer_size(outAVCodecContext->pix_fmt, outAVCodecContext->width, outAVCodecContext->height, 32);
+    uint8_t *video_out_buffer = (uint8_t *) av_malloc(nbBytes);
 
     av_image_fill_arrays(
             outFrame->data,

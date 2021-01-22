@@ -74,9 +74,7 @@ void AdvancedControl::screenshot() {
     double currentSeconds = (double) m_mediaPlayer->position() / 1000;
     QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
 
-    m_ffmpegFrame.initializeFFmpeg(urlString.substr(7));
-    m_ffmpegFrame.getFrameInTargetSeconds(currentSeconds);
-    m_ffmpegFrame.scaleAndSaveToImage(AV_PIX_FMT_RGB24, downloadDir.toStdString(), true);
+    m_ffmpegFrame.saveFrameImage(urlString.substr(7), currentSeconds, AV_PIX_FMT_RGB24, downloadDir.toStdString());
 }
 
 void AdvancedControl::logVideoCodec() {
@@ -86,25 +84,17 @@ void AdvancedControl::logVideoCodec() {
 }
 
 void AdvancedControl::logAudioCodec() {
-    qInfo() << "\nlog audio codec info";
+    qInfo() << "\nAdvancedControl::logAudioCodec";
 }
 
 void AdvancedControl::recordVideo() {
-    qInfo() << "\ntodo";
 //    this->setBtnStatus(VIDEO_RECORD, false);
 //    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
-
-    if (m_ffmpegRecord.initializeRecordDevice() == 0) {
-        if (m_ffmpegRecord.initializeOutputFile(AV_CODEC_ID_H264, "FFmpegRecord_output.mp4") == 0) {
-            if (m_ffmpegRecord.captureVideoFrames() == 0) {
-                m_ffmpegRecord.cleanAll();
-            }
-        }
-    }
+    m_ffmpegRecord.recordVideo(AV_CODEC_ID_H264, "FFmpegRecord_output.mp4");
 }
 
 void AdvancedControl::recordAudio() {
-    qInfo() << "\ntodo";
+    qInfo() << "\nAdvancedControl::recordAudio";
 //    this->setBtnStatus(AUDIO_RECORD, false);
 //    recordAudioWithFFmpeg(this, "/User/justin/Downloads/");
 }

@@ -31,14 +31,16 @@ public:
     void deallocateFFmpeg();
 
     /**
-     * decode video stream and save data into frame in specific seconds
+     * seek frame in target seconds and decode data
      */
     int getFrameInTargetSeconds(double targetSeconds);
 
     /**
-     * save frame as picture
+     * scale from original data to specific AVPixelFormat data and export to image picture
      */
-    int scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll);
+    int scaleAndSaveImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll);
+
+    int saveFrameImage(const std::string &filepath, double targetSeconds, AVPixelFormat dstFormat, const std::string &diskPath);
 
 private:
 

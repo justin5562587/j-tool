@@ -31,6 +31,8 @@ public:
 
     int cleanAll();
 
+    int recordVideo(AVCodecID avCodecId, const std::string &outputFilePath);
+
 private:
 
     char errorMessage[1024];

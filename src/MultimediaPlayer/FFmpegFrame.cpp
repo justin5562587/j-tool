@@ -117,7 +117,7 @@ int FFmpegFrame::getFrameInTargetSeconds(double targetSeconds) {
     return 0;
 }
 
-int FFmpegFrame::scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll) {
+int FFmpegFrame::scaleAndSaveImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll) {
     AVFrame *pFrameRet = av_frame_alloc();
     int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
     uint8_t *buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
@@ -164,5 +164,21 @@ int FFmpegFrame::scaleAndSaveToImage(AVPixelFormat dstFormat, const std::string 
         this->deallocateFFmpeg();
     }
 
+    return 0;
+}
+
+int FFmpegFrame::saveFrameImage(const std::string &filepath, double targetSeconds, AVPixelFormat dstFormat, const std::string &diskPath) {
+    if (initializeFFmpeg(filepath) < 0) {
+        std::cout << "\binitializeFFmpeg failed";
+        return -1;
+    }
+    if (getFrameInTargetSeconds(targetSeconds) < 0) {
+        std::cout << "\ngetFrameInTargetSeconds failed";
+        return -1;
+    }
+    if (scaleAndSaveImage(dstFormat, diskPath, true)) {
+        std::cout << "\nscaleAndSaveImage failed";
+        return -1;
+    }
     return 0;
 }

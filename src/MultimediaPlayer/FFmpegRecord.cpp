@@ -191,3 +191,20 @@ int FFmpegRecord::cleanAll() {
     avformat_free_context(outAVFormatContext);
     return 0;
 }
+
+int FFmpegRecord::recordVideo(AVCodecID avCodecId, const std::string &outputFilePath) {
+    if (initializeRecordDevice() < 0) {
+        std::cout << "\ninitializeRecordDevice failed";
+        return -1;
+    }
+    if (initializeOutputFile(avCodecId, outputFilePath) < 0) {
+        std::cout << "\ninitializeOutputFile failed";
+        return -1;
+    }
+    if (captureVideoFrames() < 0) {
+        std::cout << "\ncaptureVideoFrames";
+        return -1;
+    }
+    cleanAll();
+    return 0;
+}

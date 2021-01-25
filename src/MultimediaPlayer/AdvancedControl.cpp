@@ -91,7 +91,8 @@ void AdvancedControl::logAudioCodec() {
 void AdvancedControl::recordVideo() {
 //    this->setBtnStatus(VIDEO_RECORD, false);
 //    recordVideoWithFFmpeg(this, "/User/justin/Downloads/");
-    m_ffmpegRecord.recordVideo(AV_CODEC_ID_H264, "FFmpegRecord_output.h264");
+
+    m_ffmpegRecord.recordVideo("FFmpegRecord_output.mp4");
 }
 
 void AdvancedControl::recordAudio() {

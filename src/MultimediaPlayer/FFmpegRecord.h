@@ -31,7 +31,7 @@ public:
     /**
      * initialize FFmpeg structs (eg. AVFormatContext, encoder) for outputFile
      */
-    int initializeOutputFile(AVCodecID avCodecId, const std::string &outputFilePath);
+    int initializeOutputFile(const std::string &outputFilePath);
 
     /**
      * collect data from record device, scale data, then encode and write data to outputFile
@@ -43,7 +43,7 @@ public:
      */
     int cleanAll();
 
-    int recordVideo(AVCodecID avCodecId, const std::string &outputFilePath);
+    int recordVideo(const std::string &outputFilePath);
 
 private:
 

@@ -6,6 +6,7 @@
 
 FFmpegRecord::FFmpegRecord() {
     avdevice_register_all();
+    avcodec_register_all();
 }
 
 FFmpegRecord::~FFmpegRecord() {
@@ -41,25 +42,23 @@ int FFmpegRecord::initializeRecordDevice() {
 }
 
 // initialize output video file
-// use AV_CODEC_ID_H264 for test
-int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &outputFilePath) {
+int FFmpegRecord::initializeOutputFile(const std::string &outputFilePath) {
     value = 0;
     outputFile = outputFilePath.c_str();
-
-    outAVFormatContext = avformat_alloc_context();
-    avformat_alloc_output_context2(&outAVFormatContext, nullptr, nullptr, outputFile);
 
     // return output format in the registered format list which best match the parameters
     outAVOutputFormat = av_guess_format(nullptr, outputFile, nullptr);
 
-    outAVCodec = avcodec_find_decoder(avCodecId);
+    outAVFormatContext = nullptr;
+    avformat_alloc_output_context2(&outAVFormatContext, outAVOutputFormat, nullptr, nullptr);
+
+    outAVCodec = avcodec_find_encoder(AV_CODEC_ID_H264);
 
     video_st = avformat_new_stream(outAVFormatContext, outAVCodec);
 
-    // allocate outAVCodecContext and set properties of output video file
     outAVCodecContext = avcodec_alloc_context3(outAVCodec);
     avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar);
-    outAVCodecContext->codec_id = avCodecId;
+    outAVCodecContext->codec_id = AV_CODEC_ID_H264;
     outAVCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
     outAVCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     outAVCodecContext->bit_rate = 400000;
@@ -70,7 +69,7 @@ int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &o
     outAVCodecContext->framerate = (AVRational) {30, 1};
     outAVCodecContext->time_base = (AVRational) {1, 30};
 
-    if (avCodecId == AV_CODEC_ID_H264) {
+    if (outAVOutputFormat->video_codec == AV_CODEC_ID_H264) {
         av_opt_set(outAVCodecContext->priv_data, "present", "slow", 0);
     }
 
@@ -98,7 +97,7 @@ int FFmpegRecord::initializeOutputFile(AVCodecID avCodecId, const std::string &o
     }
 
     // todo handle this error
-    value = avformat_write_header(outAVFormatContext, &options);
+    value = avformat_write_header(outAVFormatContext, nullptr);
     if (value < 0) {
         av_strerror(value, errorMessage, 1024);
         std::cout << "\navformat_write_header: " << errorMessage;
@@ -193,12 +192,12 @@ int FFmpegRecord::cleanAll() {
     return 0;
 }
 
-int FFmpegRecord::recordVideo(AVCodecID avCodecId, const std::string &outputFilePath) {
+int FFmpegRecord::recordVideo(const std::string &outputFilePath) {
     if (initializeRecordDevice() < 0) {
         std::cout << "\ninitializeRecordDevice failed";
         return -1;
     }
-    if (initializeOutputFile(avCodecId, outputFilePath) < 0) {
+    if (initializeOutputFile(outputFilePath) < 0) {
         std::cout << "\ninitializeOutputFile failed";
         return -1;
     }

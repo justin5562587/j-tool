@@ -6,7 +6,7 @@
 
 FFmpegRecord::FFmpegRecord() {
     avdevice_register_all();
-    avcodec_register_all();
+    av_log_set_level(AV_LOG_DEBUG);
 }
 
 FFmpegRecord::~FFmpegRecord() {
@@ -55,8 +55,14 @@ int FFmpegRecord::initializeOutputFile(const std::string &outputFilePath) {
     outAVCodec = avcodec_find_encoder(AV_CODEC_ID_H264);
 
     video_st = avformat_new_stream(outAVFormatContext, outAVCodec);
+    video_st->codecpar->width = 1920;
+    video_st->codecpar->height = 1080;
+    video_st->codecpar->bit_rate = 400000;
+    video_st->codecpar->codec_id = AV_CODEC_ID_H264;
+    video_st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
 
     outAVCodecContext = avcodec_alloc_context3(outAVCodec);
+
     avcodec_parameters_to_context(outAVCodecContext, video_st->codecpar);
     outAVCodecContext->codec_id = AV_CODEC_ID_H264;
     outAVCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -105,7 +111,7 @@ int FFmpegRecord::initializeOutputFile(const std::string &outputFilePath) {
     }
 
     // dump information about output file
-    std::cout << "\n\noutput file information:\n\n";
+    std::cout << "\n-------output file information:-------\n";
     av_dump_format(outAVFormatContext, 0, outputFile, 1);
 
     return 0;

@@ -21,9 +21,14 @@ public:
     ~FFmpegFrame();
 
     /**
-     * initialize AVFormatContext, AVCodecContext, AVCodec with file in filepath
+     * initialize AVFormatContext, AVCodecContext, AVCodec with file in filepath and open Codec
      */
     int initializeFFmpeg(const std::string &filepath);
+
+    /**
+     * initialize SwsContext for image scaling
+     */
+    int initializeSwsContext(AVPixelFormat dstFormat);
 
     /**
      * clean AVFormatContext, AVCodecContext, AVCodec and etc.
@@ -31,16 +36,39 @@ public:
     void deallocateFFmpeg();
 
     /**
-     * seek frame in target seconds and decode data
+     * scale from pAVFrame to pAVFrameRet with pSwsContext
      */
-    int getFrameInTargetSeconds(double targetSeconds);
+    int scaleImage();
 
     /**
-     * scale from original data to specific AVPixelFormat data and export to image picture
+     * write image into disk file
      */
-    int scaleAndSaveImage(AVPixelFormat dstFormat, const std::string &diskPath, bool cleanAll);
+    int saveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath);
 
-    int saveFrameImage(const std::string &filepath, double targetSeconds, AVPixelFormat dstFormat, const std::string &diskPath);
+    /**
+     * combination functions of scaleImage and saveImage
+     */
+    int scaleAndSaveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath);
+
+    /**
+     * Public API
+     * decode video stream with conditions
+     * seek and decode frame in targetSeconds and export picture
+     */
+    int decodeFrameAndSaveImages(double targetSeconds, AVPixelFormat dstFormat, const std::string &diskPath);
+
+    /**
+     * Public API
+     * decode from beginning of video stream
+     * decode nFrames of frames and export pictures
+     */
+    int decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat, const std::string &diskPath);
+
+    /**
+     * Public API
+     * process of whole FFmpegFrame
+     */
+    int saveFrameImage(const std::string &filepath, double targetSeconds, int nFrames, AVPixelFormat dstFormat, const std::string &diskPath);
 
 private:
 
@@ -50,6 +78,9 @@ private:
     AVCodec *pAVCodec = nullptr;
     AVCodecContext *pAVCodecContext = nullptr;
     AVFrame *pAVFrame = nullptr;
+    AVFrame *pAVFrameRet = nullptr;
+    struct SwsContext *pSwsContext = nullptr;
+    uint8_t *buffer = nullptr;
 
     int videoStreamIndex;
     int audioStreamIndex;

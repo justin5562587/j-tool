@@ -154,9 +154,10 @@ int FFmpegRecord::captureVideoFrames() {
     int readFrameTimes = 100; // call times of av_read_frame
 
     AVPacket outPacket;
-    while (av_read_frame(pAVFormatContext, pAVPacket) > 0) {
+    while ((value = av_read_frame(pAVFormatContext, pAVPacket)) == 0) {
         if (++ii == readFrameTimes) break;
         if (pAVPacket->stream_index == videoStreamIndex) {
+
             avcodec_send_packet(pAVCodecContext, pAVPacket);
             avcodec_receive_frame(pAVCodecContext, pAVFrame);
 
@@ -176,8 +177,14 @@ int FFmpegRecord::captureVideoFrames() {
             avcodec_send_frame(outAVCodecContext, outFrame);
             avcodec_receive_packet(outAVCodecContext, &outPacket);
 
+//            av_write_frame
+
             av_packet_unref(&outPacket);
         }
+    }
+    if (value < 0) {
+        av_strerror(value, errorMessage, 1024);
+        std::cout << "\nav_read_frame: " << errorMessage;
     }
 
     std::cout << "\niterate times: " << ii;

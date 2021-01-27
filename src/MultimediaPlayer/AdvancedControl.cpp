@@ -74,7 +74,8 @@ void AdvancedControl::screenshot() {
     double currentSeconds = (double) m_mediaPlayer->position() / 1000;
     QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
 
-    m_ffmpegFrame.saveFrameImage(urlString.substr(7), currentSeconds, AV_PIX_FMT_RGB24, downloadDir.toStdString());
+    m_ffmpegFrame.saveFrameImage(urlString.substr(7), currentSeconds, -1, AV_PIX_FMT_RGB24, downloadDir.toStdString());
+//    m_ffmpegFrame.saveFrameImage(urlString.substr(7), -1, 100, AV_PIX_FMT_RGB24, downloadDir.toStdString());
 }
 
 void AdvancedControl::logVideoCodec() {

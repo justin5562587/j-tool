@@ -30,6 +30,10 @@ public:
      */
     void deallocateFFmpeg();
 
+    int initializeSwsContext(AVPixelFormat dstFormat);
+
+    int initializeScaledAVFrame(AVPixelFormat dstFormat);
+
     /**
      * write image into disk file
      */
@@ -64,6 +68,8 @@ private:
     AVCodecContext *pAVCodecContext = nullptr;
     AVFrame *pAVFrame = nullptr;
     AVFrame *pAVFrameRet = nullptr;
+    struct SwsContext *swsContext = nullptr;
+    uint8_t *buffer = nullptr;
 
     int videoStreamIndex;
     int audioStreamIndex;

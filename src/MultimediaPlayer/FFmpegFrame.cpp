@@ -47,11 +47,47 @@ int FFmpegFrame::initializeFFmpeg(const std::string &filepath) {
     return 0;
 }
 
+int FFmpegFrame::initializeSwsContext(AVPixelFormat dstFormat) {
+    swsContext = sws_getContext(
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            pAVCodecContext->pix_fmt,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            dstFormat,
+            SWS_BICUBIC,
+            nullptr,
+            nullptr,
+            nullptr
+    );
+    return 0;
+}
+
+int FFmpegFrame::initializeScaledAVFrame(AVPixelFormat dstFormat) {
+    pAVFrameRet = av_frame_alloc();
+    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
+    buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+
+    av_image_fill_arrays(
+            pAVFrameRet->data,
+            pAVFrameRet->linesize,
+            buffer,
+            dstFormat,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            32
+    );
+
+    return 0;
+}
+
 void FFmpegFrame::deallocateFFmpeg() {
     videoStreamIndex = -1;
     audioStreamIndex = -1;
     if (pAVFrame != nullptr) av_frame_free(&pAVFrame);
     av_frame_free(&pAVFrameRet);
+    av_free(buffer);
+    sws_freeContext(swsContext);
     avcodec_free_context(&pAVCodecContext);
     avformat_close_input(&pAVFormatContext);
 }
@@ -79,31 +115,8 @@ int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat,
     int ret = 0;
     int times = 0;
 
-    pAVFrameRet = av_frame_alloc();
-    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
-    uint8_t * buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-
-    av_image_fill_arrays(
-            pAVFrameRet->data,
-            pAVFrameRet->linesize,
-            buffer,
-            dstFormat,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            32
-    );
-    struct SwsContext *swsCtx = sws_getContext(
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            pAVCodecContext->pix_fmt,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            dstFormat,
-            SWS_BICUBIC,
-            nullptr,
-            nullptr,
-            nullptr
-    );
+    initializeSwsContext(dstFormat);
+    initializeScaledAVFrame(dstFormat);
 
     while (av_read_frame(pAVFormatContext, &packet) == 0) {
         if (++times == nFrames) break;
@@ -124,7 +137,7 @@ int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat,
             }
 
             sws_scale(
-                    swsCtx,
+                    swsContext,
                     (uint8_t const *const *) pAVFrame->data,
                     pAVFrame->linesize,
                     0,
@@ -145,32 +158,8 @@ int FFmpegFrame::decodeFrameAndSaveImages(double targetSeconds, AVPixelFormat ds
     AVPacket packet;
     int ret = 0;
 
-    struct SwsContext *swsCtx = sws_getContext(
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            pAVCodecContext->pix_fmt,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            dstFormat,
-            SWS_BICUBIC,
-            nullptr,
-            nullptr,
-            nullptr
-    );
-
-    pAVFrameRet = av_frame_alloc();
-    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
-    uint8_t * buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-
-    av_image_fill_arrays(
-            pAVFrameRet->data,
-            pAVFrameRet->linesize,
-            buffer,
-            dstFormat,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            32
-    );
+    initializeSwsContext(dstFormat);
+    initializeScaledAVFrame(dstFormat);
 
     int64_t streamDuration = pAVFormatContext->streams[videoStreamIndex]->duration;
     double streamTimeBase = av_q2d(pAVFormatContext->streams[videoStreamIndex]->time_base);
@@ -205,7 +194,7 @@ int FFmpegFrame::decodeFrameAndSaveImages(double targetSeconds, AVPixelFormat ds
             }
 
             sws_scale(
-                    swsCtx,
+                    swsContext,
                     (uint8_t const *const *) pAVFrame->data,
                     pAVFrame->linesize,
                     0,

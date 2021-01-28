@@ -52,8 +52,8 @@ int FFmpegFrame::initializeSwsContext(AVPixelFormat dstFormat) {
             pAVCodecContext->width,
             pAVCodecContext->height,
             pAVCodecContext->pix_fmt,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
+            pAVCodecContext->width / 4,
+            pAVCodecContext->height / 4,
             dstFormat,
             SWS_BICUBIC,
             nullptr,
@@ -130,11 +130,12 @@ int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat,
             }
 
             ret = avcodec_receive_frame(pAVCodecContext, pAVFrame);
-            if (ret != 0) {
+            if (ret == AVERROR_EOF) {
                 av_strerror(ret, errorMessage, sizeof(errorMessage));
                 std::cout << "\navcodec_receive_frame: " << errorMessage;
                 return ret;
             }
+            if (ret == AVERROR(EAGAIN)) continue;
 
             sws_scale(
                     swsContext,

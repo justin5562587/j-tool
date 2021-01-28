@@ -36,37 +36,13 @@ int FFmpegFrame::initializeFFmpeg(const std::string &filepath) {
     pAVCodec = avcodec_find_decoder(pAVFormatContext->streams[videoStreamIndex]->codecpar->codec_id);
     pAVCodecContext = avcodec_alloc_context3(pAVCodec);
     avcodec_parameters_to_context(pAVCodecContext, pAVFormatContext->streams[videoStreamIndex]->codecpar);
+
+    // set pix_fmt for AVCodecContext if -1
+    if (pAVCodecContext->pix_fmt == AV_PIX_FMT_NONE) {
+        pAVCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
+    }
+
     avcodec_open2(pAVCodecContext, pAVCodec, nullptr);
-
-    return 0;
-}
-
-int FFmpegFrame::initializeSwsContext(AVPixelFormat dstFormat) {
-    pAVFrameRet = av_frame_alloc();
-    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
-    buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-
-    av_image_fill_arrays(
-            pAVFrameRet->data,
-            pAVFrameRet->linesize,
-            buffer,
-            dstFormat,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            32
-    );
-    pSwsContext = sws_getContext(
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            pAVCodecContext->pix_fmt,
-            pAVCodecContext->width,
-            pAVCodecContext->height,
-            dstFormat,
-            SWS_BICUBIC,
-            nullptr,
-            nullptr,
-            nullptr
-    );
 
     return 0;
 }
@@ -74,29 +50,10 @@ int FFmpegFrame::initializeSwsContext(AVPixelFormat dstFormat) {
 void FFmpegFrame::deallocateFFmpeg() {
     videoStreamIndex = -1;
     audioStreamIndex = -1;
-    if (pAVFrame != nullptr) {
-        av_frame_free(&pAVFrame);
-    }
-    if (pSwsContext != nullptr) {
-        av_free(buffer);
-        av_frame_free(&pAVFrameRet);
-        sws_freeContext(pSwsContext);
-    }
+    if (pAVFrame != nullptr) av_frame_free(&pAVFrame);
+    av_frame_free(&pAVFrameRet);
     avcodec_free_context(&pAVCodecContext);
     avformat_close_input(&pAVFormatContext);
-}
-
-int FFmpegFrame::scaleImage() {
-    sws_scale(
-            pSwsContext,
-            (uint8_t const *const *) pAVFrame->data,
-            pAVFrame->linesize,
-            0,
-            pAVCodecContext->height,
-            pAVFrameRet->data,
-            pAVFrameRet->linesize
-    );
-    return 0;
 }
 
 int FFmpegFrame::saveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
@@ -116,19 +73,37 @@ int FFmpegFrame::saveImage(AVFrame *pFrame, int width, int height, const std::st
     return 0;
 }
 
-int FFmpegFrame::scaleAndSaveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
-    scaleImage();
-    saveImage(pFrame, width, height, diskPath);
-    return 0;
-}
-
 int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat, const std::string &diskPath) {
     pAVFrame = av_frame_alloc();
     AVPacket packet;
     int ret = 0;
     int times = 0;
 
-    if (pSwsContext == nullptr) initializeSwsContext(dstFormat);
+    pAVFrameRet = av_frame_alloc();
+    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
+    uint8_t * buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+
+    av_image_fill_arrays(
+            pAVFrameRet->data,
+            pAVFrameRet->linesize,
+            buffer,
+            dstFormat,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            32
+    );
+    struct SwsContext *swsCtx = sws_getContext(
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            pAVCodecContext->pix_fmt,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            dstFormat,
+            SWS_BICUBIC,
+            nullptr,
+            nullptr,
+            nullptr
+    );
 
     while (av_read_frame(pAVFormatContext, &packet) == 0) {
         if (++times == nFrames) break;
@@ -148,7 +123,16 @@ int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat,
                 return ret;
             }
 
-            scaleAndSaveImage(pAVFrameRet, pAVCodecContext->width, pAVCodecContext->height, diskPath);
+            sws_scale(
+                    swsCtx,
+                    (uint8_t const *const *) pAVFrame->data,
+                    pAVFrame->linesize,
+                    0,
+                    pAVCodecContext->height,
+                    pAVFrameRet->data,
+                    pAVFrameRet->linesize
+            );
+            saveImage(pAVFrameRet, pAVCodecContext->width, pAVCodecContext->height, diskPath);
         }
         av_packet_unref(&packet);
     }
@@ -161,7 +145,32 @@ int FFmpegFrame::decodeFrameAndSaveImages(double targetSeconds, AVPixelFormat ds
     AVPacket packet;
     int ret = 0;
 
-    if (pSwsContext == nullptr) initializeSwsContext(dstFormat);
+    struct SwsContext *swsCtx = sws_getContext(
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            pAVCodecContext->pix_fmt,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            dstFormat,
+            SWS_BICUBIC,
+            nullptr,
+            nullptr,
+            nullptr
+    );
+
+    pAVFrameRet = av_frame_alloc();
+    int numBytes = av_image_get_buffer_size(dstFormat, pAVCodecContext->width, pAVCodecContext->height, 32);
+    uint8_t * buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+
+    av_image_fill_arrays(
+            pAVFrameRet->data,
+            pAVFrameRet->linesize,
+            buffer,
+            dstFormat,
+            pAVCodecContext->width,
+            pAVCodecContext->height,
+            32
+    );
 
     int64_t streamDuration = pAVFormatContext->streams[videoStreamIndex]->duration;
     double streamTimeBase = av_q2d(pAVFormatContext->streams[videoStreamIndex]->time_base);
@@ -195,7 +204,16 @@ int FFmpegFrame::decodeFrameAndSaveImages(double targetSeconds, AVPixelFormat ds
                 done = true;
             }
 
-            scaleAndSaveImage(pAVFrameRet, pAVCodecContext->width, pAVCodecContext->height, diskPath);
+            sws_scale(
+                    swsCtx,
+                    (uint8_t const *const *) pAVFrame->data,
+                    pAVFrame->linesize,
+                    0,
+                    pAVCodecContext->height,
+                    pAVFrameRet->data,
+                    pAVFrameRet->linesize
+            );
+            saveImage(pAVFrameRet, pAVCodecContext->width, pAVCodecContext->height, diskPath);
         }
         av_packet_unref(&packet);
     }

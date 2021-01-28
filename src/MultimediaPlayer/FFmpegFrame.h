@@ -26,29 +26,14 @@ public:
     int initializeFFmpeg(const std::string &filepath);
 
     /**
-     * initialize SwsContext for image scaling
-     */
-    int initializeSwsContext(AVPixelFormat dstFormat);
-
-    /**
      * clean AVFormatContext, AVCodecContext, AVCodec and etc.
      */
     void deallocateFFmpeg();
 
     /**
-     * scale from pAVFrame to pAVFrameRet with pSwsContext
-     */
-    int scaleImage();
-
-    /**
      * write image into disk file
      */
     int saveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath);
-
-    /**
-     * combination functions of scaleImage and saveImage
-     */
-    int scaleAndSaveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath);
 
     /**
      * Public API
@@ -79,8 +64,6 @@ private:
     AVCodecContext *pAVCodecContext = nullptr;
     AVFrame *pAVFrame = nullptr;
     AVFrame *pAVFrameRet = nullptr;
-    struct SwsContext *pSwsContext = nullptr;
-    uint8_t *buffer = nullptr;
 
     int videoStreamIndex;
     int audioStreamIndex;

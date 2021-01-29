@@ -28,15 +28,15 @@ public:
 
     void test();
 
-    int initializeOpenFile(const std::string& filepath);
+    int initializeOpenFile(const std::string &filepath);
 
     int initializeFilter(const char *filtersDescr);
 
-    int decodeFilterFrames(const std::string& filepath, int nFrames);
+    int decodeFilterFrames(const std::string &filepath, int nFrames);
 
     void deallocateInOut();
 
-    int deallocate();
+    void deallocate();
 
 private:
 
@@ -44,7 +44,7 @@ private:
 
     AVFormatContext *formatContext;
     AVCodec *codec;
-    AVCodecContext  *codecContext;
+    AVCodecContext *codecContext;
 
     AVFilterGraph *filterGraph;
     const AVFilter *buffersrc;

@@ -83,7 +83,7 @@ int FFmpegFilter::initializeFilter(const char *filtersDescr) {
     return ret;
 }
 
-int FFmpegFilter::deallocate() {
+void FFmpegFilter::deallocate() {
     avfilter_graph_free(&filterGraph);
     avcodec_free_context(&codecContext);
     avformat_close_input(&formatContext);
@@ -95,33 +95,33 @@ void FFmpegFilter::deallocateInOut() {
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
 }
-
-static void displayFrame(const AVFrame *frame, AVRational timebase) {
-    int x, y;
-    uint8_t *p0, *p;
-    int64_t delay;
-
-    if (frame->pts != AV_NOPTS_VALUE) {
-        if (last_pts != AV_NOPTS_VALUE) {
-            delay = av_rescale_q(frame->pts - last_pts,
-                                 timebase, AV_TIME_BASE_Q);
-            if (delay > 0 && delay < 1000000)
-                usleep(delay)
-        }
-        last_pts = frame->pts;
-    }
-
-    p0 = frame->data[0];
-    puts("\033c");
-    for (y = 0; y < frame->height; y++) {
-        p = p0;
-        for (x = 0; x < frame->width; x++)
-            putchar(" .-+#"[*(p++) / 52]);
-        putchar('\n');
-        p0 += frame->linesize[0];
-    }
-    fflush(stdout);
-}
+//
+//static void displayFrame(const AVFrame *frame, AVRational timebase) {
+//    int x, y;
+//    uint8_t *p0, *p;
+//    int64_t delay;
+//
+//    if (frame->pts != AV_NOPTS_VALUE) {
+//        if (last_pts != AV_NOPTS_VALUE) {
+//            delay = av_rescale_q(frame->pts - last_pts,
+//                                 timebase, AV_TIME_BASE_Q);
+//            if (delay > 0 && delay < 1000000)
+//                usleep(delay)
+//        }
+//        last_pts = frame->pts;
+//    }
+//
+//    p0 = frame->data[0];
+//    puts("\033c");
+//    for (y = 0; y < frame->height; y++) {
+//        p = p0;
+//        for (x = 0; x < frame->width; x++)
+//            putchar(" .-+#"[*(p++) / 52]);
+//        putchar('\n');
+//        p0 += frame->linesize[0];
+//    }
+//    fflush(stdout);
+//}
 
 int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames) {
     int ret = 0;

@@ -6,6 +6,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -14,9 +15,6 @@ extern "C" {
 #include <libavfilter/buffersrc.h>
 #include <libavutil/opt.h>
 }
-
-enum AVPixelFormat pix_fmts[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE};
-const char *filter_descr = "scale=78:24,transpose=cclock";
 
 class FFmpegFilter {
 
@@ -32,7 +30,7 @@ public:
 
     int initializeFilter(const char *filtersDescr);
 
-    int decodeFilterFrames(const std::string &filepath, int nFrames);
+    int decodeFilterFrames(const std::string &filepath, int nFrames, const std::string &diskPath);
 
     void deallocateInOut();
 

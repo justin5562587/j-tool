@@ -11,6 +11,7 @@
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_ffmpegFrame = FFmpegFrame();
     m_ffmpegRecord = FFmpegRecord();
+    m_ffmpegFilter = FFmpegFilter();
 
     m_screenshotBtn = new QPushButton("ScreenShot", this);
     connect(m_screenshotBtn, &QAbstractButton::clicked, this, &AdvancedControl::screenshot);
@@ -22,6 +23,8 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     connect(m_videoRecordBtn, &QAbstractButton::clicked, this, &AdvancedControl::recordVideo);
     m_audioRecordBtn = new QPushButton("Record Audio", this);
     connect(m_audioRecordBtn, &QAbstractButton::clicked, this, &AdvancedControl::recordAudio);
+    m_filterBtn = new QPushButton("Filter", this);
+    connect(m_filterBtn, &QAbstractButton::clicked, this, &AdvancedControl::filterScreenshot);
 
     inactive();
 
@@ -76,6 +79,17 @@ void AdvancedControl::screenshot() {
 
 //    m_ffmpegFrame.saveFrameImage(urlString.substr(7), currentSeconds, -1, AV_PIX_FMT_RGB24, downloadDir.toStdString());
     m_ffmpegFrame.saveFrameImage(urlString.substr(7), -1, 10, AV_PIX_FMT_RGB24, downloadDir.toStdString());
+}
+
+// todo - test for avfilter
+void AdvancedControl::filterScreenshot() {
+    QMediaContent mediaContent = m_mediaPlayer->currentMedia();
+    std::string urlString = mediaContent.request().url().toString().toStdString();
+
+    double currentSeconds = (double) m_mediaPlayer->position() / 1000;
+    QString downloadDir = QStandardPaths::locate(QStandardPaths::DownloadLocation, "", QStandardPaths::LocateDirectory);
+
+    m_ffmpegFilter.decodeFilterFrames(urlString.substr(7), 10, downloadDir.toStdString());
 }
 
 void AdvancedControl::logVideoCodec() {

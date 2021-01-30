@@ -5,6 +5,28 @@
 #include "FFmpegFilter.h"
 
 const char *filterDescr = "scale=78:24,transpose=cclock";
+enum AVPixelFormat pix_fmts[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE};
+
+int saveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+    const std::string fullFilename = diskPath + "_screenshot_" + std::to_string(ms.count()) + ".ppm";
+    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    // write header
+    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
+    // Write pixel data
+    for (int y = 0; y < height; y++) {
+        ofs.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width * 3);
+    }
+
+    ofs.close();
+    return 0;
+}
+
+FFmpegFilter::FFmpegFilter() {}
+
+FFmpegFilter::~FFmpegFilter() {}
 
 int FFmpegFilter::initializeOpenFile(const std::string &filepath) {
     int ret = 0;
@@ -123,7 +145,7 @@ void FFmpegFilter::deallocateInOut() {
 //    fflush(stdout);
 //}
 
-int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames) {
+int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames, const std::string &diskPath) {
     int ret = 0;
     AVPacket packet;
     frame = av_frame_alloc();
@@ -172,6 +194,7 @@ int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames) {
                         return ret;
                     }
                     // todo display or export filtered frame
+                    saveImage(filterFrame, codecContext->width, codecContext->height, diskPath);
 //                    displayFrame(filterFrame, buffersinkContext->inputs[0]->time_base);
                     av_frame_unref(filterFrame);
                 }

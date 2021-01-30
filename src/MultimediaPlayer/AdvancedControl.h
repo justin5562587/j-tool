@@ -10,6 +10,7 @@
 
 #include "./FFmpegFrame.h"
 #include "./FFmpegRecord.h"
+#include "./FFmpegFilter.h"
 
 enum AdvancedControlBtnTypes {
     VIDEO_RECORD,
@@ -44,6 +45,8 @@ public slots:
 
     void recordAudio();
 
+    void filterScreenshot();
+
 private:
 
     QMediaPlayer *m_mediaPlayer = nullptr;
@@ -53,8 +56,10 @@ private:
     QAbstractButton *m_audioCodecBtn = nullptr;
     QAbstractButton *m_videoRecordBtn = nullptr;
     QAbstractButton *m_audioRecordBtn = nullptr;
+    QAbstractButton *m_filterBtn = nullptr;
 
     FFmpegFrame m_ffmpegFrame;
     FFmpegRecord m_ffmpegRecord;
+    FFmpegFilter m_ffmpegFilter;
 
 };

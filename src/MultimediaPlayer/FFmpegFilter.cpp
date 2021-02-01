@@ -32,7 +32,17 @@ int FFmpegFilter::initializeOpenFile(const std::string &filepath) {
     int ret = 0;
     avformat_open_input(&formatContext, filepath.c_str(), nullptr, nullptr);
     avformat_find_stream_info(formatContext, nullptr);
-    videoIndexStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
+
+    for (int i = 0; i < formatContext->nb_streams; ++i) {
+        if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoIndexStream = i;
+            break;
+        }
+    }
+
+//    videoIndexStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
+
+    codec = avcodec_find_decoder(formatContext->streams[videoIndexStream]->codecpar->codec_id);
 
     // create decode context
     codecContext = avcodec_alloc_context3(codec);
@@ -58,6 +68,13 @@ int FFmpegFilter::initializeFilter(const char *filtersDescr) {
         return ret;
     }
 
+    // format args with parameters
+    snprintf(args, sizeof(args),
+             "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+             codecContext->width, codecContext->height, codecContext->pix_fmt,
+             timebase.num, timebase.den,
+             codecContext->sample_aspect_ratio.num, codecContext->sample_aspect_ratio.den);
+
     // buffer video source
     ret = avfilter_graph_create_filter(&buffersrcContext, buffersrc, "in", args, nullptr, filterGraph);
     if (ret < 0) {
@@ -66,7 +83,7 @@ int FFmpegFilter::initializeFilter(const char *filtersDescr) {
     }
 
     // buffer video sink
-    ret = avfilter_graph_create_filter(&buffersinkContext, buffersink, "out", args, nullptr, filterGraph);
+    ret = avfilter_graph_create_filter(&buffersinkContext, buffersink, "out", nullptr, nullptr, filterGraph);
     if (ret < 0) {
         std::cout << "\ncannot create buffer sink";
         return ret;
@@ -162,11 +179,19 @@ int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames, c
         return ret;
     }
 
-    while (av_read_frame(formatContext, &packet) == 0) {
+    while (true) {
+        ret = av_read_frame(formatContext, &packet);
+        if (ret != 0) {
+            av_strerror(ret, errorMessage, sizeof(errorMessage));
+            std::cout << "\navcodec_send_packet failed: " << errorMessage;
+            break;
+        }
+
         if (packet.stream_index == videoIndexStream) {
             ret = avcodec_send_packet(codecContext, &packet);
             if (ret < 0) {
-                std::cout << "\n\"avcodec_send_packet failed";
+                av_strerror(ret, errorMessage, sizeof(errorMessage));
+                std::cout << "\navcodec_send_packet failed: " << errorMessage;
                 break;
             }
 

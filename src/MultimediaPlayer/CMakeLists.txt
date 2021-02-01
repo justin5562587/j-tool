@@ -3,7 +3,7 @@ aux_source_directory(. RESOURCES_SRC)
 add_library(j_multimedia_player STATIC ${RESOURCES_SRC})
 
 # configuration for self mac
-set(CMAKE_PREFIX_PATH /usr/local/Cellar/ffmpeg/4.3.1_4)
+#set(CMAKE_PREFIX_PATH /usr/local/Cellar/ffmpeg/4.3.1_4)
 
 find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h)
 find_library(AVCODEC_LIBRARY avcodec)

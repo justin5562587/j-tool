@@ -34,6 +34,7 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     layout->addWidget(m_audioCodecBtn);
     layout->addWidget(m_videoRecordBtn);
     layout->addWidget(m_audioRecordBtn);
+    layout->addWidget(m_filterBtn);
     setLayout(layout);
 }
 
@@ -42,6 +43,7 @@ void AdvancedControl::active(QMediaPlayer *mediaPlayer) {
     m_screenshotBtn->setEnabled(true);
     m_videoCodecBtn->setEnabled(true);
     m_audioCodecBtn->setEnabled(true);
+    m_filterBtn->setEnabled(true);
 }
 
 void AdvancedControl::inactive() {
@@ -49,6 +51,7 @@ void AdvancedControl::inactive() {
     m_screenshotBtn->setEnabled(false);
     m_videoCodecBtn->setEnabled(false);
     m_audioCodecBtn->setEnabled(false);
+    m_filterBtn->setEnabled(false);
 }
 
 void AdvancedControl::setBtnStatus(AdvancedControlBtnTypes advancedControlBtnTypes, bool isEnabled) {

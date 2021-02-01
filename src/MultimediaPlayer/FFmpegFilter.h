@@ -40,17 +40,19 @@ private:
 
     int64_t last_pts = AV_NOPTS_VALUE;
 
-    AVFormatContext *formatContext;
-    AVCodec *codec;
-    AVCodecContext *codecContext;
+    char errorMessage[512];
 
-    AVFilterGraph *filterGraph;
-    const AVFilter *buffersrc;
-    const AVFilter *buffersink;
-    AVFilterContext *buffersrcContext;
-    AVFilterContext *buffersinkContext;
-    AVFilterInOut *inputs;
-    AVFilterInOut *outputs;
+    AVFormatContext *formatContext = nullptr;
+    AVCodec *codec = nullptr;
+    AVCodecContext *codecContext = nullptr;
+
+    AVFilterGraph *filterGraph = nullptr;
+    const AVFilter *buffersrc = nullptr;
+    const AVFilter *buffersink = nullptr;
+    AVFilterContext *buffersrcContext = nullptr;
+    AVFilterContext *buffersinkContext = nullptr;
+    AVFilterInOut *inputs = nullptr;
+    AVFilterInOut *outputs = nullptr;
 
     AVFrame *frame;
     AVFrame *filterFrame;

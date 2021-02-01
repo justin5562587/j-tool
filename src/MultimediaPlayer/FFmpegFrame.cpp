@@ -60,6 +60,7 @@ int FFmpegFrame::initializeSwsContext(AVPixelFormat dstFormat) {
             nullptr,
             nullptr
     );
+
     return 0;
 }
 
@@ -136,6 +137,11 @@ int FFmpegFrame::decodeFramesAndSaveImages(int nFrames, AVPixelFormat dstFormat,
                 return ret;
             }
             if (ret == AVERROR(EAGAIN)) continue;
+
+            if (swsContext == nullptr) {
+                std::cout << "\nswsContext is NULL";
+                return -1;
+            }
 
             sws_scale(
                     swsContext,

@@ -4,7 +4,11 @@
 
 #include "FFmpegFilter.h"
 
-const char *filterDescr = "scale=78:24,transpose=cclock";
+//const char *filterDescr = "scale=78:24,transpose=cclock";
+//const char *filterDescr = "movie=/Users/justin/Downloads/example_files/1111.jpg[wm];[in][wm]overlay=5:5[out]";
+//const char *filterDescr = "delogo=x=0:y=0:w=100:h=77:band=10";
+//const char *filterDescr = "scale=100:100";
+const char *filterDescr = "reverse";
 enum AVPixelFormat pix_fmts[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE};
 
 int saveImage(AVFrame *pFrame, int width, int height, const std::string &diskPath) {
@@ -88,12 +92,7 @@ int FFmpegFilter::initializeFilter(const char *filtersDescr) {
         std::cout << "\ncannot create buffer sink";
         return ret;
     }
-
-    ret = av_opt_set_int_list(buffersinkContext, "pix_fmts", pix_fmts, AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
-    if (ret < 0) {
-        std::cout << "\ncannot set output pixel format";
-        return ret;
-    }
+    av_opt_set_int_list(buffersinkContext, "pix_fmts", pix_fmts, AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
 
     // set outputs ad buffersrc
     outputs->name = av_strdup("in");
@@ -134,6 +133,71 @@ void FFmpegFilter::deallocateInOut() {
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
 }
+
+int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames, const std::string &diskPath) {
+    int ret = 0;
+    int av_read_frame_times = 0;
+    AVPacket packet;
+    frame = av_frame_alloc();
+    filterFrame = av_frame_alloc();
+
+    ret = initializeOpenFile(filepath);
+    if (ret < 0) {
+        std::cout << "\ninitializeOpenFile failed";
+        return ret;
+    }
+    ret = initializeFilter(filterDescr);
+    if (ret < 0) {
+        std::cout << "\ninitializeFilter failed";
+        return ret;
+    }
+
+    while ((++av_read_frame_times < nFrames) && av_read_frame(formatContext, &packet) == 0) {
+
+        if (packet.stream_index == videoIndexStream) {
+            ret = avcodec_send_packet(codecContext, &packet);
+            if (ret != 0) {
+                av_strerror(ret, errorMessage, sizeof(errorMessage));
+                std::cout << "\navcodec_send_packet failed: " << errorMessage;
+                break;
+            }
+
+            while (ret >= 0) {
+                ret = avcodec_receive_frame(codecContext, frame);
+                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                    break;
+                } else if (ret < 0) {
+                    deallocate();
+                    return ret;
+                }
+
+                frame->pts = frame->best_effort_timestamp;
+
+                av_buffersrc_add_frame_flags(buffersrcContext, frame, AV_BUFFERSRC_FLAG_KEEP_REF);
+                while (true) {
+                    ret = av_buffersink_get_frame(buffersinkContext, filterFrame);
+                    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                        break;
+                    }
+                    if (ret < 0) {
+                        deallocate();
+                        return ret;
+                    }
+                    // todo handle filtered frame
+                    saveImage(filterFrame, codecContext->width, codecContext->height, diskPath);
+//                    displayFrame(filterFrame, buffersinkContext->inputs[0]->time_base);
+                    av_frame_unref(filterFrame);
+                }
+
+                av_frame_unref(frame);
+            }
+        }
+        av_packet_unref(&packet);
+    }
+
+    return ret;
+}
+
 //
 //static void displayFrame(const AVFrame *frame, AVRational timebase) {
 //    int x, y;
@@ -161,73 +225,3 @@ void FFmpegFilter::deallocateInOut() {
 //    }
 //    fflush(stdout);
 //}
-
-int FFmpegFilter::decodeFilterFrames(const std::string &filepath, int nFrames, const std::string &diskPath) {
-    int ret = 0;
-    AVPacket packet;
-    frame = av_frame_alloc();
-    filterFrame = av_frame_alloc();
-
-    ret = initializeOpenFile(filepath);
-    if (ret < 0) {
-        std::cout << "\ninitializeOpenFile failed";
-        return ret;
-    }
-    ret = initializeFilter(filterDescr);
-    if (ret < 0) {
-        std::cout << "\ninitializeFilter failed";
-        return ret;
-    }
-
-    while (true) {
-        ret = av_read_frame(formatContext, &packet);
-        if (ret != 0) {
-            av_strerror(ret, errorMessage, sizeof(errorMessage));
-            std::cout << "\navcodec_send_packet failed: " << errorMessage;
-            break;
-        }
-
-        if (packet.stream_index == videoIndexStream) {
-            ret = avcodec_send_packet(codecContext, &packet);
-            if (ret < 0) {
-                av_strerror(ret, errorMessage, sizeof(errorMessage));
-                std::cout << "\navcodec_send_packet failed: " << errorMessage;
-                break;
-            }
-
-            while (ret > 0) {
-                ret = avcodec_receive_frame(codecContext, frame);
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                    break;
-                } else if (ret < 0) {
-                    deallocate();
-                    return ret;
-                }
-
-                frame->pts = frame->best_effort_timestamp;
-                // put the decoded frame int filter_graph
-                av_buffersrc_add_frame_flags(buffersrcContext, frame, AV_BUFFERSRC_FLAG_KEEP_REF);
-
-                // pull the filtered frame from filter_graph
-                while (true) {
-                    ret = av_buffersink_get_frame(buffersinkContext, filterFrame);
-                    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                        break;
-                    }
-                    if (ret < 0) {
-                        deallocate();
-                        return ret;
-                    }
-                    // todo display or export filtered frame
-                    saveImage(filterFrame, codecContext->width, codecContext->height, diskPath);
-//                    displayFrame(filterFrame, buffersinkContext->inputs[0]->time_base);
-                    av_frame_unref(filterFrame);
-                }
-                av_frame_unref(frame);
-            }
-        }
-        av_packet_unref(&packet);
-    }
-
-    return ret;
-}

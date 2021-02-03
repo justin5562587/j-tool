@@ -8,8 +8,6 @@
 #include <QStandardPaths>
 #include <QBoxLayout>
 
-#include "./test_ffmpeg_io.cpp"
-
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_ffmpegFrame = FFmpegFrame();
     m_ffmpegRecord = FFmpegRecord();

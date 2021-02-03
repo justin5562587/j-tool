@@ -113,7 +113,7 @@ void MainWindow::initializeMenus() {
 
 void MainWindow::createMenusForMultimediaPlayer() {
     QMenu *menu = menuBar()->addMenu("Multimedia Player");
-    menu->addAction("Open", m_multimediaPlayer, &MultimediaPlayer::open);
+//    menu->addAction("Open", m_multimediaPlayer, &MultimediaPlayer::open);
 }
 
 // slot

@@ -182,6 +182,7 @@ void MultimediaPlayer::play() {
 void MultimediaPlayer::open() {
     QFileDialog fileDialog(this);
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
     fileDialog.setWindowTitle(tr("Open Files"));
     QStringList supportedMimeTypes = m_player->supportedMimeTypes();
 

@@ -7,8 +7,10 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QListView>
 
 #include "./PlayControl.h"
+#include "./PlayListModel.h"
 
 class MultimediaPlayer : public QWidget {
 Q_OBJECT
@@ -20,6 +22,9 @@ public:
     ~MultimediaPlayer();
 
 private:
+
+    QListView *playListView;
+    PlayListModel *playListModel;
 
     QLabel *screen;
 

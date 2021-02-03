@@ -16,12 +16,12 @@ typedef struct FileInfo {
 } FileInfo;
 Q_DECLARE_METATYPE(FileInfo)
 
-class PlayListModel : QAbstractListModel {
+class PlayListModel : public QAbstractListModel {
 Q_OBJECT
 
 public:
 
-    explicit PlayListModel();
+    explicit PlayListModel(QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 

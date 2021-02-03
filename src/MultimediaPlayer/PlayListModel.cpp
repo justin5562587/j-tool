@@ -4,7 +4,7 @@
 
 #include "PlayListModel.h"
 
-PlayListModel::PlayListModel() {
+PlayListModel::PlayListModel(QObject *parent) : QAbstractListModel(parent) {
     fileLists = QList<FileInfo>();
 }
 

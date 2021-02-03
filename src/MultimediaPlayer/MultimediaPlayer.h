@@ -10,7 +10,6 @@
 #include <QListView>
 
 #include "./PlayControl.h"
-#include "./PlayListModel.h"
 
 class MultimediaPlayer : public QWidget {
 Q_OBJECT
@@ -23,8 +22,7 @@ public:
 
 private:
 
-    QListView *playListView;
-    PlayListModel *playListModel;
+    QVector<QString> fileList;
 
     QLabel *screen;
 

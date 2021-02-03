@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QLineEdit>
+#include <QSlider>
+#include <QToolButton>
 
 class PlayControl : public QWidget {
 Q_OBJECT
@@ -35,10 +37,21 @@ signals:
 
 private:
 
+    QAbstractButton *openBtn;
     QAbstractButton *addUrlBtn;
     QLineEdit *urlInput;
-    QAbstractButton *openBtn;
-    QAbstractButton *playBtn;
+
+    QToolButton *playBtn;
+    QToolButton *prevBtn;
+    QToolButton *nextBtn;
+    QToolButton *forwardBtn;
+    QToolButton *backwardBtn;
+    QToolButton *muteBtn;
+    QToolButton *toPlaylistBtn;
+    QSlider *durationSlider;
+    QSlider *volumeSlider;
+
+    QAbstractButton *screenshotBtn;
 
 };
 

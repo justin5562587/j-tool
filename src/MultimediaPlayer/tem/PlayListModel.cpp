@@ -4,7 +4,7 @@
 
 #include "PlayListModel.h"
 
-PlayListModel::PlayListModel(QObject *parent) : QAbstractListModel(parent) {
+PlayListModel::PlayListModel(QObject *parent) : QAbstractItemModel(parent) {
     fileLists = QList<FileInfo>();
 }
 
@@ -24,3 +24,13 @@ QVariant PlayListModel::data(const QModelIndex &index, int role) const {
 int PlayListModel::rowCount(const QModelIndex &parent) const {
     return fileLists.size();
 }
+
+bool PlayListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    if (index.isValid()) {
+        int row = index.row();
+        FileInfo data = fileLists.at(row);
+    }
+
+    return true;
+}
+

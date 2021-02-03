@@ -5,9 +5,31 @@
 #ifndef J_TOOL_PLAYLISTMODEL_H
 #define J_TOOL_PLAYLISTMODEL_H
 
+#include <QAbstractListModel>
 
-class PlayListModel {
+typedef struct FileInfo {
+    QString filename;
+    QString url;
+    QString type;
+    QString size;
+    QString duration;
+} FileInfo;
+Q_DECLARE_METATYPE(FileInfo)
 
+class PlayListModel : QAbstractListModel {
+Q_OBJECT
+
+public:
+
+    explicit PlayListModel();
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    QVariant data(const QModelIndex &index, int role) const override;
+
+private:
+
+    QList<FileInfo> fileLists;
 };
 
 

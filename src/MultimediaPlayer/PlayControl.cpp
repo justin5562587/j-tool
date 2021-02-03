@@ -55,7 +55,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     advancedLayout->addWidget(screenshotBtn);
 
     connect(openBtn, &QAbstractButton::clicked, this, &PlayControl::open);
-    connect(playBtn, &QAbstractButton::clicked, this, &PlayControl::playClicked);
+    connect(playBtn, &QAbstractButton::clicked, this, &PlayControl::play);
 
     // layout
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -90,12 +90,12 @@ void PlayControl::open() {
 //    }
 }
 
-void PlayControl::playClicked() {
-
+void PlayControl::play() {
+    emit emitPlay();
 }
 
 void PlayControl::addUrlFromInput() {
     const QString url = urlInput->text();
-    // todo insert file url
+    emit emitAddToPlayList(url);
 }
 

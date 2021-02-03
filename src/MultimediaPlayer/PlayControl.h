@@ -25,15 +25,17 @@ public slots:
 
     void open();
 
-    void playClicked();
+    void play();
 
     void addUrlFromInput();
 
 signals:
 
-    void play();
+    void emitAddToPlayList(const QString& url);
 
-    void pause();
+    void emitPlay();
+
+    void emitPause();
 
 private:
 

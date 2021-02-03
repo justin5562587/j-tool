@@ -20,6 +20,10 @@ public:
 
     ~MultimediaPlayer();
 
+public slots:
+
+    void addToPlayList(const QString& url);
+
 private:
 
     QVector<QString> fileList;

@@ -10,6 +10,8 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
 };
 
 class FFmpegDecoder {
@@ -23,6 +25,8 @@ public:
 
     int openCodec();
 
+    int beginDecode(AVPixelFormat dstFormat);
+
     int decode();
 
 private:
@@ -34,6 +38,12 @@ private:
     AVCodecContext *audioCodecContext;
     AVStream *videoStream;
     AVStream *audioStream;
+
+    uint8_t *buffer;
+    AVFrame *frame;
+    AVFrame *retFrame;
+    AVPacket *packet;
+    SwsContext *swsContext;
 
     int videoStreamIndex;
     int audioStreamIndex;

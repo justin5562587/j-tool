@@ -47,6 +47,8 @@ public slots:
 
     void filterScreenshot();
 
+    void testOthers();
+
 private:
 
     QMediaPlayer *m_mediaPlayer = nullptr;
@@ -57,6 +59,7 @@ private:
     QAbstractButton *m_videoRecordBtn = nullptr;
     QAbstractButton *m_audioRecordBtn = nullptr;
     QAbstractButton *m_filterBtn = nullptr;
+    QAbstractButton *m_testBtn = nullptr;
 
     FFmpegFrame m_ffmpegFrame;
     FFmpegRecord m_ffmpegRecord;

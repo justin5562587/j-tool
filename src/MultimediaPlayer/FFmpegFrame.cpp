@@ -17,23 +17,11 @@ FFmpegFrame::~FFmpegFrame() {
 int FFmpegFrame::initializeFFmpeg(const std::string &filepath) {
     avformat_open_input(&pAVFormatContext, filepath.c_str(), nullptr, nullptr);
 
-    videoStreamIndex = -1;
-    for (int i = 0; i < pAVFormatContext->nb_streams; ++i) {
-        if (pAVFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIndex = i;
-        }
-        if (pAVFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            audioStreamIndex = i;
-        }
-    }
-
-    if (videoStreamIndex == -1) {
-        std::cout << "\ncannot find video stream";
-        return -1;
-    }
+    videoStreamIndex = av_find_best_stream(pAVFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &pAVCodec, 0);
+//    audioStreamIndex = av_find_best_stream(pAVFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, &pAVCodec, 0);
 
     // find video decoder
-    pAVCodec = avcodec_find_decoder(pAVFormatContext->streams[videoStreamIndex]->codecpar->codec_id);
+//    pAVCodec = avcodec_find_decoder(pAVFormatContext->streams[videoStreamIndex]->codecpar->codec_id);
     pAVCodecContext = avcodec_alloc_context3(pAVCodec);
     avcodec_parameters_to_context(pAVCodecContext, pAVFormatContext->streams[videoStreamIndex]->codecpar);
 

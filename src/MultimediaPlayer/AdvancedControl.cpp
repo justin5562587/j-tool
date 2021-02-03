@@ -8,6 +8,8 @@
 #include <QStandardPaths>
 #include <QBoxLayout>
 
+#include "./test_ffmpeg_io.cpp"
+
 AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     m_ffmpegFrame = FFmpegFrame();
     m_ffmpegRecord = FFmpegRecord();
@@ -25,6 +27,8 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     connect(m_audioRecordBtn, &QAbstractButton::clicked, this, &AdvancedControl::recordAudio);
     m_filterBtn = new QPushButton("Filter", this);
     connect(m_filterBtn, &QAbstractButton::clicked, this, &AdvancedControl::filterScreenshot);
+    m_testBtn = new QPushButton("Test", this);
+    connect(m_testBtn, &QAbstractButton::clicked, this, &AdvancedControl::testOthers);
 
     inactive();
 
@@ -35,6 +39,7 @@ AdvancedControl::AdvancedControl(QWidget *parent) : QWidget(parent) {
     layout->addWidget(m_videoRecordBtn);
     layout->addWidget(m_audioRecordBtn);
     layout->addWidget(m_filterBtn);
+    layout->addWidget(m_testBtn);
     setLayout(layout);
 }
 
@@ -103,7 +108,8 @@ void AdvancedControl::logVideoCodec() {
 }
 
 void AdvancedControl::logAudioCodec() {
-    qInfo() << "\nAdvancedControl::logAudioCodec";
+//    qInfo() << "\nAdvancedControl::logAudioCodec";
+
 }
 
 void AdvancedControl::recordVideo() {
@@ -117,4 +123,9 @@ void AdvancedControl::recordAudio() {
     qInfo() << "\nAdvancedControl::recordAudio";
 //    this->setBtnStatus(AUDIO_RECORD, false);
 //    recordAudioWithFFmpeg(this, "/User/justin/Downloads/");
+}
+
+void AdvancedControl::testOthers() {
+    test("/Users/justin/cpp/j-tool");
+
 }

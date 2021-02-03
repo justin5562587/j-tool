@@ -25,15 +25,8 @@ int FFmpegRecord::initializeRecordDevice() {
     pAVInputFormat = av_find_input_format("avfoundation");
     avformat_open_input(&pAVFormatContext, "0", pAVInputFormat, &options);
 
-    videoStreamIndex = -1;
-    for (int i = 0; i < pAVFormatContext->nb_streams; ++i) {
-        if (pAVFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIndex = i;
-            break;
-        }
-    }
+    videoStreamIndex = av_find_best_stream(pAVFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &pAVCodec, 0);
 
-    pAVCodec = avcodec_find_decoder(pAVFormatContext->streams[videoStreamIndex]->codecpar->codec_id);
     pAVCodecContext = avcodec_alloc_context3(pAVCodec);
     avcodec_parameters_to_context(pAVCodecContext, pAVFormatContext->streams[videoStreamIndex]->codecpar);
     avcodec_open2(pAVCodecContext, pAVCodec, nullptr);

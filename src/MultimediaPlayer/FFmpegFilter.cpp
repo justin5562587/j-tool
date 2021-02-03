@@ -4,6 +4,8 @@
 
 #include "FFmpegFilter.h"
 
+#include <libavutil/hwcontext.h>
+
 //const char *filterDescr = "scale=78:24,transpose=cclock";
 //const char *filterDescr = "movie=/Users/justin/Downloads/example_files/1111.jpg[wm];[in][wm]overlay=5:5[out]";
 //const char *filterDescr = "delogo=x=0:y=0:w=100:h=77:band=10";
@@ -37,16 +39,8 @@ int FFmpegFilter::initializeOpenFile(const std::string &filepath) {
     avformat_open_input(&formatContext, filepath.c_str(), nullptr, nullptr);
     avformat_find_stream_info(formatContext, nullptr);
 
-    for (int i = 0; i < formatContext->nb_streams; ++i) {
-        if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoIndexStream = i;
-            break;
-        }
-    }
-
-//    videoIndexStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
-
-    codec = avcodec_find_decoder(formatContext->streams[videoIndexStream]->codecpar->codec_id);
+    // set video stream index && set codec for video
+    videoIndexStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
 
     // create decode context
     codecContext = avcodec_alloc_context3(codec);

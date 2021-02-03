@@ -10,7 +10,7 @@ A integrated desktop tools for programmers or officers
     1. Save playback history
     2. More advanced control buttons (screen size control)
     3. Dark/Light mode https://github.com/ColinDuquesnoy/QDarkStyleSheet
-    
+
 - Format Convertor *_todo*
 
 - PDF Processor *_todo*
@@ -39,17 +39,5 @@ A integrated desktop tools for programmers or officers
 - [ffmpeg tutorial](http://dranger.com/ffmpeg/tutorial01.html)
 
 - [**ffmpeg** - *processor of audio and video*](https://ffmpeg.org/)
-
-## Reference Tools
-- [Website for File examples](https://file-examples.com/)
-
-## Reference Websites
-- [isocpp.org](https://isocpp.org/)
-
-## Reference Books
-| Book Name | Author | Year |
-|:----------|:-------------|------:|
-| CMake CMake Cookbook |  Bast, Radovan; Di Remigio, Roberto | 2018 |
-| Fundamentals of Multimedia | Ze-Nian Li | 2014 |
 
 https://www.cnblogs.com/leisure_chn/p/10047035.html

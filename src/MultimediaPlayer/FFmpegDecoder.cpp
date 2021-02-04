@@ -4,6 +4,8 @@
 
 #include "FFmpegDecoder.h"
 
+const std::string diskPath = "/Users/justin/Downloads";
+
 FFmpegDecoder::FFmpegDecoder() {
 
 }
@@ -45,7 +47,7 @@ int FFmpegDecoder::openCodec() {
     return 0;
 }
 
-int FFmpegDecoder::beginDecode(AVPixelFormat dstFormat) {
+void FFmpegDecoder::beginDecode(AVPixelFormat dstFormat) {
     swsContext = sws_alloc_context();
     sws_getContext(
             videoCodecContext->width,
@@ -79,30 +81,42 @@ int FFmpegDecoder::decode() {
     int ret;
     while (av_read_frame(formatContext, packet) == 0) {
         ret = avcodec_send_packet(videoCodecContext, packet);
-        if (ret != 0) {
+        if (ret != 0) return ret;
+
+        ret = avcodec_receive_frame(videoCodecContext, frame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            continue;
+        } else if (ret < 0) {
             return ret;
         }
 
-        while (ret >= 0) {
-            ret = avcodec_receive_frame(videoCodecContext, frame);
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-                return;
-            else if (ret < 0) {
-                fprintf(stderr, "Error during decoding\n");
-                exit(1);
-            }
+        sws_scale(
+                swsContext,
+                frame->data,
+                frame->linesize,
+                0,
+                videoCodecContext->height,
+                retFrame->data,
+                retFrame->linesize
+        );
 
-            printf("saving frame %3d\n", dec_ctx->frame_number);
-            fflush(stdout);
+        // todo write frame to disk image
 
-            /* the picture is allocated by the decoder. no need to
-               free it */
-            snprintf(buf, sizeof(buf), "%s-%d", filename, dec_ctx->frame_number);
-            pgm_save(frame->data[0], frame->linesize[0],
-                     frame->width, frame->height, buf);
-        }
+
+        av_packet_unref(packet);
     }
 
     return 0;
+}
+
+void FFmpegDecoder::deallocate() {
+    avformat_close_input(&formatContext);
+    avcodec_free_context(&videoCodecContext);
+    av_frame_free(&frame);
+    av_frame_free(&retFrame);
+    av_packet_free(&packet);
+    sws_freeContext(swsContext);
+    av_free(buffer);
+    av_free(videoStream);
 }
 

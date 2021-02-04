@@ -25,9 +25,11 @@ public:
 
     int openCodec();
 
-    int beginDecode(AVPixelFormat dstFormat);
+    void beginDecode(AVPixelFormat dstFormat);
 
     int decode();
+
+    void deallocate();
 
 private:
 

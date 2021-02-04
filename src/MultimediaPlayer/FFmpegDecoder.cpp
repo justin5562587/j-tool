@@ -6,26 +6,27 @@
 
 const std::string diskPath = "/Users/justin/Downloads/";
 AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;
-
-std::string saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
-    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-    );
-    const std::string fullFilename = filename + std::to_string(ms.count()) + ".yuv";
-
-//    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
-    std::ofstream outFile(fullFilename, std::ofstream::binary);
-
-    // write header
-    outFile << "P6\n" << width << " " << height << "\n" << "255\n";
-    // Write pixel data
-    for (int y = 0; y < height; y++) {
-        outFile.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
-    }
-
-    outFile.close();
-    return fullFilename;
-}
+//
+//std::string saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
+//    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+//            std::chrono::system_clock::now().time_since_epoch()
+//    );
+//    const std::string fullFilename = filename + std::to_string(ms.count()) + ".yuv";
+//
+////    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+//    std::ofstream outFile(fullFilename, std::ofstream::binary);
+//
+//    // write header
+//    outFile << "P6\n" << width << " " << height << "\n" << "255\n";
+//    // Write pixel data
+//    for (int y = 0; y < height; y++) {
+//        outFile.write((const char *) pFrame->data[0],  );
+//        outFile.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
+//    }
+//
+//    outFile.close();
+//    return fullFilename;
+//}
 
 void delay(int msec)
 {
@@ -170,7 +171,7 @@ int FFmpegDecoder::decode() {
 //            char buff[100];
 //            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
 //            std::string filename = buff;
-
+//
 //            std::string filepath = saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
 
             QImage img((uchar *) retFrame->data[0], videoCodecContext->width, videoCodecContext->height,

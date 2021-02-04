@@ -20,6 +20,13 @@ extern "C" {
 #include <libavutil/imgutils.h>
 };
 
+typedef struct CustomDecodeInfo {
+    AVPixelFormat dstFormat;
+    int dstWidth;
+    int dstHeight;
+
+} CustomDecodeInfo;
+
 class FFmpegDecoder {
 public:
 

@@ -39,5 +39,3 @@ A integrated desktop tools for programmers or officers
 - [ffmpeg tutorial](http://dranger.com/ffmpeg/tutorial01.html)
 
 - [**ffmpeg** - *processor of audio and video*](https://ffmpeg.org/)
-
-https://www.cnblogs.com/leisure_chn/p/10047035.html

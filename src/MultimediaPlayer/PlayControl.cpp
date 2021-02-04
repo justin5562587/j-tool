@@ -15,6 +15,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     connect(addUrlBtn, &QAbstractButton::clicked, this, &PlayControl::addUrlFromInput);
     urlInput = new QLineEdit(this);
     urlInput->setPlaceholderText("Input File Url");
+    urlInput->setText("/Users/justin/Downloads/example_files/file_example_MP4_1920_18MG.mp4");
     QHBoxLayout *addLayout = new QHBoxLayout;
     addLayout->addWidget(openBtn);
     addLayout->addWidget(addUrlBtn);

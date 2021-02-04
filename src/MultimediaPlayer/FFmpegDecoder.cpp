@@ -4,9 +4,28 @@
 
 #include "FFmpegDecoder.h"
 
-const std::string diskPath = "/Users/justin/Downloads";
+// /Users/justin/Downloads/example_files/file_example_MP4_1920_18MG.mp4
+
+const std::string diskPath = "/Users/justin/Downloads/";
 AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;
 //AVPixelFormat dstFormat = AV_PIX_FMT_YUV420P;
+
+int saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    );
+    const std::string fullFilename = filename + std::to_string(ms.count()) + ".ppm";
+    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    // write header
+    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
+    // Write pixel data
+    for (int y = 0; y < height; y++) {
+        ofs.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
+    }
+
+    ofs.close();
+    return 0;
+}
 
 FFmpegDecoder::FFmpegDecoder() {
 
@@ -67,7 +86,7 @@ int FFmpegDecoder::openCodec() {
 
 int FFmpegDecoder::beginDecode() {
     swsContext = sws_alloc_context();
-    sws_getContext(
+    swsContext = sws_getContext(
             videoCodecContext->width,
             videoCodecContext->height,
             videoCodecContext->pix_fmt,
@@ -80,7 +99,12 @@ int FFmpegDecoder::beginDecode() {
     frame = av_frame_alloc();
     retFrame = av_frame_alloc();
     packet = av_packet_alloc();
-    int nBytes = av_image_get_buffer_size(dstFormat, videoCodecContext->width, videoCodecContext->height, 32);
+    av_image_alloc(
+            retFrame->data, retFrame->linesize,
+            videoCodecContext->width, videoCodecContext->height,
+            dstFormat, 32
+    );
+/*    int nBytes = av_image_get_buffer_size(dstFormat, videoCodecContext->width, videoCodecContext->height, 32);
     buffer = (uint8_t *) av_malloc(nBytes * sizeof(uint8_t));
 
     av_image_fill_arrays(
@@ -91,7 +115,7 @@ int FFmpegDecoder::beginDecode() {
             videoCodecContext->width,
             videoCodecContext->height,
             32
-    );
+    );*/
 
     return 0;
 }
@@ -99,30 +123,50 @@ int FFmpegDecoder::beginDecode() {
 int FFmpegDecoder::decode() {
     int ret;
     int times = 0;
-    while (av_read_frame(formatContext, packet) == 0 && ++times != 50) {
-        ret = avcodec_send_packet(videoCodecContext, packet);
-        if (ret != 0) return ret;
-
-        ret = avcodec_receive_frame(videoCodecContext, frame);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            continue;
-        } else if (ret < 0) {
+    while ((ret = av_read_frame(formatContext, packet)) == 0 && ++times != 50) {
+        if (ret != 0) {
+            av_strerror(ret, errorMessage, sizeof(errorMessage));
+            std::cout << "av_read_frame: " << errorMessage << std::endl;
             return ret;
         }
 
-        sws_scale(
-                swsContext,
-                frame->data,
-                frame->linesize,
-                0,
-                videoCodecContext->height,
-                retFrame->data,
-                retFrame->linesize
-        );
+        if (packet->stream_index == videoStreamIndex) {
+            ret = avcodec_send_packet(videoCodecContext, packet);
+            if (ret != 0) {
+                av_strerror(ret, errorMessage, sizeof(errorMessage));
+                std::cout << "avcodec_send_packet: " << errorMessage << std::endl;
 
-        // todo write frame to disk image
-        std::cout << retFrame->pts << std::endl;
+                return ret;
+            }
 
+            ret = avcodec_receive_frame(videoCodecContext, frame);
+            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                continue;
+            } else if (ret < 0) {
+                av_strerror(ret, errorMessage, sizeof(errorMessage));
+                std::cout << "avcodec_receive_frame: " << errorMessage << std::endl;
+                return ret;
+            }
+
+//        sws_scale(
+//                swsContext,
+//                (uint8_t const *const *) frame->data,
+//                frame->linesize,
+//                0,
+//                videoCodecContext->height,
+//                retFrame->data,
+//                retFrame->linesize
+//        );
+
+            // todo write frame to disk image
+            std::cout << "times: " << times << " frame->pts: " << frame->pts << std::endl;
+
+            char buff[100];
+            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
+            std::string filename = buff;
+
+            saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
+        }
         av_packet_unref(packet);
     }
 
@@ -136,8 +180,7 @@ int FFmpegDecoder::deallocate() {
     av_frame_free(&retFrame);
     av_packet_free(&packet);
     sws_freeContext(swsContext);
-    av_free(buffer);
-    av_free(videoStream);
+//    av_free(buffer);
+//    av_free(videoStream);
     return 0;
 }
-

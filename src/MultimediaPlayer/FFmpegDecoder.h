@@ -7,6 +7,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -35,6 +36,8 @@ private:
     int decode();
 
     int deallocate();
+
+    char errorMessage[100];
 
     AVFormatContext *formatContext;
     AVCodec *videoCodec;

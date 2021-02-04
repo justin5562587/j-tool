@@ -4,27 +4,34 @@
 
 #include "FFmpegDecoder.h"
 
-// /Users/justin/Downloads/example_files/file_example_MP4_1920_18MG.mp4
-
 const std::string diskPath = "/Users/justin/Downloads/";
 AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;
-//AVPixelFormat dstFormat = AV_PIX_FMT_YUV420P;
 
-int saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
+std::string saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
-    const std::string fullFilename = filename + std::to_string(ms.count()) + ".ppm";
-    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    const std::string fullFilename = filename + std::to_string(ms.count()) + ".yuv";
+
+//    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
+    std::ofstream outFile(fullFilename, std::ofstream::binary);
+
     // write header
-    ofs << "P6\n" << width << " " << height << "\n" << "255\n";
+    outFile << "P6\n" << width << " " << height << "\n" << "255\n";
     // Write pixel data
     for (int y = 0; y < height; y++) {
-        ofs.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
+        outFile.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
     }
 
-    ofs.close();
-    return 0;
+    outFile.close();
+    return fullFilename;
+}
+
+void delay(int msec)
+{
+    QTime dieTime = QTime::currentTime().addMSecs(msec);
+    while( QTime::currentTime() < dieTime )
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
 FFmpegDecoder::FFmpegDecoder() {
@@ -123,7 +130,7 @@ int FFmpegDecoder::beginDecode() {
 int FFmpegDecoder::decode() {
     int ret;
     int times = 0;
-    while ((ret = av_read_frame(formatContext, packet)) == 0 && ++times != 50) {
+    while ((ret = av_read_frame(formatContext, packet)) == 0) {
         if (ret != 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             std::cout << "av_read_frame: " << errorMessage << std::endl;
@@ -148,24 +155,28 @@ int FFmpegDecoder::decode() {
                 return ret;
             }
 
-//        sws_scale(
-//                swsContext,
-//                (uint8_t const *const *) frame->data,
-//                frame->linesize,
-//                0,
-//                videoCodecContext->height,
-//                retFrame->data,
-//                retFrame->linesize
-//        );
+            sws_scale(
+                    swsContext,
+                    (uint8_t const *const *) frame->data,
+                    frame->linesize,
+                    0,
+                    videoCodecContext->height,
+                    retFrame->data,
+                    retFrame->linesize
+            );
 
             // todo write frame to disk image
             std::cout << "times: " << times << " frame->pts: " << frame->pts << std::endl;
+//            char buff[100];
+//            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
+//            std::string filename = buff;
 
-            char buff[100];
-            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
-            std::string filename = buff;
+//            std::string filepath = saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
 
-            saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
+            QImage img((uchar *) retFrame->data[0], videoCodecContext->width, videoCodecContext->height,
+                       QImage::Format_RGB888);
+            screen->setPixmap(QPixmap::fromImage(img));
+            delay(40);
         }
         av_packet_unref(packet);
     }
@@ -180,7 +191,9 @@ int FFmpegDecoder::deallocate() {
     av_frame_free(&retFrame);
     av_packet_free(&packet);
     sws_freeContext(swsContext);
-//    av_free(buffer);
-//    av_free(videoStream);
     return 0;
+}
+
+void FFmpegDecoder::setScreen(QLabel *label) {
+    this->screen = label;
 }

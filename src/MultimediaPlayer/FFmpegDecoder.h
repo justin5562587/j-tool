@@ -8,6 +8,10 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <QLabel>
+#include <QImage>
+#include <QTime>
+#include <QCoreApplication>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -24,6 +28,8 @@ public:
     ~FFmpegDecoder();
 
     int decodeVideo(const std::string& filename);
+
+    void setScreen(QLabel *label);
 
 private:
 
@@ -56,7 +62,7 @@ private:
     int videoStreamIndex;
     int audioStreamIndex;
 
-
+    QLabel *screen;
 };
 
 

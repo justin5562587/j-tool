@@ -10,17 +10,17 @@
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     fFmpegDecoder = FFmpegDecoder();
 
-    // initialize screen && playControl
     playControl = new PlayControl(this);
     connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
     connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
 
     screen = new QLabel(this);
-    screen->setText("screen");
-    QPixmap pixmap("/Users/justin/Downloads/1111.jpg");
+    QPixmap pixmap("/Users/justin/Downloads/example_files/blackbuck.bmp");
     screen->setPixmap(pixmap);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    fFmpegDecoder.setScreen(screen);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(screen);
     layout->addWidget(playControl);
 }

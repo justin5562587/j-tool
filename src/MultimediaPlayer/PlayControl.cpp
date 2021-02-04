@@ -91,7 +91,8 @@ void PlayControl::open() {
 }
 
 void PlayControl::play() {
-    emit emitPlay();
+    const QString url = urlInput->text();
+    emit emitPlay(url);
 }
 
 void PlayControl::addUrlFromInput() {

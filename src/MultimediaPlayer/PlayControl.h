@@ -33,7 +33,7 @@ signals:
 
     void emitAddToPlayList(const QString& url);
 
-    void emitPlay();
+    void emitPlay(const QString& filename);
 
     void emitPause();
 

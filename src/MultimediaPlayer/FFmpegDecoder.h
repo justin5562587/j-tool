@@ -6,6 +6,7 @@
 #define J_TOOL_FFMPEGDECODER_H
 
 #include <string>
+#include <iostream>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -21,17 +22,19 @@ public:
 
     ~FFmpegDecoder();
 
+    int decodeVideo(const std::string& filename);
+
+private:
+
     int openFile(const std::string& filename);
 
     int openCodec();
 
-    void beginDecode(AVPixelFormat dstFormat);
+    int beginDecode();
 
     int decode();
 
-    void deallocate();
-
-private:
+    int deallocate();
 
     AVFormatContext *formatContext;
     AVCodec *videoCodec;

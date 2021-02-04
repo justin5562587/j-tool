@@ -5,6 +5,8 @@
 #include "FFmpegDecoder.h"
 
 const std::string diskPath = "/Users/justin/Downloads";
+AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;
+//AVPixelFormat dstFormat = AV_PIX_FMT_YUV420P;
 
 FFmpegDecoder::FFmpegDecoder() {
 
@@ -13,6 +15,22 @@ FFmpegDecoder::FFmpegDecoder() {
 FFmpegDecoder::~FFmpegDecoder() {
 
 }
+
+int FFmpegDecoder::decodeVideo(const std::string &filename) {
+    int ret;
+    ret = openFile(filename);
+    if (ret < 0) return ret;
+    ret = openCodec();
+    if (ret < 0) return ret;
+    ret = beginDecode();
+    if (ret < 0) return ret;
+    ret = decode();
+    if (ret < 0) return ret;
+    deallocate();
+
+    return 0;
+}
+
 
 int FFmpegDecoder::openFile(const std::string &filename) {
     int ret;
@@ -47,7 +65,7 @@ int FFmpegDecoder::openCodec() {
     return 0;
 }
 
-void FFmpegDecoder::beginDecode(AVPixelFormat dstFormat) {
+int FFmpegDecoder::beginDecode() {
     swsContext = sws_alloc_context();
     sws_getContext(
             videoCodecContext->width,
@@ -74,12 +92,14 @@ void FFmpegDecoder::beginDecode(AVPixelFormat dstFormat) {
             videoCodecContext->height,
             32
     );
+
     return 0;
 }
 
 int FFmpegDecoder::decode() {
     int ret;
-    while (av_read_frame(formatContext, packet) == 0) {
+    int times = 0;
+    while (av_read_frame(formatContext, packet) == 0 && ++times != 50) {
         ret = avcodec_send_packet(videoCodecContext, packet);
         if (ret != 0) return ret;
 
@@ -101,7 +121,7 @@ int FFmpegDecoder::decode() {
         );
 
         // todo write frame to disk image
-
+        std::cout << retFrame->pts << std::endl;
 
         av_packet_unref(packet);
     }
@@ -109,7 +129,7 @@ int FFmpegDecoder::decode() {
     return 0;
 }
 
-void FFmpegDecoder::deallocate() {
+int FFmpegDecoder::deallocate() {
     avformat_close_input(&formatContext);
     avcodec_free_context(&videoCodecContext);
     av_frame_free(&frame);
@@ -118,5 +138,6 @@ void FFmpegDecoder::deallocate() {
     sws_freeContext(swsContext);
     av_free(buffer);
     av_free(videoStream);
+    return 0;
 }
 

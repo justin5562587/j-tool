@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QListView>
 
+#include "./FFmpegDecoder.h"
 #include "./PlayControl.h"
 
 class MultimediaPlayer : public QWidget {
@@ -24,6 +25,8 @@ public slots:
 
     void addToPlayList(const QString& url);
 
+    void play(const QString& filename);
+
 private:
 
     QVector<QString> fileList;
@@ -31,6 +34,8 @@ private:
     QLabel *screen;
 
     PlayControl *playControl;
+
+    FFmpegDecoder fFmpegDecoder;
 };
 
 

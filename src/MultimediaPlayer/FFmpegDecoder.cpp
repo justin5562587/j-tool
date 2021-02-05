@@ -86,7 +86,7 @@ int FFmpegDecoder::openCodec() {
     if (ret != 0) return ret;
 
     audioCodecContext = avcodec_alloc_context3(audioCodec);
-    ret = avcodec_parameters_to_context(videoCodecContext, formatContext->streams[audioStreamIndex]->codecpar);
+    ret = avcodec_parameters_to_context(audioCodecContext, formatContext->streams[audioStreamIndex]->codecpar);
     if (ret < 0) return ret;
     ret = avcodec_open2(audioCodecContext, audioCodec, nullptr);
     if (ret != 0) return ret;
@@ -132,7 +132,7 @@ int FFmpegDecoder::beginDecode() {
 
 int FFmpegDecoder::decode() {
     int ret, times = 0;
-    std::ofstream outfile("decode_audio.pcm", std::ios::out | std::ios::binary);
+//    std::ofstream outfile("decode_audio.pcm", std::ios::out | std::ios::binary);
 
     while ((ret = av_read_frame(formatContext, packet)) == 0) {
         if (ret != 0) {
@@ -140,20 +140,20 @@ int FFmpegDecoder::decode() {
             std::cout << "av_read_frame: " << errorMessage << std::endl;
             return ret;
         }
-//        if (packet->stream_index == videoStreamIndex) {
-//            ret = decodeVideo();
-//            if (ret < 0) return ret;
-//        }
-        if (packet->stream_index == audioStreamIndex) {
-            ret = decodeAudio(&outfile);
-
+        if (packet->stream_index == videoStreamIndex) {
+            ret = decodeVideo();
             if (ret < 0) return ret;
         }
+//        if (packet->stream_index == audioStreamIndex) {
+//            ret = decodeAudio(&outfile);
+//
+//            if (ret < 0) return ret;
+//        }
 
         av_packet_unref(packet);
     }
 
-    outfile.close();
+//    outfile.close();
     return 0;
 }
 

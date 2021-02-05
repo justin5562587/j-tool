@@ -18,6 +18,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+
+#include <libavutil/frame.h>
+#include <libavutil/mem.h>
 };
 
 typedef struct CustomDecodeInfo {
@@ -34,7 +37,7 @@ public:
 
     ~FFmpegDecoder();
 
-    int decodeVideo(const std::string& filename);
+    int decodeMultimediaFile(const std::string& filename);
 
     void setScreen(QLabel *label);
 
@@ -48,6 +51,10 @@ private:
 
     int decode();
 
+    int decodeVideo();
+
+    int decodeAudio(std::ofstream *outfile);
+
     int deallocate();
 
     char errorMessage[100];
@@ -57,8 +64,6 @@ private:
     AVCodecContext *videoCodecContext;
     AVCodec *audioCodec;
     AVCodecContext *audioCodecContext;
-    AVStream *videoStream;
-    AVStream *audioStream;
 
     uint8_t *buffer;
     AVFrame *frame;

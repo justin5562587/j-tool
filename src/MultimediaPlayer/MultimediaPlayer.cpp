@@ -36,5 +36,5 @@ void MultimediaPlayer::addToPlayList(const QString &url) {
 
 void MultimediaPlayer::play(const QString &filename) {
     qInfo() << "Video File: " << filename;
-    fFmpegDecoder.decodeVideo(filename.toStdString());
+    fFmpegDecoder.decodeMultimediaFile(filename.toStdString());
 }

@@ -29,11 +29,9 @@ public slots:
 
 private:
 
-    QVector<QString> fileList;
-
     QLabel *screen;
-
     PlayControl *playControl;
+    QListView *playlistView;
 
     FFmpegDecoder fFmpegDecoder;
 };

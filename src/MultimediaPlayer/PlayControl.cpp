@@ -49,6 +49,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     playLayout->addWidget(durationSlider);
     playLayout->addWidget(muteBtn);
     playLayout->addWidget(volumeSlider);
+    playLayout->addWidget(toPlaylistBtn);
 
     // advanced layout
     QHBoxLayout *advancedLayout = new QHBoxLayout;

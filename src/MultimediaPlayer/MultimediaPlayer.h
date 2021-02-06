@@ -8,9 +8,11 @@
 #include <QWidget>
 #include <QLabel>
 #include <QListView>
+#include <QMediaPlaylist>
 
 #include "./FFmpegDecoder.h"
 #include "./PlayControl.h"
+#include "./PlaylistModel.h"
 
 class MultimediaPlayer : public QWidget {
 Q_OBJECT
@@ -27,11 +29,16 @@ public slots:
 
     void play(const QString& filename);
 
+    void jump(const QModelIndex &index);
+
 private:
 
     QLabel *screen;
     PlayControl *playControl;
     QListView *playlistView;
+
+    PlaylistModel *playlistModel = nullptr;
+    QMediaPlaylist *playlist = nullptr;
 
     FFmpegDecoder fFmpegDecoder;
 };

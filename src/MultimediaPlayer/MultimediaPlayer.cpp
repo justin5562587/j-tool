@@ -10,6 +10,13 @@
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     fFmpegDecoder = FFmpegDecoder();
 
+    playlist = new QMediaPlaylist();
+    playlistModel = new PlaylistModel(this);
+    playlistModel->setPlaylist(playlist);
+    playlistView = new QListView;
+    playlistView->setModel(playlistModel);
+    connect(playlistView, &QAbstractItemView::activated, this, &MultimediaPlayer::jump);
+
     playControl = new PlayControl;
     connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
     connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
@@ -18,8 +25,6 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     screen = new QLabel;
     screen->setStyleSheet("QLabel { background-color : black; }");
     fFmpegDecoder.setScreen(screen);
-
-    playlistView = new QListView;
 
     QGridLayout *displayLayout = new QGridLayout;
     displayLayout->addWidget(screen, 0, 0, 1, 2);
@@ -35,9 +40,17 @@ MultimediaPlayer::~MultimediaPlayer() {
 
 }
 
-void MultimediaPlayer::addToPlayList(const QString &url) {
-    qInfo() << url;
-//    fileList.push_back(url);
+void MultimediaPlayer::addToPlayList(const QString &filepath) {
+    QUrl url = QUrl(filepath);
+    playlist->addMedia(url);
+}
+
+void MultimediaPlayer::jump(const QModelIndex &index) {
+    if (index.isValid()) {
+        playlist->setCurrentIndex(index.row());
+        QUrl currentFileUrl = playlist->currentMedia().request().url();
+        play(currentFileUrl.toString());
+    }
 }
 
 void MultimediaPlayer::play(const QString &filename) {

@@ -9,6 +9,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavdevice/avdevice.h>
 #include <libavutil/avutil.h>
+#include <libavcodec/avcodec.h>
 };
 
 class FFmpegRecorder {
@@ -24,6 +25,10 @@ public:
 private:
 
     int openDevice();
+
+    int beginRecord();
+
+    int record();
 
     int deallocate();
 

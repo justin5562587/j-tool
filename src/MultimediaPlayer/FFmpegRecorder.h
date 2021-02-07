@@ -37,7 +37,6 @@ private:
     AVInputFormat *inputFormat;
     AVFormatContext *formatContext;
 
-
 };
 
 

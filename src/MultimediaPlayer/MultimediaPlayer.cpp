@@ -3,10 +3,9 @@
 //
 
 #include <QBoxLayout>
+#include <QVector>
 
 #include "./MultimediaPlayer.h"
-
-#include <QVector>
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     ffmpegDecoder = FFmpegDecoder();
@@ -32,6 +31,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     playControl = new PlayControl;
     connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
     connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
+    connect(playControl, &PlayControl::emitStop, this, &MultimediaPlayer::stop);
 
     recordControl = new RecordControl;
     connect(recordControl, &RecordControl::emitRecordVideo, this, &MultimediaPlayer::recordVideo);
@@ -62,6 +62,10 @@ void MultimediaPlayer::jump(const QModelIndex &index) {
 
 void MultimediaPlayer::play(const QString &filename) {
     ffmpegDecoder.decodeMultimediaFile(filename.toStdString());
+}
+
+void MultimediaPlayer::stop() {
+    ffmpegDecoder.stopDecode();
 }
 
 void MultimediaPlayer::recordAudio() {

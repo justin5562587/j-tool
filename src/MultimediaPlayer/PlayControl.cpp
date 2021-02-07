@@ -33,6 +33,8 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     backwardBtn->setIcon(style()->standardIcon(QStyle::QStyle::SP_MediaSeekBackward));
     muteBtn = new QToolButton(this);
     muteBtn->setIcon(style()->standardIcon(QStyle::SP_MediaVolumeMuted));
+    stopBtn = new QToolButton(this);
+    stopBtn->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     toPlaylistBtn = new QToolButton(this);
     toPlaylistBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogListView));
     durationSlider = new QSlider(this);
@@ -45,6 +47,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     playLayout->addWidget(playBtn);
     playLayout->addWidget(forwardBtn);
     playLayout->addWidget(nextBtn);
+    playLayout->addWidget(stopBtn);
     playLayout->addWidget(durationSlider);
     playLayout->addWidget(muteBtn);
     playLayout->addWidget(volumeSlider);
@@ -57,6 +60,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
 
     connect(openBtn, &QAbstractButton::clicked, this, &PlayControl::open);
     connect(playBtn, &QAbstractButton::clicked, this, &PlayControl::play);
+    connect(stopBtn, &QAbstractButton::clicked, this, &PlayControl::stop);
 
     // layout
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -67,9 +71,7 @@ PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-PlayControl::~PlayControl() {
-
-}
+PlayControl::~PlayControl() {}
 
 void PlayControl::open() {
     QFileDialog fileDialog(this);
@@ -89,6 +91,10 @@ void PlayControl::open() {
 void PlayControl::play() {
     const QString url = urlInput->text();
     emit emitPlay(url);
+}
+
+void PlayControl::stop() {
+    emit emitStop();
 }
 
 void PlayControl::addUrlFromInput() {

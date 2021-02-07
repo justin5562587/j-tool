@@ -31,6 +31,8 @@ public slots:
 
     void play(const QString &filename);
 
+    void stop();
+
     void jump(const QModelIndex &index);
 
     void recordVideo();

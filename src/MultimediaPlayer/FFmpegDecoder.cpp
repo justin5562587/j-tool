@@ -39,6 +39,8 @@ FFmpegDecoder::FFmpegDecoder() {}
 
 FFmpegDecoder::~FFmpegDecoder() {}
 
+// public functions -----------------
+
 void FFmpegDecoder::setScreen(QLabel *label) {
     this->screen = label;
 }
@@ -53,16 +55,27 @@ int FFmpegDecoder::decodeMultimediaFile(const std::string &filename) {
     if (ret < 0) return ret;
     ret = beginDecode();
     if (ret < 0) return ret;
-
     ret = decode();
     if (ret < 0) return ret;
-    deallocate();
+    if (hasDeallocated != 1) deallocate();
 
     return 0;
 }
 
+int FFmpegDecoder::stopDecode() {
+    abortSignal = 1;
+    return 0;
+}
+
+// private functions -----------------
+
 int FFmpegDecoder::openFile(const std::string &filename) {
     int ret;
+
+    // initialize fields for stop && abort
+    abortSignal = -1;
+    hasDeallocated = -1;
+
     formatContext = avformat_alloc_context();
     ret = avformat_open_input(&formatContext, filename.c_str(), nullptr, nullptr);
     if (ret < 0) return ret;
@@ -134,29 +147,34 @@ int FFmpegDecoder::beginDecode() {
 }
 
 int FFmpegDecoder::decode() {
-    int ret, times = 0;
+    int ret;
 //    std::ofstream outfile("decode_audio.pcm", std::ios::out | std::ios::binary);
 
-    while ((ret = av_read_frame(formatContext, packet)) == 0) {
+    while (true) {
+        if (abortSignal == 1) {
+            deallocate();
+            return 0;
+        }
+
+        ret = av_read_frame(formatContext, packet);
         if (ret != 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             std::cout << "av_read_frame: " << errorMessage << std::endl;
             return ret;
         }
+
         if (packet->stream_index == videoStreamIndex) {
             ret = decodeVideo();
             if (ret < 0) return ret;
         }
 //        if (packet->stream_index == audioStreamIndex) {
 //            ret = decodeAudio(&outfile);
-//
 //            if (ret < 0) return ret;
 //        }
 
         av_packet_unref(packet);
     }
 
-//    outfile.close();
     return 0;
 }
 
@@ -223,7 +241,6 @@ int FFmpegDecoder::decodeVideo() {
 //            char buff[100];
 //            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
 //            std::string filename = buff;
-//
 //            std::string filepath = saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
 
     QImage img((uchar *) retFrame->data[0], videoCodecContext->width, videoCodecContext->height,
@@ -235,11 +252,14 @@ int FFmpegDecoder::decodeVideo() {
 }
 
 int FFmpegDecoder::deallocate() {
+    if (hasDeallocated == 1) return 0;
     avformat_close_input(&formatContext);
     avcodec_free_context(&videoCodecContext);
+    avcodec_free_context(&audioCodecContext);
     av_frame_free(&frame);
     av_frame_free(&retFrame);
     av_packet_free(&packet);
     sws_freeContext(swsContext);
+    hasDeallocated = 1;
     return 0;
 }

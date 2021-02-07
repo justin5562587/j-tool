@@ -27,6 +27,8 @@ public slots:
 
     void play();
 
+    void stop();
+
     void addUrlFromInput();
 
 signals:
@@ -36,6 +38,8 @@ signals:
     void emitPlay(const QString& filename);
 
     void emitPause();
+
+    void emitStop();
 
 private:
 
@@ -49,6 +53,7 @@ private:
     QToolButton *forwardBtn;
     QToolButton *backwardBtn;
     QToolButton *muteBtn;
+    QToolButton *stopBtn;
     QToolButton *toPlaylistBtn;
     QSlider *durationSlider;
     QSlider *volumeSlider;

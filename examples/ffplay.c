@@ -1262,7 +1262,7 @@ static void stream_component_close(VideoState *is, int stream_index)
         break;
     }
 }
-
+// todo
 static void stream_close(VideoState *is)
 {
     /* XXX: use a special url_shutdown call to abort parse cleanly */
@@ -3072,7 +3072,7 @@ static int read_thread(void *arg)
 
         event.type = FF_QUIT_EVENT;
         event.user.data1 = is;
-        SDL_PushEvent(&event);
+        SDL_PushEvent(&event);top
     }
     SDL_DestroyMutex(wait_mutex);
     return 0;

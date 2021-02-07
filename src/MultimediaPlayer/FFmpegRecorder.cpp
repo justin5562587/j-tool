@@ -53,6 +53,7 @@ int FFmpegRecorder::record() {
     int ret, count = 0;
     AVPacket *packet = av_packet_alloc();
 
+    // todo av_read_frame will return -35
     while ((ret = av_read_frame(formatContext, packet)) == 0 && ++count < 50) {
         av_log(nullptr, AV_LOG_INFO, "packet->size: %d", packet->size);
         av_packet_unref(packet);

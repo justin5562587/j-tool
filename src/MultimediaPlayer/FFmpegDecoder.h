@@ -33,6 +33,8 @@ public:
 
     void setScreen(QLabel *label);
 
+    int stopDecode();
+
 private:
 
     int openFile(const std::string& filename);
@@ -67,7 +69,9 @@ private:
     int audioStreamIndex;
 
     QLabel *screen;
-};
 
+    int abortSignal = -1;
+    int hasDeallocated = -1;
+};
 
 #endif //J_TOOL_FFMPEGDECODER_H

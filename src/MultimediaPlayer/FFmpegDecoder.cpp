@@ -44,6 +44,8 @@ void FFmpegDecoder::setScreen(QLabel *label) {
 }
 
 int FFmpegDecoder::decodeMultimediaFile(const std::string &filename) {
+    std::cout << "FFmpegDecoder starts decode file: " << filename << std::endl;
+
     int ret;
     ret = openFile(filename);
     if (ret < 0) return ret;
@@ -51,6 +53,7 @@ int FFmpegDecoder::decodeMultimediaFile(const std::string &filename) {
     if (ret < 0) return ret;
     ret = beginDecode();
     if (ret < 0) return ret;
+
     ret = decode();
     if (ret < 0) return ret;
     deallocate();

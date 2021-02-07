@@ -25,9 +25,9 @@ public:
 
 public slots:
 
-    void addToPlayList(const QString& url);
+    void addToPlayList(const QString &url);
 
-    void play(const QString& filename);
+    void play(const QString &filename);
 
     void jump(const QModelIndex &index);
 
@@ -35,8 +35,8 @@ private:
 
     QLabel *screen;
     PlayControl *playControl;
-    QListView *playlistView;
 
+    QListView *playlistView;
     PlaylistModel *playlistModel = nullptr;
     QMediaPlaylist *playlist = nullptr;
 

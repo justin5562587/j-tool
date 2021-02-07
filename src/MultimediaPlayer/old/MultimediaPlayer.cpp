@@ -31,6 +31,8 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     m_player = new QMediaPlayer(this);
     m_player->setAudioRole(QAudio::VideoRole);
 
+    m_player->supportedMimeTypes()
+
     m_playlist = new QMediaPlaylist();
     m_player->setPlaylist(m_playlist);
 

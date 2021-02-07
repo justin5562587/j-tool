@@ -7,9 +7,12 @@
 
 #include "MultimediaPlayer.h"
 
+#include <QVector>
+
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     fFmpegDecoder = FFmpegDecoder();
 
+    // displayLayout
     playlist = new QMediaPlaylist();
     playlistModel = new PlaylistModel(this);
     playlistModel->setPlaylist(playlist);
@@ -17,20 +20,19 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     playlistView->setModel(playlistModel);
     connect(playlistView, &QAbstractItemView::activated, this, &MultimediaPlayer::jump);
 
-    playControl = new PlayControl;
-    connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
-    connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
-
-    // displayLayout
     screen = new QLabel;
     screen->setStyleSheet("QLabel { background-color : black; }");
     fFmpegDecoder.setScreen(screen);
 
-    QGridLayout *displayLayout = new QGridLayout;
-    displayLayout->addWidget(screen, 0, 0, 1, 2);
-    displayLayout->addWidget(playlistView, 0,1,1,2);
+    QBoxLayout *displayLayout = new QHBoxLayout();
+    displayLayout->addWidget(screen, 2);
+    displayLayout->addWidget(playlistView);
 
     // main layout
+    playControl = new PlayControl;
+    connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
+    connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addLayout(displayLayout);
     layout->addWidget(playControl);
@@ -54,6 +56,5 @@ void MultimediaPlayer::jump(const QModelIndex &index) {
 }
 
 void MultimediaPlayer::play(const QString &filename) {
-    qInfo() << "Video File: " << filename;
     fFmpegDecoder.decodeMultimediaFile(filename.toStdString());
 }

@@ -9,7 +9,8 @@
 #include <QVector>
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
-    fFmpegDecoder = FFmpegDecoder();
+    ffmpegDecoder = FFmpegDecoder();
+    ffmpegRecorder = FFmpegRecorder();
 
     // displayLayout
     playlist = new QMediaPlaylist();
@@ -21,7 +22,7 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
 
     screen = new QLabel;
     screen->setStyleSheet("QLabel { background-color : black; }");
-    fFmpegDecoder.setScreen(screen);
+    ffmpegDecoder.setScreen(screen);
 
     QBoxLayout *displayLayout = new QHBoxLayout();
     displayLayout->addWidget(screen, 2);
@@ -32,9 +33,14 @@ MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     connect(playControl, &PlayControl::emitAddToPlayList, this, &MultimediaPlayer::addToPlayList);
     connect(playControl, &PlayControl::emitPlay, this, &MultimediaPlayer::play);
 
+    recordControl = new RecordControl;
+    connect(recordControl, &RecordControl::emitRecordVideo, this, &MultimediaPlayer::recordVideo);
+    connect(recordControl, &RecordControl::emitRecordAudio, this, &MultimediaPlayer::recordAudio);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addLayout(displayLayout);
     layout->addWidget(playControl);
+    layout->addWidget(recordControl);
 }
 
 MultimediaPlayer::~MultimediaPlayer() {
@@ -55,5 +61,16 @@ void MultimediaPlayer::jump(const QModelIndex &index) {
 }
 
 void MultimediaPlayer::play(const QString &filename) {
-    fFmpegDecoder.decodeMultimediaFile(filename.toStdString());
+    ffmpegDecoder.decodeMultimediaFile(filename.toStdString());
 }
+
+void MultimediaPlayer::recordAudio() {
+    ffmpegRecorder.recordAudio();
+}
+
+void MultimediaPlayer::recordVideo() {
+    // todo
+    // ffmpegRecorder.recordVideo();
+}
+
+

@@ -3,9 +3,8 @@
 //
 
 #include <QBoxLayout>
-#include <QDebug>
 
-#include "MultimediaPlayer.h"
+#include "./MultimediaPlayer.h"
 
 #include <QVector>
 

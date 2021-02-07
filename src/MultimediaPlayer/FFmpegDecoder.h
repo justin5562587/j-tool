@@ -18,17 +18,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
-
 #include <libavutil/frame.h>
 #include <libavutil/mem.h>
 };
-
-typedef struct CustomDecodeInfo {
-    AVPixelFormat dstFormat;
-    int dstWidth;
-    int dstHeight;
-
-} CustomDecodeInfo;
 
 class FFmpegDecoder {
 public:

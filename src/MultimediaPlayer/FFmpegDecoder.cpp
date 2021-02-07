@@ -2,7 +2,7 @@
 // Created by justin on 2021/02/03.
 //
 
-#include "FFmpegDecoder.h"
+#include "./FFmpegDecoder.h"
 
 const std::string diskPath = "/Users/justin/Downloads/";
 AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;

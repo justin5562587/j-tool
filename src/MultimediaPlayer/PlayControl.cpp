@@ -2,11 +2,11 @@
 // Created by justin on 2021/02/03.
 //
 
-#include "PlayControl.h"
-
 #include <QStyle>
 #include <QFileDialog>
 #include <QStandardPaths>
+
+#include "./PlayControl.h"
 
 PlayControl::PlayControl(QWidget *parent) : QWidget(parent) {
     // open layout
@@ -79,6 +79,7 @@ void PlayControl::open() {
             QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).value(0, QDir::homePath())
     );
     if (fileDialog.exec() == QDialog::Accepted) {
+        // emit single file url
         QList<QUrl> selectedUrls = fileDialog.selectedUrls();
         auto firstUrl = selectedUrls.begin();
         emit emitAddToPlayList(firstUrl->toString());

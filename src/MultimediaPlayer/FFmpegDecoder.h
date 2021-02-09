@@ -33,7 +33,7 @@ public:
 
     void setScreen(QLabel *label);
 
-    int stopDecode();
+    void stopDecode();
 
 private:
 

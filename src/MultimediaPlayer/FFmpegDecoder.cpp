@@ -57,14 +57,13 @@ int FFmpegDecoder::decodeMultimediaFile(const std::string &filename) {
     if (ret < 0) return ret;
     ret = decode();
     if (ret < 0) return ret;
-    if (hasDeallocated != 1) deallocate();
+    deallocate();
 
     return 0;
 }
 
-int FFmpegDecoder::stopDecode() {
+void FFmpegDecoder::stopDecode() {
     abortSignal = 1;
-    return 0;
 }
 
 // private functions -----------------
@@ -72,7 +71,7 @@ int FFmpegDecoder::stopDecode() {
 int FFmpegDecoder::openFile(const std::string &filename) {
     int ret;
 
-    // initialize fields for stop && abort
+    // initialize signal fields
     abortSignal = -1;
     hasDeallocated = -1;
 
@@ -165,17 +164,17 @@ int FFmpegDecoder::decode() {
 
         if (packet->stream_index == videoStreamIndex) {
             ret = decodeVideo();
-            if (ret < 0) return ret;
+            if (ret < 0) break;
         }
-//        if (packet->stream_index == audioStreamIndex) {
-//            ret = decodeAudio(&outfile);
-//            if (ret < 0) return ret;
-//        }
+        else if (packet->stream_index == audioStreamIndex) {
+            ret = decodeAudio(&outfile);
+            if (ret < 0) break;
+        }
 
         av_packet_unref(packet);
     }
 
-    return 0;
+    return ret;
 }
 
 int FFmpegDecoder::decodeAudio(std::ofstream *outfile) {
@@ -252,14 +251,15 @@ int FFmpegDecoder::decodeVideo() {
 }
 
 int FFmpegDecoder::deallocate() {
-    if (hasDeallocated == 1) return 0;
-    avformat_close_input(&formatContext);
-    avcodec_free_context(&videoCodecContext);
-    avcodec_free_context(&audioCodecContext);
-    av_frame_free(&frame);
-    av_frame_free(&retFrame);
-    av_packet_free(&packet);
-    sws_freeContext(swsContext);
+    if (hasDeallocated != 1) {
+        avformat_close_input(&formatContext);
+        avcodec_free_context(&videoCodecContext);
+        avcodec_free_context(&audioCodecContext);
+        av_frame_free(&frame);
+        av_frame_free(&retFrame);
+        av_packet_free(&packet);
+        sws_freeContext(swsContext);
+    }
     hasDeallocated = 1;
     return 0;
 }

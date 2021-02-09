@@ -12,6 +12,12 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 };
 
+enum RecordContent {
+    VIDEO = 1,
+    AUDIO = 2,
+    VIDEO_AUDIO = 3
+};
+
 class FFmpegRecorder {
 
 public:
@@ -20,20 +26,21 @@ public:
 
     ~FFmpegRecorder();
 
-    int recordAudio();
+    int record(RecordContent recordContent);
 
 private:
 
-    int openDevice();
+    int openDevice(RecordContent recordContent);
 
     int beginRecord();
 
-    int record();
+    int doRecord();
 
     int deallocate();
 
     char errorMessage[100];
 
+    AVDictionary *options = nullptr;
     AVInputFormat *inputFormat;
     AVFormatContext *formatContext;
 

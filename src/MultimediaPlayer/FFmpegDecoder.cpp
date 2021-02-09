@@ -166,10 +166,10 @@ int FFmpegDecoder::decode() {
             ret = decodeVideo();
             if (ret < 0) break;
         }
-        else if (packet->stream_index == audioStreamIndex) {
-            ret = decodeAudio(&outfile);
-            if (ret < 0) break;
-        }
+//        else if (packet->stream_index == audioStreamIndex) {
+//            ret = decodeAudio(&outfile);
+//            if (ret < 0) break;
+//        }
 
         av_packet_unref(packet);
     }

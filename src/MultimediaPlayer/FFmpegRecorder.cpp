@@ -15,19 +15,29 @@ FFmpegRecorder::FFmpegRecorder() {
 
 FFmpegRecorder::~FFmpegRecorder() {}
 
-int FFmpegRecorder::record(RecordContent recordContent) {
-    int ret;
-    ret = openDevice(recordContent);
-    if (ret < 0) return ret;
-    ret = beginRecord();
-    if (ret < 0) return ret;
-    ret = doRecord();
-    if (ret < 0) return ret;
-    ret = deallocate();
-    if (ret < 0) return ret;
+// public functions
 
+int FFmpegRecorder::record(RecordContent recordContent) {
+    if (isRecording == 1) {
+        abortSignal = 1;
+    } else {
+        abortSignal = -1;
+        isAllocated = -1;
+        isRecording = 1;
+        int ret;
+        ret = openDevice(recordContent);
+        if (ret < 0) return ret;
+        ret = beginRecord();
+        if (ret < 0) return ret;
+        ret = doRecord();
+        if (ret < 0) return ret;
+        ret = deallocate();
+        if (ret < 0) return ret;
+    }
     return 0;
 }
+
+// private functions
 
 int FFmpegRecorder::openDevice(RecordContent recordContent) {
     int ret;
@@ -59,25 +69,45 @@ int FFmpegRecorder::beginRecord() {
 }
 
 int FFmpegRecorder::doRecord() {
-    int ret, count = 0;
+    int ret;
     AVPacket *packet = av_packet_alloc();
 
-    // todo av_read_frame will return -35 both in audio and video
-    while ((ret = av_read_frame(formatContext, packet)) == 0 && ++count < 50) {
-        av_log(nullptr, AV_LOG_INFO, "packet->size: %d", packet->size);
+    // create file
+    std::fstream outfile;
+    outfile.open("/Users/justin/Downloads/outfile.yuv", std::ios::out);
+
+    while (true) {
+        if (abortSignal == 1) {
+            deallocate();
+            break;
+        }
+
+        ret = av_read_frame(formatContext, packet);
+        if (ret < 0) {
+            if (ret == AVERROR(EAGAIN)) {
+                continue; // if av_read_frame return -35 continue
+            } else {
+                av_strerror(ret, errorMessage, sizeof(errorMessage));
+                av_log(nullptr, AV_LOG_ERROR, "av_read_frame: %s", errorMessage);
+                av_packet_free(&packet);
+                return ret;
+            }
+        }
+        av_log(nullptr, AV_LOG_INFO, "packet->size: %d, packet->size: %p\n", packet->size, packet->data);
+        outfile.write((char *) packet->data, packet->size);
+
         av_packet_unref(packet);
     }
-    if (ret < 0) {
-        av_strerror(ret, errorMessage, sizeof(errorMessage));
-        av_log(nullptr, AV_LOG_ERROR, "av_read_frame: %s", errorMessage);
 
-    av_packet_free(&packet);
+    outfile.close();
     return 0;
 }
 
 int FFmpegRecorder::deallocate() {
-    avformat_close_input(&formatContext);
-    options = nullptr;
+    if (isAllocated != 1) {
+        avformat_close_input(&formatContext);
+        options = nullptr;
+    }
+    isAllocated = 1;
     return 0;
 }
-

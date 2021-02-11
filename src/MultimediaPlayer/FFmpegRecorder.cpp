@@ -28,9 +28,9 @@ int FFmpegRecorder::record(RecordContent recordContent) {
         int ret;
         ret = openDevice(recordContent);
         if (ret < 0) return ret;
-        ret = beginRecord();
+        ret = beginScale();
         if (ret < 0) return ret;
-        ret = doRecord();
+        ret = doRecord(recordContent);
         if (ret < 0) return ret;
         ret = deallocate();
         if (ret < 0) return ret;
@@ -61,23 +61,70 @@ int FFmpegRecorder::openDevice(RecordContent recordContent) {
         av_log(nullptr, AV_LOG_ERROR, "Open device error: %s", errorMessage);
     }
 
+    // initialize && open codec relevant params
+    videoStreamIndex = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &videoCodec, 0);
+    videoCodecContext = avcodec_alloc_context3(videoCodec);
+    ret = avcodec_parameters_to_context(videoCodecContext, formatContext->streams[videoStreamIndex]->codecpar);
+    if (ret < 0) {
+        av_strerror(ret, errorMessage, sizeof(errorMessage));
+        av_log(nullptr, AV_LOG_ERROR, "avcodec_parameters_to_context: %s", errorMessage);
+    }
+    ret = avcodec_open2(videoCodecContext, videoCodec, nullptr);
+    if (ret < 0) {
+        av_strerror(ret, errorMessage, sizeof(errorMessage));
+        av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
+    }
+
     return 0;
 }
 
-int FFmpegRecorder::beginRecord() {
-    return 0;
+int FFmpegRecorder::scale(AVFrame *frame, AVPacket *pkt, std::ofstream *outfile) {
+    int ret = 0;
+    /* send the frame to the encoder */
+    ret = avcodec_send_frame(videoCodecContext, frame);
+    if (ret < 0) {
+        fprintf(stderr, "Error sending a frame for encoding\n");
+        return ret;
+    }
+
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(videoCodecContext, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            return 0;
+        } else if (ret < 0) {
+            return ret;
+        }
+        outfile->write((char *) pkt->data, pkt->size);
+        av_packet_unref(pkt);
+    }
+    return ret;
 }
 
-int FFmpegRecorder::doRecord() {
+int FFmpegRecorder::beginScale() {
+    int ret = 0;
+    swsContext = sws_getContext(
+            videoCodecContext->width,
+            videoCodecContext->height,
+            videoCodecContext->pix_fmt,
+            videoCodecContext->width,
+            videoCodecContext->height,
+            AV_PIX_FMT_RGB24,
+            SWS_BICUBIC,
+            nullptr, nullptr, nullptr
+    );
+
+    return ret;
+}
+
+int FFmpegRecorder::doRecord(RecordContent recordContent) {
     int ret = 0;
     int times = 0;
     AVPacket *packet = av_packet_alloc();
 
     // create file
-    const char *filename = "/Users/justin/Downloads/outfile.yuv";
+//    char const *filename = recordContent == VIDEO ? "/Users/justin/Downloads/outfile.yuv" : "/Users/justin/Downloads/outfile.pcm";
 //    std::fstream outfile;
-//    outfile.open("", std::ios::out);
-    FILE *outfile = fopen(filename, "wb+");
+//    outfile.open(filename, std::ios::out | std::ios::binary);
 
     while (true) {
         if (times >= 500 || abortSignal == 1) {
@@ -96,17 +143,16 @@ int FFmpegRecorder::doRecord() {
         }
 
         av_log(nullptr, AV_LOG_INFO, "packet->size: %d, packet->size: %p\n", packet->size, packet->data);
-//        outfile.write((char *) packet->data, packet->size);
-//        fwrite(packet->data, packet->size, 1, outfile); // for audio
-        fwrite(packet->data, 1, 61440, outfile); // for video
-        fflush(outfile);
+//        if (recordContent == VIDEO) {
+//            outfile.write((char *) packet->data, 462720);
+//        } else {
+//            outfile.write((char *) packet->data, packet->size);
+//        }
+//        outfile.flush();
 
         times++;
-
         av_packet_unref(packet);
     }
-
-    fclose(outfile);
 
 //    outfile.close();
     return ret;

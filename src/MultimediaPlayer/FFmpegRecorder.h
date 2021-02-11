@@ -12,6 +12,7 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 #include <libavutil/avutil.h>
 #include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
 };
 
 enum RecordContent {
@@ -34,9 +35,11 @@ private:
 
     int openDevice(RecordContent recordContent);
 
-    int beginRecord();
+    int beginScale();
 
-    int doRecord();
+    int scale(AVFrame *frame, AVPacket *pkt, std::ofstream *outfile);
+
+    int doRecord(RecordContent recordContent);
 
     int deallocate();
 
@@ -45,9 +48,16 @@ private:
     int isAllocated = -1;
     char errorMessage[100];
 
+    int videoStreamIndex = -1;
+    int audioStreamIndex = -1;
+
     AVDictionary *options = nullptr;
     AVInputFormat *inputFormat;
     AVFormatContext *formatContext;
+
+    AVCodec *videoCodec;
+    AVCodecContext *videoCodecContext;
+    SwsContext *swsContext;
 
 };
 

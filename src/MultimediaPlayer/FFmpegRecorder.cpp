@@ -26,9 +26,8 @@ int FFmpegRecorder::record(RecordContent recordContent) {
         isAllocated = -1;
         isRecording = 1;
         int ret;
-        ret = openDevice();
+        ret = openDevice(recordContent);
         if (ret < 0) return ret;
-        ret = createOutfile();
         ret = beginScale();
         if (ret < 0) return ret;
         ret = doRecord();
@@ -41,9 +40,12 @@ int FFmpegRecorder::record(RecordContent recordContent) {
 
 // private functions
 
-int FFmpegRecorder::openDevice(RecordContent recordContent, AVPixelFormat dstFormat, const char* outFilename) {
+int FFmpegRecorder::openDevice(RecordContent recordContent) {
     int ret;
     const char *deviceName;
+
+    // set custom value in RecordInfo
+    recordInfo.recordContent = recordContent;
 
     if (recordContent == VIDEO) {
         deviceName = videoDeviceName;
@@ -75,9 +77,6 @@ int FFmpegRecorder::openDevice(RecordContent recordContent, AVPixelFormat dstFor
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
     }
-
-    // create outfile
-    char const *filename = recordContent == VIDEO ? "/Users/justin/Downloads/outfile.yuv" : "/Users/justin/Downloads/outfile.pcm";
 
     return 0;
 }
@@ -112,7 +111,7 @@ int FFmpegRecorder::beginScale() {
             videoCodecContext->pix_fmt,
             videoCodecContext->width,
             videoCodecContext->height,
-            AV_PIX_FMT_RGB24,
+            recordInfo.dstFormat,
             SWS_BICUBIC,
             nullptr, nullptr, nullptr
     );
@@ -120,12 +119,16 @@ int FFmpegRecorder::beginScale() {
     return ret;
 }
 
-int FFmpegRecorder::doRecord(RecordContent recordContent) {
+int FFmpegRecorder::doRecord() {
     int ret = 0;
     int times = 0;
     AVPacket *packet = av_packet_alloc();
 
-
+    // create outfile
+    std::stringstream fullFilename;
+    fullFilename << recordInfo.outDiskPath << recordInfo.outFilename;
+    fullFilename << (recordInfo.recordContent == VIDEO ? ".yuv" : ".pcm");
+    std::ofstream outfile(fullFilename.str(), std::ios::out | std::ios::binary);
 
     while (true) {
         if (times >= 500 || abortSignal == 1) {

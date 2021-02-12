@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -26,7 +27,8 @@ enum RecordContent {
 typedef struct RecordInfo {
     RecordContent recordContent;
     AVPixelFormat dstFormat;
-    char *outFilename;
+    const char *outDiskPath;
+    const char *outFilename;
 } RecordInfo;
 
 class FFmpegRecorder {
@@ -41,9 +43,7 @@ public:
 
 private:
 
-    int openDevice(RecordContent recordContent, AVPixelFormat dstFormat, const char* outFilename);
-
-    int createOutfile();
+    int openDevice(RecordContent recordContent);
 
     int beginScale();
 
@@ -53,12 +53,14 @@ private:
 
     int deallocate();
 
-    RecordInfo *recordInfo;
+    RecordInfo recordInfo {
+        VIDEO,
+        AV_PIX_FMT_RGB24,
+        "/Users/justin/Downloads/",
+        "outfile",
+    };
 
     // fields below are for FFmpeg
-
-    std::ofstream *outfile;
-
     int isRecording = -1;
     int abortSignal = -1;
     int isAllocated = -1;

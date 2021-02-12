@@ -26,11 +26,12 @@ int FFmpegRecorder::record(RecordContent recordContent) {
         isAllocated = -1;
         isRecording = 1;
         int ret;
-        ret = openDevice(recordContent);
+        ret = openDevice();
         if (ret < 0) return ret;
+        ret = createOutfile();
         ret = beginScale();
         if (ret < 0) return ret;
-        ret = doRecord(recordContent);
+        ret = doRecord();
         if (ret < 0) return ret;
         ret = deallocate();
         if (ret < 0) return ret;
@@ -40,7 +41,7 @@ int FFmpegRecorder::record(RecordContent recordContent) {
 
 // private functions
 
-int FFmpegRecorder::openDevice(RecordContent recordContent) {
+int FFmpegRecorder::openDevice(RecordContent recordContent, AVPixelFormat dstFormat, const char* outFilename) {
     int ret;
     const char *deviceName;
 
@@ -74,6 +75,9 @@ int FFmpegRecorder::openDevice(RecordContent recordContent) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
     }
+
+    // create outfile
+    char const *filename = recordContent == VIDEO ? "/Users/justin/Downloads/outfile.yuv" : "/Users/justin/Downloads/outfile.pcm";
 
     return 0;
 }
@@ -121,10 +125,7 @@ int FFmpegRecorder::doRecord(RecordContent recordContent) {
     int times = 0;
     AVPacket *packet = av_packet_alloc();
 
-    // create file
-//    char const *filename = recordContent == VIDEO ? "/Users/justin/Downloads/outfile.yuv" : "/Users/justin/Downloads/outfile.pcm";
-//    std::fstream outfile;
-//    outfile.open(filename, std::ios::out | std::ios::binary);
+
 
     while (true) {
         if (times >= 500 || abortSignal == 1) {

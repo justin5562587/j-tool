@@ -17,7 +17,6 @@ FFmpegRecorder::FFmpegRecorder() {
 FFmpegRecorder::~FFmpegRecorder() {}
 
 // public functions
-
 int FFmpegRecorder::record(RecordContent recordContent) {
     if (isRecording == 1) {
         abortSignal = 1;
@@ -28,8 +27,6 @@ int FFmpegRecorder::record(RecordContent recordContent) {
         int ret;
         ret = openDevice(recordContent);
         if (ret < 0) return ret;
-        ret = beginScale();
-        if (ret < 0) return ret;
         ret = doRecord();
         if (ret < 0) return ret;
         ret = deallocate();
@@ -39,7 +36,6 @@ int FFmpegRecorder::record(RecordContent recordContent) {
 }
 
 // private functions
-
 int FFmpegRecorder::openDevice(RecordContent recordContent) {
     int ret;
     const char *deviceName;
@@ -96,40 +92,6 @@ int FFmpegRecorder::openDevice(RecordContent recordContent) {
     return 0;
 }
 
-int FFmpegRecorder::scale(AVFrame *frame, AVPacket *pkt, std::ofstream *outfile) {
-    int ret = 0;
-    /* send the frame to the encoder */
-    ret = avcodec_send_frame(videoCodecContext, frame);
-    if (ret < 0) {
-        fprintf(stderr, "Error sending a frame for encoding\n");
-        return ret;
-    }
-
-    while (ret >= 0) {
-        ret = avcodec_receive_packet(videoCodecContext, pkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            return 0;
-        } else if (ret < 0) {
-            return ret;
-        }
-        outfile->write((char *) pkt->data, pkt->size);
-        av_packet_unref(pkt);
-    }
-    return ret;
-}
-
-int FFmpegRecorder::beginScale() {
-    int ret = 0;
-    swsContext = sws_getContext(
-            videoCodecContext->width, videoCodecContext->height, videoCodecContext->pix_fmt,
-            videoCodecContext->width, videoCodecContext->height, recordInfo.dstFormat,
-            SWS_BICUBIC,
-            nullptr, nullptr, nullptr
-    );
-
-    return ret;
-}
-
 int FFmpegRecorder::doRecord() {
     int ret = 0, times = 0, outFrameBufferSize = 0;
     AVPacket *packet = av_packet_alloc();
@@ -143,11 +105,17 @@ int FFmpegRecorder::doRecord() {
             outFrame->data, outFrame->linesize, videoCodecContext->width, videoCodecContext->height,
             recordInfo.dstFormat, 32
     );
+    SwsContext* swsContext = sws_getContext(
+            videoCodecContext->width, videoCodecContext->height, videoCodecContext->pix_fmt,
+            videoCodecContext->width, videoCodecContext->height, recordInfo.dstFormat,
+            SWS_BICUBIC,
+            nullptr, nullptr, nullptr
+    );
 
     // create outfile
     std::stringstream fullFilename;
     fullFilename << recordInfo.outDiskPath << recordInfo.outFilename;
-    fullFilename << (recordInfo.recordContent == VIDEO ? ".mkv" : ".pcm");
+    fullFilename << (recordInfo.recordContent == VIDEO ? ".yuv" : ".pcm");
     std::ofstream outfile(fullFilename.str(), std::ios::out | std::ios::binary);
 
     while (true) {
@@ -192,6 +160,7 @@ int FFmpegRecorder::doRecord() {
                 (const uint8_t *const *) frame->data, frame->linesize, 0, videoCodecContext->height,
                 outFrame->data, outFrame->linesize
         );
+
         if (recordInfo.recordContent == VIDEO) {
             outfile.write((char * ) outFrame->data[0], outFrameBufferSize);
         } else {
@@ -203,6 +172,7 @@ int FFmpegRecorder::doRecord() {
     }
 
     outfile.close();
+    sws_freeContext(swsContext);
     av_packet_free(&packet);
     av_frame_free(&frame);
     av_frame_free(&outFrame);

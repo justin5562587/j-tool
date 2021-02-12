@@ -46,10 +46,6 @@ private:
 
     int openDevice(RecordContent recordContent);
 
-    int beginScale();
-
-    int scale(AVFrame *frame, AVPacket *pkt, std::ofstream *outfile);
-
     int doRecord();
 
     int deallocate();
@@ -74,7 +70,7 @@ private:
     int videoStreamIndex = -1;
     AVCodec *videoCodec;
     AVCodecContext *videoCodecContext;
-    SwsContext *swsContext;
+//    SwsContext *swsContext;
     int audioStreamIndex = -1;
     AVCodec *audioCodec;
     AVCodecContext *audioCodecContext;

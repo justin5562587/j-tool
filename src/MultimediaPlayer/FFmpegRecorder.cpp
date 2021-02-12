@@ -25,7 +25,9 @@ int FFmpegRecorder::record(RecordContent recordContent) {
         isAllocated = -1;
         isRecording = 1;
         int ret;
-        ret = openDevice(recordContent);
+        ret = initializeInputDevice(recordContent);
+        if (ret < 0) return ret;
+        ret = initializeOutfile();
         if (ret < 0) return ret;
         ret = doRecord();
         if (ret < 0) return ret;
@@ -36,7 +38,7 @@ int FFmpegRecorder::record(RecordContent recordContent) {
 }
 
 // private functions
-int FFmpegRecorder::openDevice(RecordContent recordContent) {
+int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     int ret;
     const char *deviceName;
 
@@ -92,6 +94,18 @@ int FFmpegRecorder::openDevice(RecordContent recordContent) {
     return 0;
 }
 
+// https://stackoverflow.com/questions/46444474/c-ffmpeg-create-mp4-file
+int FFmpegRecorder::initializeOutfile() {
+    char fullFilename[100];
+    strcpy(fullFilename, recordInfo.outDiskPath);
+    strcpy(fullFilename, recordInfo.outFilename);
+    AVOutputFormat *outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
+
+
+
+    return 0;
+}
+
 int FFmpegRecorder::doRecord() {
     int ret = 0, times = 0, outFrameBufferSize = 0;
     AVPacket *packet = av_packet_alloc();
@@ -108,8 +122,7 @@ int FFmpegRecorder::doRecord() {
     SwsContext* swsContext = sws_getContext(
             videoCodecContext->width, videoCodecContext->height, videoCodecContext->pix_fmt,
             videoCodecContext->width, videoCodecContext->height, recordInfo.dstFormat,
-            SWS_BICUBIC,
-            nullptr, nullptr, nullptr
+            SWS_BICUBIC,nullptr, nullptr, nullptr
     );
 
     // create outfile

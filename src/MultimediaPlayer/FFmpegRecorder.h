@@ -44,7 +44,9 @@ public:
 
 private:
 
-    int openDevice(RecordContent recordContent);
+    int initializeInputDevice(RecordContent recordContent);
+
+    int initializeOutfile();
 
     int doRecord();
 

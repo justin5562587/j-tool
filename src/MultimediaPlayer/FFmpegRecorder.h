@@ -14,6 +14,7 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 #include <libavutil/avutil.h>
 #include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
 };

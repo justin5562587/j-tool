@@ -105,24 +105,17 @@ int FFmpegRecorder::initializeOutfile() {
     outputFormatContext = avformat_alloc_context();
     avformat_alloc_output_context2(&outputFormatContext, outputFormat, nullptr, fullFilename);
 
-    AVCodec *outVCodec = avcodec_find_decoder(outputFormat->video_codec);
+    outVCodec = avcodec_find_decoder(outputFormat->video_codec);
+    outVStream = avformat_new_stream(outputFormatContext, outVCodec);
+    outVCodecContext = avcodec_alloc_context3(outVCodec);
 
-    AVStream *outVStream = avformat_new_stream(outputFormatContext, outVCodec);
-
-    AVCodecContext *outVCodecContext = avcodec_alloc_context3(outVCodec);
-
-    outVStream->codecpar->codec_id = outputFormat->video_codec;
-    outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    outVStream->codecpar->width = videoCodecContext->width;
-    outVStream->codecpar->height = videoCodecContext->height;
-    outVStream->codecpar->format = recordInfo.outFormat;
-    outVStream->codecpar->bit_rate = bitrate * 1000;
+    avcodec_parameters_from_context(outVStream->codecpar, inVCodecContext);
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 
-    outVCodecContext->time_base = (AVRational) {1, 30};
-    outVCodecContext->max_b_frames = 2;
-    outVCodecContext->gop_size = 12;
-    outVCodecContext->framerate = (AVRational) {30, 1};
+    outVCodecContext->time_base = inVCodecContext->time_base;
+    outVCodecContext->max_b_frames = inVCodecContext->max_b_frames;
+    outVCodecContext->gop_size = inVCodecContext->gop_size;
+    outVCodecContext->framerate = inVCodecContext->framerate;
 
     //must remove the following
     //outVCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
@@ -164,7 +157,7 @@ int FFmpegRecorder::doRecord() {
             break;
         }
 
-        ret = av_read_frame(formatContext, packet);
+        ret = av_read_frame(inputFormatContext, packet);
         if (ret == AVERROR(EAGAIN)) {
             continue; // if av_read_frame return -35 continue
         } else if (ret < 0) {
@@ -186,7 +179,7 @@ int FFmpegRecorder::doRecord() {
 
 int FFmpegRecorder::deallocate() {
     if (isAllocated != 1) {
-        avformat_close_input(&formatContext);
+        avformat_close_input(&inputFormatContext);
         options = nullptr;
     }
     isAllocated = 1;

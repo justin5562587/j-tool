@@ -27,9 +27,10 @@ enum RecordContent {
 
 typedef struct RecordInfo {
     RecordContent recordContent;
-    AVPixelFormat dstFormat;
+    AVPixelFormat outFormat;
     const char *outDiskPath;
     const char *outFilename;
+    const char *outFileExtension;
 } RecordInfo;
 
 class FFmpegRecorder {
@@ -54,29 +55,34 @@ private:
 
     RecordInfo recordInfo {
         VIDEO,
-        AV_PIX_FMT_RGB24,
+        AV_PIX_FMT_YUV420P,
         "/Users/justin/Downloads/",
         "outfile",
+        ".mp4"
     };
 
-    // fields below are for FFmpeg
     int isRecording = -1;
     int abortSignal = -1;
     int isAllocated = -1;
     char errorMessage[100];
 
+    // fields for input
     AVDictionary *options = nullptr;
     AVInputFormat *inputFormat;
-    AVFormatContext *formatContext;
+    AVFormatContext *inputFormatContext;
+    int inVStreamIndex = -1;
+    AVCodec *inVCodec;
+    AVCodecContext *inVCodecContext;
+    int inAStreamIndex = -1;
+    AVCodec *inACodec;
+    AVCodecContext *inACodecContext;
 
-    int videoStreamIndex = -1;
-    AVCodec *videoCodec;
-    AVCodecContext *videoCodecContext;
-//    SwsContext *swsContext;
-    int audioStreamIndex = -1;
-    AVCodec *audioCodec;
-    AVCodecContext *audioCodecContext;
-    SwrContext *swrContext;
+    // fields for output
+    AVOutputFormat *outputFormat;
+    AVFormatContext *outputFormatContext;
+    AVCodec *outVCodec;
+    AVCodecContext *outVCodecContext;
+    AVStream *outVStream;
 
 };
 

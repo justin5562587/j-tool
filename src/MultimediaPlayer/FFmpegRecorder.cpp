@@ -55,36 +55,35 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     }
 
     inputFormat = av_find_input_format("avfoundation");
-    formatContext = avformat_alloc_context();
-    ret = avformat_open_input(&formatContext, deviceName, inputFormat, &options);
-    if (ret < 0) {
+    inputFormatContext = avformat_alloc_context();
+    if ((ret = avformat_open_input(&inputFormatContext, deviceName, inputFormat, &options)) < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         av_log(nullptr, AV_LOG_ERROR, "Open device error: %s", errorMessage);
     }
 
     // initialize && open codec relevant params
     if (recordContent == VIDEO) {
-        videoStreamIndex = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &videoCodec, 0);
-        videoCodecContext = avcodec_alloc_context3(videoCodec);
-        ret = avcodec_parameters_to_context(videoCodecContext, formatContext->streams[videoStreamIndex]->codecpar);
+        inVStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &inVCodec, 0);
+        inVCodecContext = avcodec_alloc_context3(inVCodec);
+        ret = avcodec_parameters_to_context(inVCodecContext, inputFormatContext->streams[inVStreamIndex]->codecpar);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             av_log(nullptr, AV_LOG_ERROR, "avcodec_parameters_to_context: %s", errorMessage);
         }
-        ret = avcodec_open2(videoCodecContext, videoCodec, nullptr);
+        ret = avcodec_open2(inVCodecContext, inVCodec, nullptr);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
         }
     } else {
-        audioStreamIndex = av_find_best_stream(formatContext, AVMEDIA_TYPE_AUDIO, -1, -1, &audioCodec, 0);
-        audioCodecContext = avcodec_alloc_context3(audioCodec);
-        ret = avcodec_parameters_to_context(audioCodecContext, formatContext->streams[audioStreamIndex]->codecpar);
+        inAStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, &inACodec, 0);
+        inACodecContext = avcodec_alloc_context3(inACodec);
+        ret = avcodec_parameters_to_context(inACodecContext, inputFormatContext->streams[inAStreamIndex]->codecpar);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             av_log(nullptr, AV_LOG_ERROR, "avcodec_parameters_to_context: %s", errorMessage);
         }
-        ret = avcodec_open2(audioCodecContext, videoCodec, nullptr);
+        ret = avcodec_open2(inACodecContext, inACodec, nullptr);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
@@ -96,40 +95,68 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
 
 // https://stackoverflow.com/questions/46444474/c-ffmpeg-create-mp4-file
 int FFmpegRecorder::initializeOutfile() {
+    int ret = 0;
     char fullFilename[100];
     strcpy(fullFilename, recordInfo.outDiskPath);
     strcpy(fullFilename, recordInfo.outFilename);
-    AVOutputFormat *outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
+    strcpy(fullFilename, recordInfo.outFileExtension);
 
+    outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
+    outputFormatContext = avformat_alloc_context();
+    avformat_alloc_output_context2(&outputFormatContext, outputFormat, nullptr, fullFilename);
 
+    AVCodec *outVCodec = avcodec_find_decoder(outputFormat->video_codec);
+
+    AVStream *outVStream = avformat_new_stream(outputFormatContext, outVCodec);
+
+    AVCodecContext *outVCodecContext = avcodec_alloc_context3(outVCodec);
+
+    outVStream->codecpar->codec_id = outputFormat->video_codec;
+    outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    outVStream->codecpar->width = videoCodecContext->width;
+    outVStream->codecpar->height = videoCodecContext->height;
+    outVStream->codecpar->format = recordInfo.outFormat;
+    outVStream->codecpar->bit_rate = bitrate * 1000;
+    avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
+
+    outVCodecContext->time_base = (AVRational) {1, 30};
+    outVCodecContext->max_b_frames = 2;
+    outVCodecContext->gop_size = 12;
+    outVCodecContext->framerate = (AVRational) {30, 1};
+
+    //must remove the following
+    //outVCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    if (outVStream->codecpar->codec_id == AV_CODEC_ID_H264) {
+        av_opt_set(outVCodecContext, "preset", "ultrafast", 0);
+    } else if (outVStream->codecpar->codec_id == AV_CODEC_ID_H265) {
+        av_opt_set(outVCodecContext, "preset", "ultrafast", 0);
+    }
+    avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
+
+    avcodec_open2(outVCodecContext, outVCodec, nullptr);
+
+    if (!(outputFormat->flags & AVFMT_NOFILE)) {
+        if ((ret = avio_open(&outputFormatContext->pb, fullFilename, AVIO_FLAG_WRITE)) < 0) {
+            av_strerror(ret, errorMessage, sizeof(errorMessage));
+            av_log(outputFormatContext, AV_LOG_ERROR, "avio_open: %s", errorMessage);
+            return ret;
+        }
+    }
+
+    if ((ret = avformat_write_header(outputFormatContext, nullptr)) < 0) {
+        av_strerror(ret, errorMessage, sizeof(errorMessage));
+        av_log(outputFormatContext, AV_LOG_ERROR, "avformat_write_header: %s", errorMessage);
+        return ret;
+    }
+
+    av_dump_format(outputFormatContext, 0, fullFilename, 1);
 
     return 0;
 }
 
 int FFmpegRecorder::doRecord() {
-    int ret = 0, times = 0, outFrameBufferSize = 0;
+    int ret = 0, times = 0;
     AVPacket *packet = av_packet_alloc();
-    AVFrame *frame = av_frame_alloc();
-    av_image_alloc(
-            frame->data, frame->linesize, videoCodecContext->width, videoCodecContext->height,
-            videoCodecContext->pix_fmt, 32
-    );
-    AVFrame *outFrame = av_frame_alloc();
-    outFrameBufferSize = av_image_alloc(
-            outFrame->data, outFrame->linesize, videoCodecContext->width, videoCodecContext->height,
-            recordInfo.dstFormat, 32
-    );
-    SwsContext* swsContext = sws_getContext(
-            videoCodecContext->width, videoCodecContext->height, videoCodecContext->pix_fmt,
-            videoCodecContext->width, videoCodecContext->height, recordInfo.dstFormat,
-            SWS_BICUBIC,nullptr, nullptr, nullptr
-    );
-
-    // create outfile
-    std::stringstream fullFilename;
-    fullFilename << recordInfo.outDiskPath << recordInfo.outFilename;
-    fullFilename << (recordInfo.recordContent == VIDEO ? ".yuv" : ".pcm");
-    std::ofstream outfile(fullFilename.str(), std::ios::out | std::ios::binary);
 
     while (true) {
         if (times >= 500 || abortSignal == 1) {
@@ -145,50 +172,15 @@ int FFmpegRecorder::doRecord() {
             av_log(nullptr, AV_LOG_ERROR, "av_read_frame: %s", errorMessage);
             break;
         }
-        av_log(nullptr, AV_LOG_INFO, "packet->size: %d, packet->data: %p\n", packet->size, packet->data);
-//        if (recordInfo.recordContent == VIDEO) {
-//            outfile.write((char *) outFrame->data, 462720);
-//        } else {
-//            outfile.write((char *) outFrame->data, outFrame->linesize);
-//        }
+        av_log(nullptr, AV_LOG_INFO, "input device packet: size->%d, data->%p\n", packet->size, packet->data);
 
-        ret = avcodec_send_packet(videoCodecContext, packet);
-        if (ret != 0) {
-            av_strerror(ret, errorMessage, sizeof(errorMessage));
-            av_log(nullptr, AV_LOG_ERROR, "av_read_frame: %s", errorMessage);
-            return ret;
-        }
-
-        ret = avcodec_receive_frame(videoCodecContext, frame);
-        if (ret == AVERROR(EAGAIN)) {
-            continue;
-        } else if (ret < 0) {
-            av_strerror(ret, errorMessage, sizeof(errorMessage));
-            av_log(nullptr, AV_LOG_ERROR, "avcodec_receive_frame: %s", errorMessage);
-            break;
-        }
-
-        sws_scale(
-                swsContext,
-                (const uint8_t *const *) frame->data, frame->linesize, 0, videoCodecContext->height,
-                outFrame->data, outFrame->linesize
-        );
-
-        if (recordInfo.recordContent == VIDEO) {
-            outfile.write((char * ) outFrame->data[0], outFrameBufferSize);
-        } else {
-//            outfile.write((char *) outFrame->data, outFrame->linesize);
-        }
+        av_write_frame();
 
         times++;
         av_packet_unref(packet);
     }
 
-    outfile.close();
-    sws_freeContext(swsContext);
     av_packet_free(&packet);
-    av_frame_free(&frame);
-    av_frame_free(&outFrame);
     return ret;
 }
 

@@ -97,9 +97,9 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
 int FFmpegRecorder::initializeOutfile() {
     int ret = 0;
     char fullFilename[100];
-    strcpy(fullFilename, recordInfo.outDiskPath);
-    strcpy(fullFilename, recordInfo.outFilename);
-    strcpy(fullFilename, recordInfo.outFileExtension);
+    strcat(fullFilename, recordInfo.outDiskPath);
+    strcat(fullFilename, recordInfo.outFilename);
+    strcat(fullFilename, recordInfo.outFileExtension);
 
     outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
     outputFormatContext = avformat_alloc_context();
@@ -109,7 +109,12 @@ int FFmpegRecorder::initializeOutfile() {
     outVStream = avformat_new_stream(outputFormatContext, outVCodec);
     outVCodecContext = avcodec_alloc_context3(outVCodec);
 
-    avcodec_parameters_from_context(outVStream->codecpar, inVCodecContext);
+    outVStream->codecpar->codec_id = outputFormat->video_codec;
+    outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    outVStream->codecpar->width = inVCodecContext->width;
+    outVStream->codecpar->height = inVCodecContext->height;
+    outVStream->codecpar->format = inVCodecContext->pix_fmt; // AV_PIX_FMT_YUV420P AV_PIX_FMT_NV12;
+    outVStream->codecpar->bit_rate = 2000 * 1000; // bitrate * 1000;
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 
     outVCodecContext->time_base = inVCodecContext->time_base;
@@ -167,19 +172,33 @@ int FFmpegRecorder::doRecord() {
         }
         av_log(nullptr, AV_LOG_INFO, "input device packet: size->%d, data->%p\n", packet->size, packet->data);
 
-        av_write_frame();
+        av_write_frame(outputFormatContext, packet);
 
         times++;
         av_packet_unref(packet);
     }
 
+    av_write_trailer(outputFormatContext);
+    if (!(outputFormat->flags & AVFMT_NOFILE)) {
+        ret = avio_close(outputFormatContext->pb);
+        if (ret < 0) {
+            av_strerror(ret, errorMessage, sizeof(errorMessage));
+            av_log(outputFormatContext, AV_LOG_ERROR, "avio_close: %s", errorMessage);
+            return ret;
+        }
+    }
+
     av_packet_free(&packet);
+
     return ret;
 }
 
 int FFmpegRecorder::deallocate() {
     if (isAllocated != 1) {
         avformat_close_input(&inputFormatContext);
+        avformat_free_context(outputFormatContext);
+        avcodec_close(inVCodecContext);
+        avcodec_close(outVCodecContext);
         options = nullptr;
     }
     isAllocated = 1;

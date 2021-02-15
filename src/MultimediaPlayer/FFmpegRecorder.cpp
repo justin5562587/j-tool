@@ -129,19 +129,25 @@ int FFmpegRecorder::initializeOutfile() {
     } else if (outVStream->codecpar->codec_id == AV_CODEC_ID_H265) {
         av_opt_set(outVCodecContext, "preset", "ultrafast", 0);
     }
+
+    // todo 观察codec打开前后 参数的变化
     avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
 
     avcodec_open2(outVCodecContext, outVCodec, nullptr);
 
+    avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
+
     if (!(outputFormat->flags & AVFMT_NOFILE)) {
-        if ((ret = avio_open(&outputFormatContext->pb, fullFilename, AVIO_FLAG_WRITE)) < 0) {
+        ret = avio_open(&outputFormatContext->pb, fullFilename, AVIO_FLAG_WRITE);
+        if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
             av_log(outputFormatContext, AV_LOG_ERROR, "avio_open: %s", errorMessage);
             return ret;
         }
     }
 
-    if ((ret = avformat_write_header(outputFormatContext, nullptr)) < 0) {
+    ret = avformat_write_header(outputFormatContext, nullptr);
+    if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
         av_log(outputFormatContext, AV_LOG_ERROR, "avformat_write_header: %s", errorMessage);
         return ret;
@@ -158,7 +164,7 @@ int FFmpegRecorder::doRecord() {
 
     while (true) {
         if (times >= 500 || abortSignal == 1) {
-            deallocate();
+//            deallocate();
             break;
         }
 
@@ -172,7 +178,8 @@ int FFmpegRecorder::doRecord() {
         }
         av_log(nullptr, AV_LOG_INFO, "input device packet: size->%d, data->%p\n", packet->size, packet->data);
 
-        av_write_frame(outputFormatContext, packet);
+//        av_write_frame(outputFormatContext, packet);
+        av_interleaved_write_frame(outputFormatContext, packet);
 
         times++;
         av_packet_unref(packet);

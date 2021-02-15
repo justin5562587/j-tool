@@ -2,7 +2,7 @@
 // Created by justin on 2021/02/03.
 //
 
-#include "PlaylistModel.h"
+#include "./PlaylistModel.h"
 
 #include <QFileInfo>
 #include <QUrl>

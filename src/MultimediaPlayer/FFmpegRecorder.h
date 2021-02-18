@@ -17,6 +17,7 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
+#include <libavutil/timestamp.h>
 };
 
 enum RecordContent {
@@ -49,6 +50,8 @@ private:
 
     int initializeOutfile();
 
+    int mapIOFormatStream();
+
     int doRecord();
 
     int deallocate();
@@ -66,6 +69,9 @@ private:
     int isAllocated = -1;
     char errorMessage[100];
 
+    int *streamMapping;
+    unsigned int streamMappingSize;
+
     // fields for input
     AVDictionary *options = nullptr;
     AVInputFormat *inputFormat;
@@ -80,9 +86,9 @@ private:
     // fields for output
     AVOutputFormat *outputFormat;
     AVFormatContext *outputFormatContext;
-    AVCodec *outVCodec;
-    AVCodecContext *outVCodecContext;
-    AVStream *outVStream;
+//    AVCodec *outVCodec;
+//    AVCodecContext *outVCodecContext;
+//    AVStream *outVStream;
 
 };
 

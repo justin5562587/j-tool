@@ -20,6 +20,8 @@ extern "C" {
 #include <libavutil/timestamp.h>
 };
 
+#include <QThread>
+
 enum RecordContent {
     VIDEO = 1,
     AUDIO = 2,
@@ -34,7 +36,8 @@ typedef struct RecordInfo {
     const char *outFileExtension;
 } RecordInfo;
 
-class FFmpegRecorder {
+class FFmpegRecorder : public QThread {
+Q_OBJECT
 
 public:
 
@@ -43,6 +46,9 @@ public:
     ~FFmpegRecorder();
 
     int record(RecordContent recordContent);
+
+protected:
+    void run();
 
 private:
 
@@ -86,9 +92,9 @@ private:
     // fields for output
     AVOutputFormat *outputFormat;
     AVFormatContext *outputFormatContext;
-//    AVCodec *outVCodec;
-//    AVCodecContext *outVCodecContext;
-//    AVStream *outVStream;
+    AVCodec *outVCodec;
+    AVCodecContext *outVCodecContext;
+    AVStream *outVStream;
 
 };
 

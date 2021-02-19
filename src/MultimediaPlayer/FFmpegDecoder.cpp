@@ -129,18 +129,6 @@ int FFmpegDecoder::beginDecode() {
             videoCodecContext->width, videoCodecContext->height,
             dstFormat, 32
     );
-/*    int nBytes = av_image_get_buffer_size(dstFormat, videoCodecContext->width, videoCodecContext->height, 32);
-    buffer = (uint8_t *) av_malloc(nBytes * sizeof(uint8_t));
-
-    av_image_fill_arrays(
-            retFrame->data,
-            retFrame->linesize,
-            buffer,
-            dstFormat,
-            videoCodecContext->width,
-            videoCodecContext->height,
-            32
-    );*/
 
     return 0;
 }
@@ -177,6 +165,7 @@ int FFmpegDecoder::decode() {
     return ret;
 }
 
+// todo decode and send audio packet to device
 int FFmpegDecoder::decodeAudio(std::ofstream *outfile) {
     int ret, i, channel, dataSize;
     ret = avcodec_send_packet(audioCodecContext, packet);
@@ -207,6 +196,7 @@ int FFmpegDecoder::decodeAudio(std::ofstream *outfile) {
     return 0;
 }
 
+// decode video packet and display image data with QImage, QLabel
 int FFmpegDecoder::decodeVideo() {
     int ret;
 

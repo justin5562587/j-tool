@@ -57,6 +57,10 @@ private:
 
     int mapIOFormatStream();
 
+    int decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, AVFrame *frame, AVFrame *yuvFrame);
+
+    int encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket);
+
     int doRecord();
 
     int deallocate();

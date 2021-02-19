@@ -116,6 +116,10 @@ int FFmpegRecorder::initializeOutfile() {
     strcat(fullFilename, recordInfo.outFilename);
     strcat(fullFilename, recordInfo.outFileExtension);
 
+
+
+
+    avcodec_get_context_defaults3
     outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
     outputFormatContext = avformat_alloc_context();
     avformat_alloc_output_context2(&outputFormatContext, outputFormat, nullptr, fullFilename);

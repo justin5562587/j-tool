@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QListView>
 #include <QMediaPlaylist>
+#include <QThread>
+#include <pthread.h>
 
 #include "./FFmpegDecoder.h"
 #include "./FFmpegRecorder.h"
@@ -38,7 +40,6 @@ public slots:
     void recordVideo();
 
     void recordAudio();
-
 
 private:
 

@@ -8,6 +8,8 @@
 #include "./MultimediaPlayer.h"
 
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
+    qInfo() << "MultimediaPlayer thread ID: " << pthread_self();
+
     ffmpegDecoder = FFmpegDecoder();
     ffmpegRecorder = FFmpegRecorder();
 

@@ -36,8 +36,7 @@ typedef struct RecordInfo {
     const char *outFileExtension;
 } RecordInfo;
 
-class FFmpegRecorder : public QThread {
-Q_OBJECT
+class FFmpegRecorder {
 
 public:
 
@@ -47,8 +46,8 @@ public:
 
     int record(RecordContent recordContent);
 
-protected:
-    void run();
+//protected:
+//    void run();
 
 private:
 

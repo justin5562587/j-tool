@@ -4,11 +4,34 @@
 
 #include <QBoxLayout>
 #include <QVector>
+#include <SDL_thread.h>
+#include <SDL_timer.h>
 
 #include "./MultimediaPlayer.h"
 
+static int testThread(void *ptr)
+{
+    int cnt;
+
+    for (cnt = 0; cnt < 50; ++cnt) {
+        printf("Thread counter: %d\n", cnt);
+        SDL_Delay(200);
+    }
+
+    return cnt;
+}
+
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     qInfo() << "MultimediaPlayer thread ID: " << pthread_self();
+
+    int threadReturnValue;
+    SDL_Thread *sdlThread = SDL_CreateThread(testThread, "TestThread", nullptr);
+    if (NULL == threadReturnValue) {
+        printf("SDL_CreateThread failed: %s\n", SDL_GetError());
+    } else {
+        SDL_WaitThread(sdlThread, &threadReturnValue);
+        printf("Thread returned value: %d\n", threadReturnValue);
+    }
 
     ffmpegDecoder = FFmpegDecoder();
     ffmpegRecorder = FFmpegRecorder();

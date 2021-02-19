@@ -19,9 +19,9 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
            pkt->stream_index);
 }
 
-void FFmpegRecorder::run() {
-
-}
+//void FFmpegRecorder::run() {
+//
+//}
 
 FFmpegRecorder::FFmpegRecorder() {
     avdevice_register_all();
@@ -116,10 +116,6 @@ int FFmpegRecorder::initializeOutfile() {
     strcat(fullFilename, recordInfo.outFilename);
     strcat(fullFilename, recordInfo.outFileExtension);
 
-
-
-
-    avcodec_get_context_defaults3
     outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
     outputFormatContext = avformat_alloc_context();
     avformat_alloc_output_context2(&outputFormatContext, outputFormat, nullptr, fullFilename);
@@ -187,7 +183,7 @@ int FFmpegRecorder::doRecord() {
 
         ret = av_read_frame(inputFormatContext, &packet);
         if (ret == AVERROR(EAGAIN)) {
-            msleep(10);
+//            msleep(10);
             continue;
         } else if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));

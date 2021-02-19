@@ -129,7 +129,7 @@ int FFmpegRecorder::initializeOutfile() {
     outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outVStream->codecpar->width = inVCodecContext->width;
     outVStream->codecpar->height = inVCodecContext->height;
-    outVStream->codecpar->format = inVCodecContext->pix_fmt; // AV_PIX_FMT_YUV420P AV_PIX_FMT_NV12;
+    outVStream->codecpar->format = AV_PIX_FMT_YUV420P; // AV_PIX_FMT_YUV420P AV_PIX_FMT_NV12;
     outVStream->codecpar->bit_rate = 2000 * 1000; // bitrate * 1000;
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 
@@ -150,8 +150,6 @@ int FFmpegRecorder::initializeOutfile() {
     avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
 
     avcodec_open2(outVCodecContext, outVCodec, nullptr);
-
-    avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
 
     if (!(outputFormat->flags & AVFMT_NOFILE)) {
         ret = avio_open(&outputFormatContext->pb, fullFilename, AVIO_FLAG_WRITE);
@@ -212,7 +210,8 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
     ret = avcodec_send_frame(outVCodecContext, yuvFrame);
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
-        av_log(outVCodecContext, AV_LOG_ERROR, "avcodec_send_frame: %s", errorMessage);
+        av_log(nullptr, AV_LOG_ERROR, "avcodec_send_frame: %s", errorMessage);
+
         return ret;
     }
 
@@ -221,7 +220,7 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
         return 0; // non-enough data, return 0 for continue;
     } else if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
-        av_log(outVCodecContext, AV_LOG_ERROR, "avcodec_receive_packet: %s", errorMessage);
+        av_log(nullptr, AV_LOG_ERROR, "avcodec_receive_packet: %s", errorMessage);
         return ret;
     }
 

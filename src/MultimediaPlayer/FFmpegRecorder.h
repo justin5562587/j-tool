@@ -55,8 +55,6 @@ private:
 
     int initializeOutfile();
 
-    int mapIOFormatStream();
-
     int decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, AVFrame *frame, AVFrame *yuvFrame);
 
     int encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket);
@@ -77,9 +75,6 @@ private:
     int abortSignal = -1;
     int isAllocated = -1;
     char errorMessage[100];
-
-    int *streamMapping;
-    unsigned int streamMappingSize;
 
     // fields for input
     AVDictionary *options = nullptr;

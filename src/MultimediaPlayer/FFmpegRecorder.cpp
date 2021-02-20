@@ -81,6 +81,7 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     if (recordContent == VIDEO) {
         inVStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &inVCodec, 0);
         inVCodecContext = avcodec_alloc_context3(inVCodec);
+
         ret = avcodec_parameters_to_context(inVCodecContext, inputFormatContext->streams[inVStreamIndex]->codecpar);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -106,6 +107,7 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
         }
     }
 
+    av_dump_format(inputFormatContext, inVStreamIndex, nullptr, 0);
     return 0;
 }
 
@@ -129,7 +131,7 @@ int FFmpegRecorder::initializeOutfile() {
     outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outVStream->codecpar->width = inVCodecContext->width;
     outVStream->codecpar->height = inVCodecContext->height;
-    outVStream->codecpar->format = AV_PIX_FMT_YUV420P;
+    outVStream->codecpar->format = AV_PIX_FMT_YUV420P; // AV_PIX_FMT_YUV420P;
     outVStream->codecpar->bit_rate = 2000 * 1000; // bitrate * 1000;
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 
@@ -142,11 +144,8 @@ int FFmpegRecorder::initializeOutfile() {
     //outVCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     if (outVStream->codecpar->codec_id == AV_CODEC_ID_H264) {
         av_opt_set(outVCodecContext, "preset", "ultrafast", 0);
-    } else if (outVStream->codecpar->codec_id == AV_CODEC_ID_H265) {
-        av_opt_set(outVCodecContext, "preset", "ultrafast", 0);
     }
 
-    // todo 观察codec打开前后 参数的变化
     avcodec_parameters_from_context(outVStream->codecpar, outVCodecContext);
 
     avcodec_open2(outVCodecContext, outVCodec, nullptr);
@@ -160,6 +159,8 @@ int FFmpegRecorder::initializeOutfile() {
         }
     }
 
+    // avformat_write_header will overwrite AVStream.time_base according to file extension
+    // AVRational{1, 90000} if mpeg
     ret = avformat_write_header(outputFormatContext, nullptr);
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -168,7 +169,6 @@ int FFmpegRecorder::initializeOutfile() {
     }
 
     av_dump_format(outputFormatContext, 0, fullFilename, 1);
-
     return 0;
 }
 
@@ -204,9 +204,6 @@ int FFmpegRecorder::decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, 
     yuvFrame->width = inVCodecContext->width;
     yuvFrame->height = inVCodecContext->height;
     yuvFrame->format = AV_PIX_FMT_YUV420P;
-    yuvFrame->pts = frame->pts;
-    yuvFrame->pkt_dts = frame->pkt_dts;
-    yuvFrame->pkt_duration = frame->pkt_duration;
     return ret;
 }
 
@@ -236,8 +233,10 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
 int FFmpegRecorder::doRecord() {
     int ret = 0, times = 0;
     int ptsBase = 0;
+    int packetCount = 0;
     AVPacket packet;
     AVPacket *outPacket = av_packet_alloc();
+//    av_init_packet(outPacket);
 //    AVStream *inStream, *outStream;
 
     SwsContext *swsContext = sws_getContext(
@@ -256,7 +255,7 @@ int FFmpegRecorder::doRecord() {
     av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height, AV_PIX_FMT_YUV420P, 32);
 
     while (abortSignal != 1) {
-        if (times >= 500) break;
+        if (times >= 100) break;
 
         ret = av_read_frame(inputFormatContext, &packet);
         if (ret == AVERROR(EAGAIN)) {
@@ -267,28 +266,27 @@ int FFmpegRecorder::doRecord() {
             break;
         }
 
+        av_log(nullptr, AV_LOG_FATAL, "INPUT packet: pts->%lld, size->%d, data->%p\n", packet.pts, packet.size, packet.data);
+
         if (packet.stream_index == inVStreamIndex) {
             ret = decodeSourceVideo(swsContext, &packet, frame, yuvFrame);
             if (ret < 0) return ret;
-
             yuvFrame->pts = ptsBase++;
 
             ret = encodeOutVideo(yuvFrame, outPacket);
             if (ret < 0) return ret;
 
-//            inStream = inputFormatContext->streams[inVStreamIndex];
-//            outStream = outputFormatContext->streams[inVStreamIndex];
-//
 //            // copy packet
 //            outPacket.pts = av_rescale_q_rnd(outPacket.pts, inStream->time_base, outStream->time_base,static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
 //            outPacket.dts = av_rescale_q_rnd(outPacket.dts, inStream->time_base, outStream->time_base,static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
 //            outPacket.duration = av_rescale_q(outPacket.duration, inStream->time_base, outStream->time_base);
 //            outPacket.pos = -1;
 
-//            outPacket->pts  = av_rescale_q_rnd(outPacket->pts, );
+            av_log(nullptr, AV_LOG_FATAL, "OUTPUT packet: pts->%lld, size->%d, data->%p\n", outPacket->pts, outPacket->size, outPacket->data);
 
             av_interleaved_write_frame(outputFormatContext, outPacket);
 
+            packetCount++;
             times++;
             av_packet_unref(&packet);
             av_packet_unref(outPacket);
@@ -320,7 +318,7 @@ int FFmpegRecorder::deallocate() {
         avformat_close_input(&inputFormatContext);
         avformat_free_context(outputFormatContext);
         avcodec_close(inVCodecContext);
-//        avcodec_close(outVCodecContext);
+        avcodec_close(outVCodecContext);
         options = nullptr;
     }
     isAllocated = 1;

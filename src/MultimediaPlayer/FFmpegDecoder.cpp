@@ -188,7 +188,7 @@ int FFmpegDecoder::decodeVideo(AVPacket *packet) {
     }
 
     ret = avcodec_receive_frame(videoCodecContext, frame);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+    if (ret == AVERROR(EAGAIN)) {
         return 0;
     } else if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -196,6 +196,7 @@ int FFmpegDecoder::decodeVideo(AVPacket *packet) {
         return ret;
     }
 
+    // scale to AV_PIX_FMT_RGB24(Format_RGB888 in QT) for QImage constructor
     sws_scale(
             swsContext,
             (uint8_t const *const *) frame->data,
@@ -206,14 +207,12 @@ int FFmpegDecoder::decodeVideo(AVPacket *packet) {
             retFrame->linesize
     );
 
-    std::cout << " frame->pts: " << frame->pts << std::endl;
 //            char buff[100];
 //            snprintf(buff, sizeof(buff), "%s%d_%lld_", diskPath.c_str(), times, frame->pts);
 //            std::string filename = buff;
 //            std::string filepath = saveImage(frame, videoCodecContext->width, videoCodecContext->height, filename);
 
-    QImage img((uchar *) retFrame->data[0], videoCodecContext->width, videoCodecContext->height,
-               QImage::Format_RGB888);
+    QImage img((uchar *) retFrame->data[0], videoCodecContext->width, videoCodecContext->height,QImage::Format_RGB888);
     screen->setPixmap(QPixmap::fromImage(img));
     delay(40);
 

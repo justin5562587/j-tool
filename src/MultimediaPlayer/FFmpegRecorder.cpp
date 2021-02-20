@@ -129,7 +129,7 @@ int FFmpegRecorder::initializeOutfile() {
     outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outVStream->codecpar->width = inVCodecContext->width;
     outVStream->codecpar->height = inVCodecContext->height;
-    outVStream->codecpar->format = AV_PIX_FMT_YUV420P; // AV_PIX_FMT_YUV420P AV_PIX_FMT_NV12;
+    outVStream->codecpar->format = AV_PIX_FMT_YUV420P;
     outVStream->codecpar->bit_rate = 2000 * 1000; // bitrate * 1000;
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 

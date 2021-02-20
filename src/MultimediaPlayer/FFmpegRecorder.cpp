@@ -204,6 +204,9 @@ int FFmpegRecorder::decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, 
     yuvFrame->width = inVCodecContext->width;
     yuvFrame->height = inVCodecContext->height;
     yuvFrame->format = AV_PIX_FMT_YUV420P;
+    yuvFrame->pts = frame->pts;
+    yuvFrame->pkt_dts = frame->pkt_dts;
+    yuvFrame->pkt_duration = frame->pkt_duration;
     return ret;
 }
 
@@ -217,7 +220,6 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
         return ret;
     }
 
-    // todo handle error here
     ret = avcodec_receive_packet(outVCodecContext, outPacket);
     if (ret == AVERROR(EAGAIN)) {
         return 0; // non-enough data, return 0 for continue;
@@ -282,6 +284,8 @@ int FFmpegRecorder::doRecord() {
 //            outPacket.dts = av_rescale_q_rnd(outPacket.dts, inStream->time_base, outStream->time_base,static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
 //            outPacket.duration = av_rescale_q(outPacket.duration, inStream->time_base, outStream->time_base);
 //            outPacket.pos = -1;
+
+//            outPacket->pts  = av_rescale_q_rnd(outPacket->pts, );
 
             av_interleaved_write_frame(outputFormatContext, outPacket);
 

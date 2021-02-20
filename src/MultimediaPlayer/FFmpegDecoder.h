@@ -45,9 +45,9 @@ private:
 
     int decode();
 
-    int decodeVideo();
+    int decodeVideo(AVPacket *packet);
 
-    int decodeAudio(std::ofstream *outfile);
+    int decodeAudio(AVPacket *packet, std::ofstream *outfile);
 
     int deallocate();
 
@@ -59,10 +59,8 @@ private:
     AVCodec *audioCodec;
     AVCodecContext *audioCodecContext;
 
-    uint8_t *buffer;
     AVFrame *frame;
     AVFrame *retFrame;
-    AVPacket *packet;
     SwsContext *swsContext;
 
     int videoStreamIndex;

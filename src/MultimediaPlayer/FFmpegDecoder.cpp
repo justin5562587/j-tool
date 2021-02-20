@@ -4,29 +4,8 @@
 
 #include "./FFmpegDecoder.h"
 
-const std::string diskPath = "/Users/justin/Downloads/";
-AVPixelFormat dstFormat = AV_PIX_FMT_RGB24;
-//
-//std::string saveImage(AVFrame *pFrame, int width, int height, const std::string &filename) {
-//    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-//            std::chrono::system_clock::now().time_since_epoch()
-//    );
-//    const std::string fullFilename = filename + std::to_string(ms.count()) + ".yuv";
-//
-////    std::ofstream ofs(fullFilename, std::ios_base::out | std::ios_base::binary);
-//    std::ofstream outFile(fullFilename, std::ofstream::binary);
-//
-//    // write header
-//    outFile << "P6\n" << width << " " << height << "\n" << "255\n";
-//    // Write pixel data
-//    for (int y = 0; y < height; y++) {
-//        outFile.write((const char *) pFrame->data[0],  );
-//        outFile.write((const char *) pFrame->data[0] + y * pFrame->linesize[0], width);
-//    }
-//
-//    outFile.close();
-//    return fullFilename;
-//}
+#define dstFormat AV_PIX_FMT_RGB24
+#define diskPath "/Users/justin/Downloads/"
 
 void delay(int msec)
 {
@@ -123,7 +102,6 @@ int FFmpegDecoder::beginDecode() {
     );
     frame = av_frame_alloc();
     retFrame = av_frame_alloc();
-    packet = av_packet_alloc();
     av_image_alloc(
             retFrame->data, retFrame->linesize,
             videoCodecContext->width, videoCodecContext->height,
@@ -135,6 +113,7 @@ int FFmpegDecoder::beginDecode() {
 
 int FFmpegDecoder::decode() {
     int ret;
+    AVPacket *packet = av_packet_alloc();
 //    std::ofstream outfile("decode_audio.pcm", std::ios::out | std::ios::binary);
 
     while (true) {
@@ -151,7 +130,7 @@ int FFmpegDecoder::decode() {
         }
 
         if (packet->stream_index == videoStreamIndex) {
-            ret = decodeVideo();
+            ret = decodeVideo(packet);
             if (ret < 0) break;
         }
 //        else if (packet->stream_index == audioStreamIndex) {
@@ -162,11 +141,12 @@ int FFmpegDecoder::decode() {
         av_packet_unref(packet);
     }
 
+    av_packet_free(&packet);
     return ret;
 }
 
 // todo decode and send audio packet to device
-int FFmpegDecoder::decodeAudio(std::ofstream *outfile) {
+int FFmpegDecoder::decodeAudio(AVPacket *packet, std::ofstream *outfile) {
     int ret, i, channel, dataSize;
     ret = avcodec_send_packet(audioCodecContext, packet);
     if (ret < 0) {
@@ -197,7 +177,7 @@ int FFmpegDecoder::decodeAudio(std::ofstream *outfile) {
 }
 
 // decode video packet and display image data with QImage, QLabel
-int FFmpegDecoder::decodeVideo() {
+int FFmpegDecoder::decodeVideo(AVPacket *packet) {
     int ret;
 
     ret = avcodec_send_packet(videoCodecContext, packet);
@@ -247,7 +227,6 @@ int FFmpegDecoder::deallocate() {
         avcodec_free_context(&audioCodecContext);
         av_frame_free(&frame);
         av_frame_free(&retFrame);
-        av_packet_free(&packet);
         sws_freeContext(swsContext);
     }
     hasDeallocated = 1;

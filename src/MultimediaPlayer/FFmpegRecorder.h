@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <thread>
+#include <mutex>
 #include <iostream>
 
 extern "C" {
@@ -44,6 +45,18 @@ public:
 
     ~FFmpegRecorder();
 
+    // delete original copy/assign
+    FFmpegRecorder(const FFmpegRecorder&) = delete;
+    FFmpegRecorder* operator=(const FFmpegRecorder&) = delete;
+
+    // define move copy/assign
+    FFmpegRecorder(FFmpegRecorder &&ffmpegRecorder);
+    FFmpegRecorder& operator=(FFmpegRecorder &&ffmpegRecorder) noexcept;
+
+    void startRecord(RecordContent recordContent);
+
+    void stopRecord();
+
     int record(RecordContent recordContent);
 
 //protected:
@@ -71,8 +84,8 @@ private:
         ".mp4"
     };
 
-//    std::thread recordVideoThread;
-//    std::thread encodeThread;
+    std::thread recordVideoThread;
+    std::thread encodeThread;
     std::thread testThread;
 
     int isRecording = -1;

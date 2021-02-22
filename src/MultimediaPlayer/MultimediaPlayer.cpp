@@ -76,5 +76,7 @@ void MultimediaPlayer::recordAudio() {
 }
 
 void MultimediaPlayer::recordVideo() {
-     ffmpegRecorder.record(VIDEO);
+//     ffmpegRecorder.record(VIDEO);
+
+    ffmpegRecorder.startRecord(VIDEO);
 }

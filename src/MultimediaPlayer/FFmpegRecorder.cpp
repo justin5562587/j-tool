@@ -20,46 +20,63 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
            pkt->stream_index);
 }
 
-//void FFmpegRecorder::run() {
-//
-//}
-
-void testCount() {
-    std::cout << "testCount: " << std::this_thread::get_id() << std::endl;
-    int k = 10;
-    for (int i = 0; i < k; k++) {
-        printf("testCount: %d\n", i);
-    }
-
-}
-
-FFmpegRecorder::FFmpegRecorder() : testThread(testCount, nullptr) {
-    std::cout << "FFmpegRecorder Constructor: " << std::this_thread::get_id() << std::endl;
-
+FFmpegRecorder::FFmpegRecorder() {
     avdevice_register_all();
     av_log_set_level(AV_LOG_ERROR);
 }
 
 FFmpegRecorder::~FFmpegRecorder() {}
 
+FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexcept {
+    this->recordVideoThread = std::move(ffmpegRecorder.recordVideoThread);
+    this->encodeThread = std::move(ffmpegRecorder.encodeThread);
+    return *this;
+}
+
+FFmpegRecorder::FFmpegRecorder(FFmpegRecorder &&ffmpegRecorder) {
+    this->recordVideoThread = std::move(ffmpegRecorder.recordVideoThread);
+    this->encodeThread = std::move(ffmpegRecorder.encodeThread);
+}
+
 // public functions
+void FFmpegRecorder::startRecord(RecordContent recordContent) {
+    std::thread thread(&FFmpegRecorder::record, this, recordContent);
+    testThread = std::move(thread);
+}
+
+void FFmpegRecorder::stopRecord() {
+    abortSignal = 1;
+}
+
 int FFmpegRecorder::record(RecordContent recordContent) {
-    if (isRecording == 1) {
-        abortSignal = 1;
-    } else {
-        abortSignal = -1;
-        isAllocated = -1;
-        isRecording = 1;
-        int ret;
-        ret = initializeInputDevice(recordContent);
-        if (ret < 0) return ret;
-        ret = initializeOutfile();
-        if (ret < 0) return ret;
-        ret = doRecord();
-        if (ret < 0) return ret;
-        ret = deallocate();
-        if (ret < 0) return ret;
-    }
+//    if (isRecording == 1) {
+//        abortSignal = 1;
+//    } else {
+//        abortSignal = -1;
+//        isAllocated = -1;
+//        isRecording = 1;
+//        int ret;
+//        ret = initializeInputDevice(recordContent);
+//        if (ret < 0) return ret;
+//        ret = initializeOutfile();
+//        if (ret < 0) return ret;
+//        ret = doRecord();
+//        if (ret < 0) return ret;
+//        ret = deallocate();
+//        if (ret < 0) return ret;
+//    }
+    abortSignal = -1;
+    isAllocated = -1;
+    isRecording = 1;
+    int ret;
+    ret = initializeInputDevice(recordContent);
+    if (ret < 0) return ret;
+    ret = initializeOutfile();
+    if (ret < 0) return ret;
+    ret = doRecord();
+    if (ret < 0) return ret;
+    ret = deallocate();
+    if (ret < 0) return ret;
     return 0;
 }
 

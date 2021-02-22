@@ -26,7 +26,7 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
 
 FFmpegRecorder::FFmpegRecorder() {
     avdevice_register_all();
-    av_log_set_level(AV_LOG_DEBUG);
+    av_log_set_level(AV_LOG_ERROR);
 }
 
 FFmpegRecorder::~FFmpegRecorder() {}
@@ -204,10 +204,13 @@ int FFmpegRecorder::decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, 
     yuvFrame->width = inVCodecContext->width;
     yuvFrame->height = inVCodecContext->height;
     yuvFrame->format = AV_PIX_FMT_YUV420P;
+    yuvFrame->pts = frame->pts;
+    yuvFrame->pkt_pts = frame->pkt_pts;
+    yuvFrame->pkt_dts = frame->pkt_dts;
     return ret;
 }
 
-int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
+int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame) {
     int ret = 0;
 
     ret = avcodec_send_frame(outVCodecContext, yuvFrame);
@@ -217,13 +220,22 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
         return ret;
     }
 
-    ret = avcodec_receive_packet(outVCodecContext, outPacket);
-    if (ret == AVERROR(EAGAIN)) {
-        return 0; // non-enough data, return 0 for continue;
-    } else if (ret < 0) {
-        av_strerror(ret, errorMessage, sizeof(errorMessage));
-        av_log(nullptr, AV_LOG_ERROR, "avcodec_receive_packet: %s", errorMessage);
-        return ret;
+    while (ret >= 0) {
+        AVPacket outPacket = {0};
+        ret = avcodec_receive_packet(outVCodecContext, &outPacket);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            break; // non-enough data, return 0 for continue;
+        } else if (ret < 0) {
+            av_strerror(ret, errorMessage, sizeof(errorMessage));
+            av_log(nullptr, AV_LOG_ERROR, "avcodec_receive_packet: %s", errorMessage);
+            return ret;
+        }
+
+        av_packet_rescale_ts(&outPacket, outVCodecContext->time_base, outVStream->time_base);
+        outPacket.stream_index = inVStreamIndex;
+
+        av_interleaved_write_frame(outputFormatContext, &outPacket);
+        av_packet_unref(&outPacket);
     }
 
     return ret;
@@ -232,12 +244,8 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket) {
 
 int FFmpegRecorder::doRecord() {
     int ret = 0, times = 0;
-    int ptsBase = 0;
     int packetCount = 0;
     AVPacket packet;
-    AVPacket *outPacket = av_packet_alloc();
-//    av_init_packet(outPacket);
-//    AVStream *inStream, *outStream;
 
     SwsContext *swsContext = sws_getContext(
             inVCodecContext->width,
@@ -252,7 +260,8 @@ int FFmpegRecorder::doRecord() {
 
     AVFrame *frame = av_frame_alloc();
     AVFrame *yuvFrame = av_frame_alloc();
-    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height, AV_PIX_FMT_YUV420P, 32);
+    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height,
+                   AV_PIX_FMT_YUV420P, 32);
 
     while (abortSignal != 1) {
         if (times >= 100) break;
@@ -266,14 +275,14 @@ int FFmpegRecorder::doRecord() {
             break;
         }
 
-        av_log(nullptr, AV_LOG_FATAL, "INPUT packet: pts->%lld, size->%d, data->%p\n", packet.pts, packet.size, packet.data);
+        av_log(nullptr, AV_LOG_FATAL, "INPUT packet: pts->%lld, size->%d, data->%p\n", packet.pts, packet.size,
+               packet.data);
 
         if (packet.stream_index == inVStreamIndex) {
             ret = decodeSourceVideo(swsContext, &packet, frame, yuvFrame);
             if (ret < 0) return ret;
-            yuvFrame->pts = ptsBase++;
 
-            ret = encodeOutVideo(yuvFrame, outPacket);
+            ret = encodeOutVideo(yuvFrame);
             if (ret < 0) return ret;
 
 //            // copy packet
@@ -282,14 +291,12 @@ int FFmpegRecorder::doRecord() {
 //            outPacket.duration = av_rescale_q(outPacket.duration, inStream->time_base, outStream->time_base);
 //            outPacket.pos = -1;
 
-            av_log(nullptr, AV_LOG_FATAL, "OUTPUT packet: pts->%lld, size->%d, data->%p\n", outPacket->pts, outPacket->size, outPacket->data);
+//            av_log(nullptr, AV_LOG_FATAL, "OUTPUT packet: pts->%lld, size->%d, data->%p\n", outPacket->pts, outPacket->size, outPacket->data);
 
-            av_interleaved_write_frame(outputFormatContext, outPacket);
 
             packetCount++;
             times++;
             av_packet_unref(&packet);
-            av_packet_unref(outPacket);
         } else if (packet.stream_index == inAStreamIndex) {
             // todo
         }

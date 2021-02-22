@@ -57,7 +57,7 @@ private:
 
     int decodeSourceVideo(SwsContext *swsContext, AVPacket *packet, AVFrame *frame, AVFrame *yuvFrame);
 
-    int encodeOutVideo(AVFrame *yuvFrame, AVPacket *outPacket);
+    int encodeOutVideo(AVFrame *yuvFrame);
 
     int doRecord();
 

@@ -37,6 +37,7 @@ typedef struct RecordInfo {
     const char *outFileExtension;
 } RecordInfo;
 
+//https://stackoverflow.com/questions/10673585/start-thread-with-member-function
 class FFmpegRecorder {
 
 public:

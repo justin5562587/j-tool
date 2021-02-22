@@ -79,4 +79,5 @@ void MultimediaPlayer::recordVideo() {
 //     ffmpegRecorder.record(VIDEO);
 
     ffmpegRecorder.startRecord(VIDEO);
+    // todo click to stop when recording
 }

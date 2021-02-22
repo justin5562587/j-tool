@@ -176,9 +176,11 @@ int FFmpegDecoder::decodeAudio(AVPacket *packet, std::ofstream *outfile) {
     return 0;
 }
 
-// decode video packet and display image data with QImage, QLabel
+// decode video packet and display image data with QImage in QLabel
 int FFmpegDecoder::decodeVideo(AVPacket *packet) {
     int ret;
+
+    av_log(nullptr, AV_LOG_FATAL, "packet.data: %p, packet.size: %d, packet->pts: %lld\n", packet->data, packet->size, packet->pts);
 
     ret = avcodec_send_packet(videoCodecContext, packet);
     if (ret != 0) {

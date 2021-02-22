@@ -8,6 +8,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <thread>
+#include <iostream>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -19,8 +21,6 @@ extern "C" {
 #include <libswresample/swresample.h>
 #include <libavutil/timestamp.h>
 };
-
-#include <QThread>
 
 enum RecordContent {
     VIDEO = 1,
@@ -71,6 +71,10 @@ private:
         ".mp4"
     };
 
+//    std::thread recordVideoThread;
+//    std::thread encodeThread;
+    std::thread testThread;
+
     int isRecording = -1;
     int abortSignal = -1;
     int isAllocated = -1;
@@ -88,7 +92,6 @@ private:
     AVCodecContext *inACodecContext;
 
     // fields for output
-    AVOutputFormat *outputFormat;
     AVFormatContext *outputFormatContext;
     AVCodec *outVCodec;
     AVCodecContext *outVCodecContext;

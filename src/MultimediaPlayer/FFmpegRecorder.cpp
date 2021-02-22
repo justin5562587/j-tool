@@ -24,7 +24,18 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
 //
 //}
 
-FFmpegRecorder::FFmpegRecorder() {
+void testCount() {
+    std::cout << "testCount: " << std::this_thread::get_id() << std::endl;
+    int k = 10;
+    for (int i = 0; i < k; k++) {
+        printf("testCount: %d\n", i);
+    }
+
+}
+
+FFmpegRecorder::FFmpegRecorder() : testThread(testCount, nullptr) {
+    std::cout << "FFmpegRecorder Constructor: " << std::this_thread::get_id() << std::endl;
+
     avdevice_register_all();
     av_log_set_level(AV_LOG_ERROR);
 }
@@ -111,7 +122,6 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     return 0;
 }
 
-// https://stackoverflow.com/questions/46444474/c-ffmpeg-create-mp4-file
 int FFmpegRecorder::initializeOutfile() {
     int ret = 0;
     char fullFilename[100];
@@ -119,15 +129,14 @@ int FFmpegRecorder::initializeOutfile() {
     strcat(fullFilename, recordInfo.outFilename);
     strcat(fullFilename, recordInfo.outFileExtension);
 
-    outputFormat = av_guess_format(nullptr, fullFilename, nullptr);
     outputFormatContext = avformat_alloc_context();
-    avformat_alloc_output_context2(&outputFormatContext, outputFormat, nullptr, fullFilename);
+    avformat_alloc_output_context2(&outputFormatContext, nullptr, nullptr, fullFilename);
 
-    outVCodec = avcodec_find_encoder(outputFormat->video_codec);
+    outVCodec = avcodec_find_encoder(outputFormatContext->oformat->video_codec);
     outVStream = avformat_new_stream(outputFormatContext, outVCodec);
     outVCodecContext = avcodec_alloc_context3(outVCodec);
 
-    outVStream->codecpar->codec_id = outputFormat->video_codec;
+    outVStream->codecpar->codec_id = outputFormatContext->oformat->video_codec;
     outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outVStream->codecpar->width = inVCodecContext->width;
     outVStream->codecpar->height = inVCodecContext->height;
@@ -150,7 +159,7 @@ int FFmpegRecorder::initializeOutfile() {
 
     avcodec_open2(outVCodecContext, outVCodec, nullptr);
 
-    if (!(outputFormat->flags & AVFMT_NOFILE)) {
+    if (!(outputFormatContext->oformat->flags & AVFMT_NOFILE)) {
         ret = avio_open(&outputFormatContext->pb, fullFilename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -160,7 +169,7 @@ int FFmpegRecorder::initializeOutfile() {
     }
 
     // avformat_write_header will overwrite AVStream.time_base according to file extension
-    // AVRational{1, 90000} if mpeg
+    // AVRational{1, 90000} if MPEG format, as sample rate of MPEG is 90khz
     ret = avformat_write_header(outputFormatContext, nullptr);
     if (ret < 0) {
         av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -233,7 +242,8 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame) {
             return ret;
         }
 
-        av_log(nullptr, AV_LOG_FATAL, "outpacket->data: %p, outpacket->size: %d, outpacket->pts: %lld\n", outPacket.data, outPacket.size, outPacket.pts);
+        av_log(nullptr, AV_LOG_FATAL, "outpacket->data: %p, outpacket->size: %d, outpacket->pts: %lld\n",
+               outPacket.data, outPacket.size, outPacket.pts);
 
         av_packet_rescale_ts(&outPacket, inputFormatContext->streams[inVStreamIndex]->time_base, outVStream->time_base);
         outPacket.duration = 3000;
@@ -245,7 +255,6 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame) {
 
     return ret == AVERROR_EOF ? 1 : 0;
 }
-
 
 int FFmpegRecorder::doRecord() {
     int ret = 0, times = 0;
@@ -265,7 +274,8 @@ int FFmpegRecorder::doRecord() {
 
     AVFrame *frame = av_frame_alloc();
     AVFrame *yuvFrame = av_frame_alloc();
-    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height,AV_PIX_FMT_YUV420P, 32);
+    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height,
+                   AV_PIX_FMT_YUV420P, 32);
 
     while (abortSignal != 1) {
         if (times >= 500) break;
@@ -301,7 +311,7 @@ int FFmpegRecorder::doRecord() {
     }
 
     av_write_trailer(outputFormatContext);
-    if (!(outputFormat->flags & AVFMT_NOFILE)) {
+    if (!(outputFormatContext->oformat->flags & AVFMT_NOFILE)) {
         ret = avio_close(outputFormatContext->pb);
         if (ret < 0) {
             av_strerror(ret, errorMessage, sizeof(errorMessage));
@@ -312,9 +322,7 @@ int FFmpegRecorder::doRecord() {
 
     av_frame_free(&frame);
     av_frame_free(&yuvFrame);
-//    av_freep(yuvFrame);
     sws_freeContext(swsContext);
-
     return ret;
 }
 

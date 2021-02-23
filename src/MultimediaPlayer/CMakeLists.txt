@@ -2,8 +2,10 @@ aux_source_directory(. RESOURCES_SRC)
 
 add_library(j_multimedia_player STATIC ${RESOURCES_SRC})
 
-find_package(SDL2 REQUIRED)
-find_package(SFML REQUIRED system window graphics audio)
+#find_package(SDL2 REQUIRED)
+
+set(OpenCV_DIR "/Users/justin/cpp/THIRD_PART_LIBRARY/build_opencv")
+find_package(OpenCV)
 
 # configuration for self mac
 set(CMAKE_PREFIX_PATH /usr/local/Cellar/ffmpeg/4.3.1_4)
@@ -29,11 +31,13 @@ find_library(AVFILTER_LIBRARY avfilter)
 target_include_directories(
         j_multimedia_player
         PUBLIC ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${AVDEVICE_INCLUDE_DIR} ${SWSCALE_INCLUDE_DIR} ${AVFILTER_INCLUDE_DIR}
-        ${SDL2_INCLUDE_DIRS}
+#        ${SDL2_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
 )
 
 target_link_libraries(
         j_multimedia_player
-        PUBLIC ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARY} ${AVFILTER_LIBRARY} ${SDL2_LIBRARIES}
-        sfml-system sfml-audio sfml-window sfml-graphics
+        PUBLIC ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARY} ${AVFILTER_LIBRARY}
+#        ${SDL2_LIBRARIES}
+        ${OpenCV_LIBRARIES}
 )

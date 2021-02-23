@@ -29,24 +29,21 @@ FFmpegRecorder::~FFmpegRecorder() {
     if (recordVideoThread.joinable()) {
         recordVideoThread.join();
     }
-    if (encodeThread.joinable()) {
-        encodeThread.join();
-    }
 }
 
 FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexcept {
     this->recordVideoThread = std::move(ffmpegRecorder.recordVideoThread);
-    this->encodeThread = std::move(ffmpegRecorder.encodeThread);
     return *this;
 }
 
 // public functions
 void FFmpegRecorder::doRecord(RecordContent recordContent) {
-    if (isRunning) {
+
+    if (isRunning == 1) {
         abortSignal = 1;
     } else {
-        std::thread localRecordVideoThread(&FFmpegRecorder::record, this, recordContent);
-        recordVideoThread = std::move(localRecordVideoThread);
+//        std::thread localRecordVideoThread(&FFmpegRecorder::record, this, recordContent);
+        recordVideoThread = std::move(std::thread(&FFmpegRecorder::record, this, recordContent));
     }
 }
 
@@ -328,6 +325,9 @@ int FFmpegRecorder::doRecord() {
 }
 
 void FFmpegRecorder::deallocate() {
+    if (recordVideoThread.joinable()) {
+        recordVideoThread.join();
+    }
     if (isAllocated != 1) {
         avformat_close_input(&inputFormatContext);
         avformat_free_context(outputFormatContext);

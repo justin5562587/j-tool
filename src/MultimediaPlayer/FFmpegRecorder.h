@@ -82,7 +82,6 @@ private:
     };
 
     std::thread recordVideoThread;
-    std::thread encodeThread;
 
     int abortSignal = -1;
     int isRunning = -1;

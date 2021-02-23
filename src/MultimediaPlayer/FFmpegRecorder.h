@@ -50,32 +50,28 @@ public:
     FFmpegRecorder(const FFmpegRecorder&) = delete;
     FFmpegRecorder* operator=(const FFmpegRecorder&) = delete;
 
-    // define move copy/assign
-    FFmpegRecorder(FFmpegRecorder &&ffmpegRecorder);
+    // define assign-copy using std::move
     FFmpegRecorder& operator=(FFmpegRecorder &&ffmpegRecorder) noexcept;
 
-    void startRecord(RecordContent recordContent);
-
-    void stopRecord();
-
-    int record(RecordContent recordContent);
-
-//protected:
-//    void run();
+    void doRecord(RecordContent recordContent);
 
 private:
 
-    int initializeInputDevice(RecordContent recordContent);
+    int record(RecordContent recordContent);
 
-    int initializeOutfile();
+    void registerRecordInfo(RecordContent recordContent);
+
+    int initializeInputDevice();
+
+    int initializeOutputFile();
+
+    int doRecord();
+
+    void deallocate();
 
     int decodeInVideo(SwsContext *swsContext, AVPacket *inPacket, AVFrame *frame, AVFrame *yuvFrame);
 
     int encodeOutVideo(AVFrame *yuvFrame);
-
-    int doRecord();
-
-    int deallocate();
 
     RecordInfo recordInfo {
         VIDEO,
@@ -87,11 +83,11 @@ private:
 
     std::thread recordVideoThread;
     std::thread encodeThread;
-    std::thread testThread;
 
-    int isRecording = -1;
     int abortSignal = -1;
+    int isRunning = -1;
     int isAllocated = -1;
+
     char errorMessage[100];
 
     // fields for input

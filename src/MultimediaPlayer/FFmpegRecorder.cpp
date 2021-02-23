@@ -25,7 +25,14 @@ FFmpegRecorder::FFmpegRecorder() {
     av_log_set_level(AV_LOG_ERROR);
 }
 
-FFmpegRecorder::~FFmpegRecorder() {}
+FFmpegRecorder::~FFmpegRecorder() {
+    if (recordVideoThread.joinable()) {
+        recordVideoThread.join();
+    }
+    if (encodeThread.joinable()) {
+        encodeThread.join();
+    }
+}
 
 FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexcept {
     this->recordVideoThread = std::move(ffmpegRecorder.recordVideoThread);
@@ -33,67 +40,48 @@ FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexc
     return *this;
 }
 
-FFmpegRecorder::FFmpegRecorder(FFmpegRecorder &&ffmpegRecorder) {
-    this->recordVideoThread = std::move(ffmpegRecorder.recordVideoThread);
-    this->encodeThread = std::move(ffmpegRecorder.encodeThread);
-}
-
 // public functions
-void FFmpegRecorder::startRecord(RecordContent recordContent) {
-    std::thread thread(&FFmpegRecorder::record, this, recordContent);
-    testThread = std::move(thread);
-}
-
-void FFmpegRecorder::stopRecord() {
-    abortSignal = 1;
+void FFmpegRecorder::doRecord(RecordContent recordContent) {
+    if (isRunning) {
+        abortSignal = 1;
+    } else {
+        std::thread localRecordVideoThread(&FFmpegRecorder::record, this, recordContent);
+        recordVideoThread = std::move(localRecordVideoThread);
+    }
 }
 
 int FFmpegRecorder::record(RecordContent recordContent) {
-//    if (isRecording == 1) {
-//        abortSignal = 1;
-//    } else {
-//        abortSignal = -1;
-//        isAllocated = -1;
-//        isRecording = 1;
-//        int ret;
-//        ret = initializeInputDevice(recordContent);
-//        if (ret < 0) return ret;
-//        ret = initializeOutfile();
-//        if (ret < 0) return ret;
-//        ret = doRecord();
-//        if (ret < 0) return ret;
-//        ret = deallocate();
-//        if (ret < 0) return ret;
-//    }
+    int ret;
     abortSignal = -1;
     isAllocated = -1;
-    isRecording = 1;
-    int ret;
-    ret = initializeInputDevice(recordContent);
+    isRunning = 1;
+    registerRecordInfo(recordContent);
+    ret = initializeInputDevice();
     if (ret < 0) return ret;
-    ret = initializeOutfile();
+    ret = initializeOutputFile();
     if (ret < 0) return ret;
     ret = doRecord();
     if (ret < 0) return ret;
-    ret = deallocate();
-    if (ret < 0) return ret;
+    deallocate();
+
     return 0;
 }
 
 // private functions
-int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
+void FFmpegRecorder::registerRecordInfo(RecordContent recordContent) {
+    recordInfo.recordContent = recordContent;
+}
+
+int FFmpegRecorder::initializeInputDevice() {
     int ret;
     const char *deviceName;
 
-    // set custom value in RecordInfo
-    recordInfo.recordContent = recordContent;
-
-    if (recordContent == VIDEO) {
+    if (recordInfo.recordContent == VIDEO) {
         deviceName = VIDEO_DEVICE_NAME;
         av_dict_set(&options, "video_size", "640*480", 0);
         av_dict_set(&options, "framerate", "30", 0);
         av_dict_set(&options, "pixel_format", "nv12", 0);
-    } else if (recordContent == AUDIO) {
+    } else if (recordInfo.recordContent == AUDIO) {
         deviceName = AUDIO_DEVICE_NAME;
     }
 
@@ -106,7 +94,7 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     }
 
     // initialize && open codec relevant params
-    if (recordContent == VIDEO) {
+    if (recordInfo.recordContent == VIDEO) {
         inVStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &inVCodec, 0);
         inVCodecContext = avcodec_alloc_context3(inVCodec);
 
@@ -139,7 +127,7 @@ int FFmpegRecorder::initializeInputDevice(RecordContent recordContent) {
     return 0;
 }
 
-int FFmpegRecorder::initializeOutfile() {
+int FFmpegRecorder::initializeOutputFile() {
     int ret = 0;
     char fullFilename[100];
     strcat(fullFilename, recordInfo.outDiskPath);
@@ -274,9 +262,8 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame) {
 }
 
 int FFmpegRecorder::doRecord() {
-    int ret = 0, times = 0;
+    int ret = 0;
     int64_t inPacketOffset = 0;
-    AVPacket inPacket;
 
     SwsContext *swsContext = sws_getContext(
             inVCodecContext->width,
@@ -289,14 +276,12 @@ int FFmpegRecorder::doRecord() {
             nullptr, nullptr, nullptr
     );
 
+    AVPacket inPacket;
     AVFrame *frame = av_frame_alloc();
     AVFrame *yuvFrame = av_frame_alloc();
-    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height,
-                   AV_PIX_FMT_YUV420P, 32);
+    av_image_alloc(yuvFrame->data, yuvFrame->linesize, inVCodecContext->width, inVCodecContext->height,AV_PIX_FMT_YUV420P, 32);
 
-    while (abortSignal != 1) {
-        if (times >= 500) break;
-
+    while (abortSignal == -1) {
         ret = av_read_frame(inputFormatContext, &inPacket);
         if (ret == AVERROR(EAGAIN)) {
             continue;
@@ -320,7 +305,6 @@ int FFmpegRecorder::doRecord() {
             ret = encodeOutVideo(yuvFrame);
             if (ret < 0) return ret;
 
-            times++;
             av_packet_unref(&inPacket);
         } else if (inPacket.stream_index == inAStreamIndex) {
             // todo
@@ -343,7 +327,7 @@ int FFmpegRecorder::doRecord() {
     return ret;
 }
 
-int FFmpegRecorder::deallocate() {
+void FFmpegRecorder::deallocate() {
     if (isAllocated != 1) {
         avformat_close_input(&inputFormatContext);
         avformat_free_context(outputFormatContext);
@@ -352,5 +336,5 @@ int FFmpegRecorder::deallocate() {
         options = nullptr;
     }
     isAllocated = 1;
-    return 0;
+    isRunning = -1;
 }

@@ -72,12 +72,9 @@ void MultimediaPlayer::stop() {
 }
 
 void MultimediaPlayer::recordAudio() {
-    ffmpegRecorder.record(AUDIO);
+    ffmpegRecorder.doRecord(AUDIO);
 }
 
 void MultimediaPlayer::recordVideo() {
-//     ffmpegRecorder.record(VIDEO);
-
-    ffmpegRecorder.startRecord(VIDEO);
-    // todo click to stop when recording
+    ffmpegRecorder.doRecord(VIDEO);
 }

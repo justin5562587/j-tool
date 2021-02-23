@@ -76,5 +76,12 @@ void MultimediaPlayer::recordAudio() {
 }
 
 void MultimediaPlayer::recordVideo() {
+    if (isRecording == 1) {
+        recordControl->changeRecordVideoBtnStatus(false);
+        isRecording = -1;
+    } else {
+        recordControl->changeRecordVideoBtnStatus(true);
+        isRecording = 1;
+    }
     ffmpegRecorder.doRecord(VIDEO);
 }

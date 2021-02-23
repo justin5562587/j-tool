@@ -26,9 +26,6 @@ FFmpegRecorder::FFmpegRecorder() {
 }
 
 FFmpegRecorder::~FFmpegRecorder() {
-    if (recordVideoThread.joinable()) {
-        recordVideoThread.join();
-    }
 }
 
 FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexcept {
@@ -40,9 +37,11 @@ FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexc
 void FFmpegRecorder::doRecord(RecordContent recordContent) {
     if (isRunning == 1) {
         abortSignal = 1;
+        if (recordVideoThread.joinable()) {
+            recordVideoThread.join();
+        }
     } else {
         recordVideoThread = std::thread(&FFmpegRecorder::record, this, recordContent);
-        recordVideoThread.detach();
     }
 }
 
@@ -50,7 +49,6 @@ void FFmpegRecorder::doRecord(RecordContent recordContent) {
 int FFmpegRecorder::record(RecordContent recordContent) {
     int ret;
     abortSignal = -1;
-    isAllocated = -1;
     isRunning = 1;
     registerRecordInfo(recordContent);
     ret = initializeInputDevice();
@@ -327,16 +325,11 @@ int FFmpegRecorder::processRecord() {
 }
 
 void FFmpegRecorder::deallocate() {
-//    if (recordVideoThread.joinable()) {
-//        recordVideoThread.join();
-//    }
-    if (isAllocated != 1) {
-        avformat_close_input(&inputFormatContext);
-        avformat_free_context(outputFormatContext);
-        avcodec_close(inVCodecContext);
-        avcodec_close(outVCodecContext);
-        options = nullptr;
-    }
-    isAllocated = 1;
+    avformat_close_input(&inputFormatContext);
+    avformat_free_context(outputFormatContext);
+    avcodec_close(inVCodecContext);
+    avcodec_close(outVCodecContext);
+    options = nullptr;
+
     isRunning = -1;
 }

@@ -87,7 +87,6 @@ private:
 
     int abortSignal = -1;
     int isRunning = -1;
-    int isAllocated = -1;
 
     char errorMessage[100];
 

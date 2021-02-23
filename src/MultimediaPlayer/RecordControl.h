@@ -18,6 +18,10 @@ public:
 
     ~RecordControl();
 
+    void changeRecordVideoBtnStatus(bool isDoing);
+
+    void changeRecordAudioBtnStatus(bool isDoing);
+
 public slots:
 
     void recordAudio();

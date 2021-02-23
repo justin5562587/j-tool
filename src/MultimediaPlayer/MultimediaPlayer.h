@@ -53,7 +53,10 @@ private:
     QMediaPlaylist *playlist = nullptr;
 
     FFmpegDecoder ffmpegDecoder;
+    int isDecoding = -1;
+
     FFmpegRecorder ffmpegRecorder;
+    int isRecording = -1;
 };
 
 #endif //J_TOOL_MULTIMEDIAPLAYER_H

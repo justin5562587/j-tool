@@ -16,7 +16,6 @@ RecordControl::RecordControl(QWidget *parent) : QWidget(parent) {
 }
 
 RecordControl::~RecordControl() {
-
 }
 
 void RecordControl::recordAudio() {
@@ -25,4 +24,20 @@ void RecordControl::recordAudio() {
 
 void RecordControl::recordVideo() {
     emit emitRecordVideo();
+}
+
+void RecordControl::changeRecordVideoBtnStatus(bool isDoing) {
+    if (isDoing) {
+        recordVideoBtn->setText("Recording...");
+    } else {
+        recordVideoBtn->setText("Record Video");
+    }
+}
+
+void RecordControl::changeRecordAudioBtnStatus(bool isDoing) {
+    if (isDoing) {
+        recordAudioBtn->setText("Recording...");
+    } else {
+        recordAudioBtn->setText("Record Audio");
+    }
 }

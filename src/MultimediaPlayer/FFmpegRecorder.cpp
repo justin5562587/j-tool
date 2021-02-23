@@ -38,15 +38,15 @@ FFmpegRecorder& FFmpegRecorder::operator=(FFmpegRecorder &&ffmpegRecorder) noexc
 
 // public functions
 void FFmpegRecorder::doRecord(RecordContent recordContent) {
-
     if (isRunning == 1) {
         abortSignal = 1;
     } else {
-//        std::thread localRecordVideoThread(&FFmpegRecorder::record, this, recordContent);
-        recordVideoThread = std::move(std::thread(&FFmpegRecorder::record, this, recordContent));
+        recordVideoThread = std::thread(&FFmpegRecorder::record, this, recordContent);
+        recordVideoThread.detach();
     }
 }
 
+// record will be executed in recordVideoThread
 int FFmpegRecorder::record(RecordContent recordContent) {
     int ret;
     abortSignal = -1;
@@ -57,7 +57,7 @@ int FFmpegRecorder::record(RecordContent recordContent) {
     if (ret < 0) return ret;
     ret = initializeOutputFile();
     if (ret < 0) return ret;
-    ret = doRecord();
+    ret = processRecord();
     if (ret < 0) return ret;
     deallocate();
 
@@ -82,7 +82,7 @@ int FFmpegRecorder::initializeInputDevice() {
         deviceName = AUDIO_DEVICE_NAME;
     }
 
-    inputFormat = av_find_input_format(DEVICE_NAME);
+    AVInputFormat *inputFormat = av_find_input_format(DEVICE_NAME);
     inputFormatContext = avformat_alloc_context();
     ret = avformat_open_input(&inputFormatContext, deviceName, inputFormat, &options);
     if (ret < 0) {
@@ -92,6 +92,7 @@ int FFmpegRecorder::initializeInputDevice() {
 
     // initialize && open codec relevant params
     if (recordInfo.recordContent == VIDEO) {
+        AVCodec *inVCodec = nullptr;
         inVStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &inVCodec, 0);
         inVCodecContext = avcodec_alloc_context3(inVCodec);
 
@@ -106,6 +107,7 @@ int FFmpegRecorder::initializeInputDevice() {
             av_log(nullptr, AV_LOG_ERROR, "avcodec_open2: %s", errorMessage);
         }
     } else {
+        AVCodec *inACodec = nullptr;
         inAStreamIndex = av_find_best_stream(inputFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, &inACodec, 0);
         inACodecContext = avcodec_alloc_context3(inACodec);
         ret = avcodec_parameters_to_context(inACodecContext, inputFormatContext->streams[inAStreamIndex]->codecpar);
@@ -125,7 +127,7 @@ int FFmpegRecorder::initializeInputDevice() {
 }
 
 int FFmpegRecorder::initializeOutputFile() {
-    int ret = 0;
+    int ret;
     char fullFilename[100];
     strcat(fullFilename, recordInfo.outDiskPath);
     strcat(fullFilename, recordInfo.outFilename);
@@ -134,7 +136,7 @@ int FFmpegRecorder::initializeOutputFile() {
     outputFormatContext = avformat_alloc_context();
     avformat_alloc_output_context2(&outputFormatContext, nullptr, nullptr, fullFilename);
 
-    outVCodec = avcodec_find_encoder(outputFormatContext->oformat->video_codec);
+    AVCodec *outVCodec = avcodec_find_encoder(outputFormatContext->oformat->video_codec);
     outVStream = avformat_new_stream(outputFormatContext, outVCodec);
     outVCodecContext = avcodec_alloc_context3(outVCodec);
 
@@ -142,14 +144,14 @@ int FFmpegRecorder::initializeOutputFile() {
     outVStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outVStream->codecpar->width = inVCodecContext->width;
     outVStream->codecpar->height = inVCodecContext->height;
-    outVStream->codecpar->format = AV_PIX_FMT_YUV420P; // AV_PIX_FMT_YUV420P;
-    outVStream->codecpar->bit_rate = 2000 * 1000; // bitrate * 1000;
+    outVStream->codecpar->format = AV_PIX_FMT_YUV420P;
+    outVStream->codecpar->bit_rate = 2000 * 1000; // todo
     avcodec_parameters_to_context(outVCodecContext, outVStream->codecpar);
 
-    outVCodecContext->time_base = AVRational{1, 30};// inVCodecContext->time_base;
+    outVCodecContext->time_base = AVRational{1, recordInfo.fps};// inVCodecContext->time_base;
     outVCodecContext->max_b_frames = inVCodecContext->max_b_frames;
     outVCodecContext->gop_size = inVCodecContext->gop_size;
-    outVCodecContext->framerate = AVRational{30, 1};// inVCodecContext->framerate;
+    outVCodecContext->framerate = AVRational{recordInfo.fps, 1};// inVCodecContext->framerate;
 
     //must remove the following
     //outVCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
@@ -258,7 +260,7 @@ int FFmpegRecorder::encodeOutVideo(AVFrame *yuvFrame) {
     return ret == AVERROR_EOF ? 1 : 0;
 }
 
-int FFmpegRecorder::doRecord() {
+int FFmpegRecorder::processRecord() {
     int ret = 0;
     int64_t inPacketOffset = 0;
 
@@ -325,9 +327,9 @@ int FFmpegRecorder::doRecord() {
 }
 
 void FFmpegRecorder::deallocate() {
-    if (recordVideoThread.joinable()) {
-        recordVideoThread.join();
-    }
+//    if (recordVideoThread.joinable()) {
+//        recordVideoThread.join();
+//    }
     if (isAllocated != 1) {
         avformat_close_input(&inputFormatContext);
         avformat_free_context(outputFormatContext);

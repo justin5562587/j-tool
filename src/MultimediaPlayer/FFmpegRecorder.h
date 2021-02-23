@@ -30,6 +30,7 @@ enum RecordContent {
 };
 
 typedef struct RecordInfo {
+    int fps;
     RecordContent recordContent;
     AVPixelFormat outFormat;
     const char *outDiskPath;
@@ -65,7 +66,7 @@ private:
 
     int initializeOutputFile();
 
-    int doRecord();
+    int processRecord();
 
     void deallocate();
 
@@ -74,6 +75,7 @@ private:
     int encodeOutVideo(AVFrame *yuvFrame);
 
     RecordInfo recordInfo {
+        30,
         VIDEO,
         AV_PIX_FMT_YUV420P,
         "/Users/justin/Downloads/",
@@ -91,18 +93,14 @@ private:
 
     // fields for input
     AVDictionary *options = nullptr;
-    AVInputFormat *inputFormat;
     AVFormatContext *inputFormatContext;
     int inVStreamIndex = -1;
-    AVCodec *inVCodec;
     AVCodecContext *inVCodecContext;
     int inAStreamIndex = -1;
-    AVCodec *inACodec;
     AVCodecContext *inACodecContext;
 
     // fields for output
     AVFormatContext *outputFormatContext;
-    AVCodec *outVCodec;
     AVCodecContext *outVCodecContext;
     AVStream *outVStream;
 

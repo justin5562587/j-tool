@@ -4,7 +4,6 @@
 
 #include <QBoxLayout>
 #include <QVector>
-#include <SDL_mutex.h>
 
 #include "./MultimediaPlayer.h"
 

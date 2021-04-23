@@ -12,8 +12,6 @@
 #include <mutex>
 #include <iostream>
 
-#include <opencv2/core.hpp>
-
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavdevice/avdevice.h>
@@ -104,8 +102,6 @@ private:
     AVFormatContext *outputFormatContext;
     AVCodecContext *outVCodecContext;
     AVStream *outVStream;
-
-    cv::Mat test;
 
 };
 

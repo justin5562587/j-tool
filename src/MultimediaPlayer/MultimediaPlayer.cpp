@@ -10,6 +10,8 @@
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     qInfo() << "MultimediaPlayer thread ID: " << pthread_self();
 
+    cacheController = CacheController();
+    cacheController.loadCache();
     ffmpegDecoder = FFmpegDecoder();
     ffmpegRecorder = FFmpegRecorder();
 

@@ -17,6 +17,7 @@
 #include "./PlayControl.h"
 #include "./RecordControl.h"
 #include "./PlaylistModel.h"
+#include "./CacheController.h"
 
 class MultimediaPlayer : public QWidget {
 Q_OBJECT
@@ -57,6 +58,8 @@ private:
 
     FFmpegRecorder ffmpegRecorder;
     int isRecording = -1;
+
+    CacheController cacheController;
 };
 
 #endif //J_TOOL_MULTIMEDIAPLAYER_H

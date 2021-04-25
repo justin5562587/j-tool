@@ -70,6 +70,7 @@ void MultimediaPlayer::jump(const QModelIndex &index) {
 }
 
 void MultimediaPlayer::play(const QString &filename) {
+
     ffmpegDecoder.decodeMultimediaFile(filename.toStdString());
 }
 
@@ -79,7 +80,7 @@ void MultimediaPlayer::stop() {
 
 void MultimediaPlayer::recordAudio() {
 //    ffmpegRecorder.doRecord(AUDIO);
-    cacheController.writeCache("2012-12-09 04:11:39 av_information.mp4");
+//    cacheController.writeCache("2012-12-09 04:11:39 av_information.mp4");
 }
 
 void MultimediaPlayer::recordVideo() {

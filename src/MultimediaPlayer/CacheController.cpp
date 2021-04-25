@@ -27,18 +27,28 @@ void CacheController::loadCache() {
     }
 }
 
+void CacheController::readCache() {
+
+}
+
+
 void CacheController::writeCache(const std::string &input) {
     unsigned long length = input.length() + 1;
     char copyInputChar[length];
     strcpy(copyInputChar, input.c_str());
     strcat(copyInputChar, "\n");
-//    strcat
     cacheFile.write(copyInputChar, length);
     cacheFile.flush();
 }
 
-void CacheController::cleanCache() {
-
+void CacheController::cleanCache(operationFlag flag) {
+    if (cacheFile.is_open()) {
+        cacheFile.close();
+    }
+    cacheFile.open(filepath, std::ios::trunc);
+    if (flag & CLOSE) {
+        cacheFile.close();
+    }
 }
 
 void CacheController::backupCache() {

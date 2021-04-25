@@ -15,6 +15,11 @@ class CacheController {
 
 public:
 
+    typedef unsigned int operationFlag;
+    static const operationFlag FLUSH = 0x01;
+    static const operationFlag CLOSE = 0x02;
+    static const operationFlag OPEN = 0x04;
+
     explicit CacheController(const std::string &customFilePath);
 
     CacheController& operator=(CacheController&& cacheController) noexcept;
@@ -23,9 +28,11 @@ public:
 
     void loadCache();
 
+    void readCache();
+
     void writeCache(const std::string &input);
 
-    void cleanCache();
+    void cleanCache(operationFlag flag = CLOSE);
 
     void backupCache();
 

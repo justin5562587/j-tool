@@ -9,13 +9,36 @@ CacheController::CacheController(const std::string &customFilePath) {
 }
 
 CacheController::~CacheController() {
-
+    if (cacheFile.is_open()) {
+        cacheFile.close();
+    }
 }
 
 CacheController& CacheController::operator=(CacheController &&cacheController) noexcept {
     this->filepath = cacheController.filepath;
     this->cacheFile.open(this->filepath);
     return *this;
+}
+
+void CacheController::loadCache() {
+    cacheFile.open(filepath,std::ios::binary | std::ios::in | std::ios::out);
+    if (!cacheFile) {
+        std::cout << "cannot open cache file\n";
+    }
+}
+
+void CacheController::writeCache(const std::string &input) {
+    unsigned long length = input.length() + 1;
+    char copyInputChar[length];
+    strcpy(copyInputChar, input.c_str());
+    strcat(copyInputChar, "\n");
+//    strcat
+    cacheFile.write(copyInputChar, length);
+    cacheFile.flush();
+}
+
+void CacheController::cleanCache() {
+
 }
 
 void CacheController::backupCache() {
@@ -38,22 +61,3 @@ void CacheController::backupCache() {
 
     delete[] tmpBuffer;
 }
-
-void CacheController::loadCache() {
-    cacheFile.open(filepath,std::ios::binary | std::ios::in | std::ios::out);
-    if (!cacheFile) {
-        std::cout << "cannot open cache file\n";
-    }
-}
-
-void CacheController::writeCache(const std::string &input) {
-    char *copyInputChar = new char[input.length() + 1];
-    strcpy(copyInputChar, input.c_str());
-    strcat(copyInputChar, "\n");
-    cacheFile.write(copyInputChar, sizeof(copyInputChar));
-}
-
-void CacheController::cleanCache() {
-
-}
-

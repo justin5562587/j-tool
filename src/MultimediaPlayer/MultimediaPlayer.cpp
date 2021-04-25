@@ -7,11 +7,16 @@
 
 #include "./MultimediaPlayer.h"
 
-MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
+MultimediaPlayer::MultimediaPlayer(QWidget *parent) :
+        QWidget(parent),
+        cacheController("/Users/justin/cpp/j-tool/src/MultimediaPlayer/j_multimedia_player_cache.txt") {
+
     qInfo() << "MultimediaPlayer thread ID: " << pthread_self();
 
-    cacheController = CacheController("/Users/justin/cpp/j-tool/src/MultimediaPlayer/j_multimedia_player_cache.txt");
+    // initialize core components
     cacheController.loadCache();
+
+    // initialize ffmpeg components
     ffmpegDecoder = FFmpegDecoder();
     ffmpegRecorder = FFmpegRecorder();
 

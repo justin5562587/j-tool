@@ -59,7 +59,7 @@ private:
     FFmpegRecorder ffmpegRecorder;
     int isRecording = -1;
 
-    CacheController cacheController = nullptr;
+    CacheController cacheController;
 };
 
 #endif //J_TOOL_MULTIMEDIAPLAYER_H

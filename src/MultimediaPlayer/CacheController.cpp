@@ -4,42 +4,56 @@
 
 #include "CacheController.h"
 
-CacheController::CacheController() {
-
+CacheController::CacheController(const std::string &customFilePath) {
+    filepath = customFilePath;
 }
-
-//CacheController& CacheController::operator=(const CacheController& cacheController) noexcept {
-//    memcpy(this->cacheBuffer, cacheController.cacheBuffer, sizeof(cacheController.cacheBuffer));
-//    return *this;
-//}
 
 CacheController::~CacheController() {
-//    delete[] cacheBuffer;
+
 }
 
-//void CacheController::writeCache(char *input) {
-//    cacheBuffer
-//}
+CacheController& CacheController::operator=(CacheController &&cacheController) noexcept {
+    this->filepath = cacheController.filepath;
+    this->cacheFile.open(this->filepath);
+    return *this;
+}
+
+void CacheController::backupCache() {
+    cacheFile.seekg(0, cacheFile.end);
+    int length = cacheFile.tellg();
+    cacheFile.seekg(0, cacheFile.end);
+
+    char *tmpBuffer = new char[length];
+    cacheFile.read(tmpBuffer, length);
+    cacheFile.close();
+
+    typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> milliTime;
+    milliTime nowDate = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+
+    std::ofstream backupFile("backup.txt");
+    backupFile.write(tmpBuffer, length);
+    nowDate.time_since_epoch().count();
+    backupFile << " " << nowDate.time_since_epoch().count() << "\n";
+    backupFile.close();
+
+    delete[] tmpBuffer;
+}
 
 void CacheController::loadCache() {
-    std::fstream cacheFile("/Users/justin/cpp/j-tool/src/MultimediaPlayer/j_multimedia_player_cache.txt", std::ios::binary | std::ios::in | std::ios::out);
-    if (cacheFile) {
-        // get length
-        cacheFile.seekg(0, cacheFile.end);
-        int length = cacheFile.tellg();
-        cacheFile.seekg(0, cacheFile.beg);
-
-        // allocate mem
-        char *cacheBuffer = new char[length];
-
-        // read data && close file
-        cacheFile.read(cacheBuffer, length);
-        cacheFile.close();
-
-        std::fstream resultFile("j_multimedia_player_cache_result.txt");
-        resultFile.write(cacheBuffer, length);
-        resultFile.close();
-
-        delete[] cacheBuffer;
+    cacheFile.open(filepath,std::ios::binary | std::ios::in | std::ios::out);
+    if (!cacheFile) {
+        std::cout << "cannot open cache file\n";
     }
 }
+
+void CacheController::writeCache(const std::string &input) {
+    char *copyInputChar = new char[input.length() + 1];
+    strcpy(copyInputChar, input.c_str());
+    strcat(copyInputChar, "\n");
+    cacheFile.write(copyInputChar, sizeof(copyInputChar));
+}
+
+void CacheController::cleanCache() {
+
+}
+

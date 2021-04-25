@@ -9,30 +9,31 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <chrono>
 
 class CacheController {
 
 public:
 
-    explicit CacheController();
+    explicit CacheController(const std::string &customFilePath);
 
-//    CacheController(const CacheController& cacheController) = delete;
-
-//    CacheController& operator=(const CacheController& cacheController) noexcept;
+    CacheController& operator=(CacheController&& cacheController) noexcept;
 
     ~CacheController();
 
     void loadCache();
 
+    void writeCache(const std::string &input);
+
+    void cleanCache();
+
+    void backupCache();
+
 private:
 
-//    void writeCache(std::istream input);
-//
+    std::string filepath = "/Users/justin/cpp/j-tool/src/MultimediaPlayer/j_multimedia_player_cache.txt";
 
-//
-//    void cleanCache();
-
-//    char *cacheBuffer;
+    std::fstream cacheFile;
 };
 
 

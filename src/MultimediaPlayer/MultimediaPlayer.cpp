@@ -10,7 +10,7 @@
 MultimediaPlayer::MultimediaPlayer(QWidget *parent) : QWidget(parent) {
     qInfo() << "MultimediaPlayer thread ID: " << pthread_self();
 
-    cacheController = CacheController();
+    cacheController = CacheController("/Users/justin/cpp/j-tool/src/MultimediaPlayer/j_multimedia_player_cache.txt");
     cacheController.loadCache();
     ffmpegDecoder = FFmpegDecoder();
     ffmpegRecorder = FFmpegRecorder();
@@ -73,7 +73,8 @@ void MultimediaPlayer::stop() {
 }
 
 void MultimediaPlayer::recordAudio() {
-    ffmpegRecorder.doRecord(AUDIO);
+//    ffmpegRecorder.doRecord(AUDIO);
+    cacheController.writeCache("2012-12-09 04:11:39 av_information.mp4");
 }
 
 void MultimediaPlayer::recordVideo() {

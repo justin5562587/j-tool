@@ -19,6 +19,11 @@ public:
     static const operationFlag FLUSH = 0x01;
     static const operationFlag CLOSE = 0x02;
     static const operationFlag OPEN = 0x04;
+    static const operationFlag OPEN_FLUSH = FLUSH | OPEN;
+    static const operationFlag CLOSE_FLUSH = FLUSH | CLOSE;
+
+    typedef unsigned int ccErrno;
+    static const ccErrno INSUFFICIENT_CHAR_LENGTH = 0x01;
 
     explicit CacheController(const std::string &customFilePath);
 
@@ -28,7 +33,7 @@ public:
 
     void loadCache();
 
-    void readCache();
+    ccErrno readCache(char *gBuffer);
 
     void writeCache(const std::string &input);
 

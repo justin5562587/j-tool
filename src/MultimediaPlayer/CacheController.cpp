@@ -27,17 +27,24 @@ void CacheController::loadCache() {
     }
 }
 
-void CacheController::readCache() {
+CacheController::ccErrno CacheController::readCache(char *gBuffer) {
+    cacheFile.seekg(0, cacheFile.end);
+    const int length = cacheFile.tellg();
+    if (strlen(gBuffer) < length) {
+        return INSUFFICIENT_CHAR_LENGTH;
+    }
 
+    cacheFile.read(gBuffer, cacheFile.tellg());
+    cacheFile.seekg(0, cacheFile.beg);
+    return 0;
 }
-
 
 void CacheController::writeCache(const std::string &input) {
     unsigned long length = input.length() + 1;
-    char copyInputChar[length];
-    strcpy(copyInputChar, input.c_str());
-    strcat(copyInputChar, "\n");
-    cacheFile.write(copyInputChar, length);
+    char tmpInputChar[length];
+    strcpy(tmpInputChar, &input[0]);
+    strcat(tmpInputChar, "\n");
+    cacheFile.write(tmpInputChar, length);
     cacheFile.flush();
 }
 
@@ -54,9 +61,9 @@ void CacheController::cleanCache(operationFlag flag) {
 void CacheController::backupCache() {
     cacheFile.seekg(0, cacheFile.end);
     int length = cacheFile.tellg();
-    cacheFile.seekg(0, cacheFile.end);
+    cacheFile.seekg(0, cacheFile.beg);
 
-    char *tmpBuffer = new char[length];
+    char tmpBuffer[length];
     cacheFile.read(tmpBuffer, length);
     cacheFile.close();
 
@@ -68,6 +75,4 @@ void CacheController::backupCache() {
     nowDate.time_since_epoch().count();
     backupFile << " " << nowDate.time_since_epoch().count() << "\n";
     backupFile.close();
-
-    delete[] tmpBuffer;
 }
